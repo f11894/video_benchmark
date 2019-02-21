@@ -58,6 +58,7 @@ set vpxenc="%~dp0tools\vpxenc.exe"
 set "aom_dir=%~dp0tools\"
 set rav1e="%~dp0tools\rav1e-20190205-v0.1.0-2cec0f9.exe"
 set SVT-AV1="%~dp0tools\SvtAv1EncApp.exe"
+set SVT-VP9="%~dp0tools\SvtVp9EncApp.exe"
 
 set VTM="%~dp0tools\vvc-4.0-20671d8\EncoderApp.exe"
 
@@ -159,6 +160,10 @@ if not exist "%movie_dir%%~2" (
       %ffmpeg% -y -loglevel quiet -i "%~1" -an -nostdin -f rawvideo %EncodePixelFormat% -strict -2 - | %timer64% %SVT-AV1% -i stdin %CommandLine% -n %FrameCount% -w %Width% -h %Height% -fps-num %frame_rate_num% -fps-denom %frame_rate_denom% -b "%movie_dir%%~n2.ivf" 2>&1 | %safetee% -o "%log_dir%%~n2_log%pass_temp%.txt"
       %mp4box% -fps %frame_rate% -add "%movie_dir%%~n2.ivf" -new "%movie_dir%%~2" 2>&1 | %safetee% -a "%log_dir%%~n2_log%pass_temp%.txt"
       chcp 932 >nul 2>&1
+   )
+   if "%codec%"=="SVT-VP9" (
+      %ffmpeg% -y -loglevel quiet -i "%~1" -an -nostdin -f rawvideo %EncodePixelFormat% -strict -2 - | %timer64% %SVT-VP9% -i stdin %CommandLine% -n %FrameCount% -w %Width% -h %Height% -fps-num %frame_rate_num% -fps-denom %frame_rate_denom% -b "%movie_dir%%~n2.ivf" 2>&1 | %safetee% -o "%log_dir%%~n2_log%pass_temp%.txt"
+      %ffmpeg% -y -r %frame_rate% -i "%movie_dir%%~n2.ivf" "%movie_dir%%~2" 2>&1 | %safetee% -a "%log_dir%%~n2_log%pass_temp%.txt"
    )
    if "%codec%"=="libvpx" (
       if not exist "%movie_dir%%~n1_temp%EncodeBitDepth%.y4m" echo 入力に使用する中間ファイルを作成しています&&%ffmpeg% -y -loglevel quiet -i "%~1" -an %EncodePixelFormat% -strict -2 "%movie_dir%%~n1_temp%EncodeBitDepth%.y4m"
