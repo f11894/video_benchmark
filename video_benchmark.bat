@@ -222,7 +222,7 @@ if "%SSIM_check%"=="1" (
    echo.
 )
 :ssim2
-find "Parsed_ssim" "%~n2_ssim(%CompareBitDepth%)_log%pass_orig%.txt">nul
+find "Parsed_ssim" "%~n2_ssim(%CompareBitDepth%)_log%pass_orig%.txt">nul 2>&1
 if not "%ERRORLEVEL%"=="0" if not "%enc_error%"=="1" (
    echo SSIM‚ÆPSNR‚ÌŽZo‚ÉŽ¸”s‚µ‚Ü‚µ‚½
    echo %date% %time%>>%error_log%
@@ -274,22 +274,25 @@ popd
 :VMAF_skip
 
 pushd "%log_dir%"
-FOR /f "DELIMS=" %%i IN ('find "Parsed_ssim" "%~n2_ssim(%CompareBitDepth%)_log%pass_orig%.txt"') DO SET Parsed_ssim=%%i  
-for /f "tokens=5" %%i in ("%Parsed_ssim%") do set SSIM_Y=%%i
-for /f "tokens=11" %%i in ("%Parsed_ssim%") do set SSIM_All=%%i
-FOR /f "DELIMS=" %%i IN ('find "Parsed_psnr" "%~n2_ssim(%CompareBitDepth%)_log%pass_orig%.txt"') DO SET Parsed_psnr=%%i
-for /f "tokens=5" %%i in ("%Parsed_psnr%") do set PSNR_Y=%%i
-for /f "tokens=8" %%i in ("%Parsed_psnr%") do set PSNR_Average=%%i
-if "%EnableVMAF%"=="1" if not "%Compare_error%"=="1" FOR /f "tokens=6" %%i IN ('find "VMAF score" "%~n2_vmaf(%CompareBitDepth%)_log%pass_orig%.txt"') DO SET VMAF=%%i
-
-set SSIM_Y=%SSIM_Y:~2%
-set SSIM_All=%SSIM_All:~4%
-set PSNR_Y=%PSNR_Y:~2%
-set PSNR_Average=%PSNR_Average:~8%
-
-if not "%enc_error%"=="1" set /a echo_bitrare=%Filesize%/%Duration2%*8
-FOR /f "DELIMS=" %%i IN ('PowerShell %Filesize%*8/%Duration2%') DO SET "bitrate=%%i"
-
+if not "%enc_error%"=="1" if not "%Compare_error%"=="1" (
+   for /f "DELIMS=" %%i IN ('find "Parsed_ssim" "%~n2_ssim(%CompareBitDepth%)_log%pass_orig%.txt"') DO SET "Parsed_ssim=%%i"
+   for /f "DELIMS=" %%i IN ('find "Parsed_psnr" "%~n2_ssim(%CompareBitDepth%)_log%pass_orig%.txt"') DO SET "Parsed_psnr=%%i"
+)
+if not "%enc_error%"=="1" if not "%Compare_error%"=="1" (
+   for /f "tokens=5" %%i in ("%Parsed_ssim%") do set "SSIM_Y=%%i"
+   for /f "tokens=11" %%i in ("%Parsed_ssim%") do set "SSIM_All=%%i"
+   for /f "tokens=5" %%i in ("%Parsed_psnr%") do set "PSNR_Y=%%i"
+   for /f "tokens=8" %%i in ("%Parsed_psnr%") do set "PSNR_Average=%%i"
+   if "%EnableVMAF%"=="1" FOR /f "tokens=6" %%i IN ('find "VMAF score" "%~n2_vmaf(%CompareBitDepth%)_log%pass_orig%.txt"') DO SET "VMAF=%%i"
+)
+if not "%enc_error%"=="1" if not "%Compare_error%"=="1" (
+   set "SSIM_Y=%SSIM_Y:~2%"
+   set "SSIM_All=%SSIM_All:~4%"
+   set "PSNR_Y=%PSNR_Y:~2%"
+   set "PSNR_Average=%PSNR_Average:~8%"
+   set /a "echo_bitrare=%Filesize%/%Duration2%*8"
+   for /f "DELIMS=" %%i IN ('PowerShell %Filesize%*8/%Duration2%') DO SET "bitrate=%%i"
+)
 if not "%enc_error%"=="1" if not "%Compare_error%"=="1" (
    echo %bitrate%,%PSNR_Y%>>"%~n1_%csv_name%_PSNR_Y(%CompareBitDepth%).csv"
    echo %bitrate%,%PSNR_Average%>>"%~n1_%csv_name%_PSNR_Average(%CompareBitDepth%).csv"
