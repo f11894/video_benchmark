@@ -25,7 +25,10 @@ for metric in metric_array:
    if csvFileExist:
        plt.title(input)
        plt.xlabel("bitrate(kbps)")
-       plt.ylabel(metric)
+       if metric == 'PSNR_Y' or metric == 'PSNR_Average':
+          plt.ylabel(metric + ' (dB)')
+       else:
+          plt.ylabel(metric)
        plt.grid(True,linestyle='dashed')
        plt.legend(loc='lower right')
        plt.savefig(input + '_' +  metric + '(' + BitDepth + ')_Graph.png')
