@@ -59,6 +59,7 @@ set "aom_dir=%~dp0tools\"
 set rav1e="%~dp0tools\rav1e-20190205-v0.1.0-2cec0f9.exe"
 set SVT-AV1="%~dp0tools\SvtAv1EncApp.exe"
 set SVT-VP9="%~dp0tools\SvtVp9EncApp.exe"
+set SVT-HEVC="%~dp0tools\SvtHevcEncApp.exe"
 
 set VTM="%~dp0tools\vvc-4.0-20671d8\EncoderApp.exe"
 
@@ -159,6 +160,11 @@ if not exist "%movie_dir%%~2" (
    if "%codec%"=="SVT-AV1" (
       %ffmpeg% -y -loglevel quiet -i "%~1" -an -nostdin -f rawvideo %EncodePixelFormat% -strict -2 - | %timer64% %SVT-AV1% -i stdin %CommandLine% -n %FrameCount% -w %Width% -h %Height% -fps-num %frame_rate_num% -fps-denom %frame_rate_denom% -b "%movie_dir%%~n2.ivf" 2>&1 | %safetee% -o "%log_dir%%~n2_log%pass_temp%.txt"
       %mp4box% -fps %frame_rate% -add "%movie_dir%%~n2.ivf" -new "%movie_dir%%~2" 2>&1 | %safetee% -a "%log_dir%%~n2_log%pass_temp%.txt"
+      chcp 932 >nul 2>&1
+   )
+   if "%codec%"=="SVT-HEVC" (
+      %ffmpeg% -y -loglevel quiet -i "%~1" -an -nostdin -f rawvideo %EncodePixelFormat% -strict -2 - | %timer64% %SVT-HEVC% -i stdin %CommandLine% -n %FrameCount% -w %Width% -h %Height% -fps-num %frame_rate_num% -fps-denom %frame_rate_denom% -b "%movie_dir%%~n2.hevc" 2>&1 | %safetee% -o "%log_dir%%~n2_log%pass_temp%.txt"
+      %mp4box% -fps %frame_rate% -add "%movie_dir%%~n2.hevc" -new "%movie_dir%%~2" 2>&1 | %safetee% -a "%log_dir%%~n2_log%pass_temp%.txt"
       chcp 932 >nul 2>&1
    )
    if "%codec%"=="SVT-VP9" (
