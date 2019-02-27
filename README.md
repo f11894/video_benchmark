@@ -3,6 +3,7 @@
 
 PSNR、SSIM、VMAFのスコアを算出してcsvに出力することが出来ます  
 エンコード速度の計測や自動マルチパスエンコード機能もあります  
+またPythonをインストールしてあると出力したcsvからグラフを作ることも出来ます   
 
 ### 使い方  
 
@@ -27,6 +28,8 @@ FFmpeg
 libvpx  
 libaom  
 rav1e  
+SVT-HEVC   
+SVT-VP9   
 SVT-AV1  
 VTM  
 
