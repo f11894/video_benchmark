@@ -56,7 +56,7 @@ set NVEncC="%~dp0tools\VCEEncC\x64\NVEncC64.exe"
 
 set vpxenc="%~dp0tools\vpxenc.exe"
 set "aom_dir=%~dp0tools\"
-set rav1e="%~dp0tools\rav1e-20190205-v0.1.0-2cec0f9.exe"
+set rav1e="%~dp0tools\rav1e-20190223-v0.1.0-03378c3.exe"
 set SVT-AV1="%~dp0tools\SvtAv1EncApp.exe"
 set SVT-VP9="%~dp0tools\SvtVp9EncApp.exe"
 set SVT-HEVC="%~dp0tools\SvtHevcEncApp.exe"
@@ -151,25 +151,27 @@ if not exist "%movie_dir%%~2" (
       %timer64% "%aom_dir%aomenc.exe" %CommandLine% -o "%movie_dir%%~n2.ivf" "%movie_dir%%~n1_temp%EncodeBitDepth%.y4m" 2>&1 | %safetee% -a "%log_dir%%~n2_log%pass_temp%.txt"
       %mp4box% -fps %frame_rate% -add "%movie_dir%%~n2.ivf" -new "%movie_dir%%~2" 2>&1 | %safetee% -a "%log_dir%%~n2_log%pass_temp%.txt"
       chcp 932 >nul 2>&1
+      del "%movie_dir%%~n2.ivf"
    )
    if "%codec%"=="rav1e" (
       %ffmpeg% -y -loglevel quiet -i "%~1" -an %EncodePixelFormat% -strict -2 -f yuv4mpegpipe - | %timer64% %rav1e% %CommandLine% - -o "%movie_dir%%~n2.ivf" 2>&1 | %safetee% -o "%log_dir%%~n2_log%pass_temp%.txt"
-      %mp4box% -fps %frame_rate% -add "%movie_dir%%~n2.ivf" -new "%movie_dir%%~2" 2>&1 | %safetee% -a "%log_dir%%~n2_log%pass_temp%.txt"
-      chcp 932 >nul 2>&1
    )
    if "%codec%"=="SVT-AV1" (
       %ffmpeg% -y -loglevel quiet -i "%~1" -an -nostdin -f rawvideo %EncodePixelFormat% -strict -2 - | %timer64% %SVT-AV1% -i stdin %CommandLine% -n %FrameCount% -w %Width% -h %Height% -fps-num %frame_rate_num% -fps-denom %frame_rate_denom% -b "%movie_dir%%~n2.ivf" 2>&1 | %safetee% -o "%log_dir%%~n2_log%pass_temp%.txt"
       %mp4box% -fps %frame_rate% -add "%movie_dir%%~n2.ivf" -new "%movie_dir%%~2" 2>&1 | %safetee% -a "%log_dir%%~n2_log%pass_temp%.txt"
       chcp 932 >nul 2>&1
+      del "%movie_dir%%~n2.ivf"
    )
    if "%codec%"=="SVT-HEVC" (
       %ffmpeg% -y -loglevel quiet -i "%~1" -an -nostdin -f rawvideo %EncodePixelFormat% -strict -2 - | %timer64% %SVT-HEVC% -i stdin %CommandLine% -n %FrameCount% -w %Width% -h %Height% -fps-num %frame_rate_num% -fps-denom %frame_rate_denom% -b "%movie_dir%%~n2.hevc" 2>&1 | %safetee% -o "%log_dir%%~n2_log%pass_temp%.txt"
       %mp4box% -fps %frame_rate% -add "%movie_dir%%~n2.hevc" -new "%movie_dir%%~2" 2>&1 | %safetee% -a "%log_dir%%~n2_log%pass_temp%.txt"
       chcp 932 >nul 2>&1
+      del "%movie_dir%%~n2.hevc"
    )
    if "%codec%"=="SVT-VP9" (
       %ffmpeg% -y -loglevel quiet -i "%~1" -an -nostdin -f rawvideo %EncodePixelFormat% -strict -2 - | %timer64% %SVT-VP9% -i stdin %CommandLine% -n %FrameCount% -w %Width% -h %Height% -fps-num %frame_rate_num% -fps-denom %frame_rate_denom% -b "%movie_dir%%~n2.ivf" 2>&1 | %safetee% -o "%log_dir%%~n2_log%pass_temp%.txt"
       %ffmpeg% -y -r %frame_rate% -i "%movie_dir%%~n2.ivf" "%movie_dir%%~2" 2>&1 | %safetee% -a "%log_dir%%~n2_log%pass_temp%.txt"
+      del "%movie_dir%%~n2.ivf"
    )
    if "%codec%"=="libvpx" (
       if not exist "%movie_dir%%~n1_temp%EncodeBitDepth%.y4m" echo 入力に使用する中間ファイルを作成しています&&%ffmpeg% -y -loglevel quiet -i "%~1" -an %EncodePixelFormat% -strict -2 "%movie_dir%%~n1_temp%EncodeBitDepth%.y4m"
@@ -181,19 +183,17 @@ if not exist "%movie_dir%%~2" (
        %timer64% %VTM%  %CommandLine% -fr %frame_rate% -wdt %Width% -hgt %Height% -f %FrameCount% -i "%movie_dir%%~n1_temp%EncodeBitDepth%.yuv" -o "%movie_dir%%~n2.yuv" -b "%movie_dir%%~2" 2>&1 | %safetee% -o "%log_dir%%~n2_log%pass_temp%.txt"
        %ffmpeg% -y -f rawvideo -s %video_size% -r %frame_rate% %EncodePixelFormat% -strict -2 -i "%movie_dir%%~n2.yuv" "%movie_dir%%~n2.y4m" >>"%log_dir%%~n2_log%pass_temp%.txt" 2>&1 &&del "%movie_dir%%~n2.yuv"
    )
-
 ) else (set enc_skip=1)
 
 rem エンコード後の処理
 echo.
 rem エラーチェック&マルチパスの途中のファイルは削除する
-if not "%enc_skip%"=="1" if "%codec%"=="x265" (
-   call :error_check "%~1" "%movie_dir%%~n2.h265"
-   if "%multipass%"=="1" if not "%enc_skip%"=="1" if not "%pass_temp%"=="%pass_orig%" if exist "%movie_dir%%~n2.h265" del "%movie_dir%%~n2.h265"
-) else (
-   call :error_check "%~1" "%movie_dir%%~2"
-   if "%multipass%"=="1" if not "%enc_skip%"=="1" if not "%pass_temp%"=="%pass_orig%" if exist "%movie_dir%%~2" del "%movie_dir%%~2"
-)
+set ErrorCheckFile="%movie_dir%%~2"
+if "%codec%"=="x265" set ErrorCheckFile="%movie_dir%%~n2.h265"
+if "%codec%"=="rav1e" set ErrorCheckFile="%movie_dir%%~n2.ivf"
+
+call :error_check "%~1" %ErrorCheckFile%
+if "%multipass%"=="1" if not "%enc_skip%"=="1" if not "%pass_temp%"=="%pass_orig%" if exist %ErrorCheckFile% del %ErrorCheckFile%
 
 rem 処理時間をログファイルから拾う
 if not "%enc_error%"=="1" findstr "^[0-9][0-9]*$" "%log_dir%%~n2_log%pass_temp%.txt">nul||set enc_error=1
@@ -212,9 +212,11 @@ if "%multipass%"=="1" (
    if exist x264_2pass.log.mbtree del x264_2pass.log.mbtree
    if exist x265_2pass.log del x265_2pass.log
    if exist x265_2pass.log.cutree del x265_2pass.log.cutree
+   if exist rav1e_stats.json del rav1e_stats.json
 )
 rem h.265をmp4に格納
 if exist "%movie_dir%%~n2.h265" %mp4box% -fps %frame_rate% -add "%movie_dir%%~n2.h265" -new "%movie_dir%%~2" 2>&1 | %safetee% -a "%log_dir%%~n2_log%pass_temp%.txt" &&echo.&&del "%movie_dir%%~n2.h265"
+if exist "%movie_dir%%~n2.ivf" %mp4box% -fps %frame_rate% -add "%movie_dir%%~n2.ivf" -new "%movie_dir%%~2" 2>&1 | %safetee% -a "%log_dir%%~n2_log%pass_temp%.txt" &&echo.&&del "%movie_dir%%~n2.ivf"
 chcp 932 >nul 2>&1
 
 rem SSIMを算出する
