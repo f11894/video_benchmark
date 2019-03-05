@@ -192,7 +192,7 @@ set ErrorCheckFile="%movie_dir%%~2"
 if "%codec%"=="x265" set ErrorCheckFile="%movie_dir%%~n2.h265"
 if "%codec%"=="rav1e" set ErrorCheckFile="%movie_dir%%~n2.ivf"
 
-call :error_check "%~1" %ErrorCheckFile%
+if not "%enc_skip%"=="1" call :error_check "%~1" %ErrorCheckFile%
 if "%multipass%"=="1" if not "%enc_skip%"=="1" if not "%pass_temp%"=="%pass_orig%" if exist %ErrorCheckFile% del %ErrorCheckFile%
 
 rem 処理時間をログファイルから拾う
