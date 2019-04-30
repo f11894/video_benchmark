@@ -47,8 +47,8 @@ set timer64="%~dp0tools\timer64.exe"
 set safetee="%~dp0tools\safetee.exe"
 set awk="%~dp0tools\awk.exe"
 
-set x264="%~dp0tools\x264_2935_x64.exe"
-set x265="%~dp0tools\x265_3.0+1_x64.exe"
+set x264="%~dp0tools\x264_2969_x64.exe"
+set x265="%~dp0tools\x265_3.0_Au+21_x64.exe"
 
 set QSVEncC="%~dp0tools\QSVEncC\x64\QSVEncC64.exe"
 set VCEEncC="%~dp0tools\VCEEncC\x64\VCEEncC64.exe"
