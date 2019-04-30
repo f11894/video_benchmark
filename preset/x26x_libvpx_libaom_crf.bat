@@ -1,6 +1,7 @@
 @echo off
 cd "%~dp0"
 for %%i in ("..\video_benchmark.bat") do set benchmark_bat="%%~dpnxi"
+for /L %%i in (160,-20,60) do call %benchmark_bat% "%~1" "%~n1_rav1e_20190427_s2_tunepsnr_low_latency_false_q%%i.mp4" "--quantizer %%i --speed 2 --tune psnr --keyint 250 --threads 8 --tile-cols-log2 2 --tile-rows-log2 2" rav1e 20190427_s2_tunepsnr_low_latency_false
 
 for /L %%i in (32,-2,18) do call %benchmark_bat% "%~1" "%~n1_x264_placebo_tunessim_crf%%i.mp4" "--preset placebo --tune ssim --crf %%i" x264 placebo_tunessim_crf
 for /L %%i in (32,-2,18) do call %benchmark_bat% "%~1" "%~n1_x265_placebo_tunessim_crf%%i.mp4" "--preset placebo --tune ssim --crf %%i" x265 placebo_tunessim_crf

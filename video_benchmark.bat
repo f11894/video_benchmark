@@ -56,7 +56,7 @@ set NVEncC="%~dp0tools\VCEEncC\x64\NVEncC64.exe"
 
 set vpxenc="%~dp0tools\vpxenc.exe"
 set "aom_dir=%~dp0tools\"
-set rav1e="%~dp0tools\rav1e-20190223-v0.1.0-03378c3.exe"
+set rav1e="%~dp0tools\rav1e-20190427-v0.1.0-5eb7b87.exe"
 set SVT-AV1="%~dp0tools\SvtAv1EncApp.exe"
 set SVT-VP9="%~dp0tools\SvtVp9EncApp.exe"
 set SVT-HEVC="%~dp0tools\SvtHevcEncApp.exe"
@@ -154,7 +154,7 @@ if not exist "%movie_dir%%~2" (
       del "%movie_dir%%~n2.ivf"
    )
    if "%codec%"=="rav1e" (
-      %ffmpeg% -y -loglevel quiet -i "%~1" -an %EncodePixelFormat% -strict -2 -f yuv4mpegpipe - | %timer64% %rav1e% %CommandLine% - -o "%movie_dir%%~n2.ivf" 2>&1 | %safetee% -o "%log_dir%%~n2_log%pass_temp%.txt"
+      %ffmpeg% -y -loglevel quiet -i "%~1" -an %EncodePixelFormat% -strict -2 -f yuv4mpegpipe - | %timer64% %rav1e% - %CommandLine% -o "%movie_dir%%~n2.ivf" 2>&1 | %safetee% -o "%log_dir%%~n2_log%pass_temp%.txt"
    )
    if "%codec%"=="SVT-AV1" (
       %ffmpeg% -y -loglevel quiet -i "%~1" -an -nostdin -f rawvideo %EncodePixelFormat% -strict -2 - | %timer64% %SVT-AV1% -i stdin %CommandLine% -n %FrameCount% -w %Width% -h %Height% -fps-num %frame_rate_num% -fps-denom %frame_rate_denom% -b "%movie_dir%%~n2.ivf" 2>&1 | %safetee% -o "%log_dir%%~n2_log%pass_temp%.txt"
