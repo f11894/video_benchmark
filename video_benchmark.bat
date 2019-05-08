@@ -61,7 +61,7 @@ set SVT-AV1="%~dp0tools\SvtAv1EncApp.exe"
 set SVT-VP9="%~dp0tools\SvtVp9EncApp.exe"
 set SVT-HEVC="%~dp0tools\SvtHevcEncApp.exe"
 
-set VTM="%~dp0tools\vvc-4.2\EncoderApp.exe"
+set VTM="%~dp0tools\vtm\EncoderApp.exe"
 
 set mp4box="%~dp0tools\mp4box.exe"
 rem --------------------------------------------------------------------------------------------------------
