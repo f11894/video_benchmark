@@ -149,30 +149,11 @@ if not exist "%movie_dir%%~2" (
       if not exist "%movie_dir%%~n1_temp%EncodeBitDepth%.y4m" echo 入力に使用する中間ファイルを作成しています&&%ffmpeg% -y -loglevel quiet -i "%~1" -an %EncodePixelFormat% -strict -2 "%movie_dir%%~n1_temp%EncodeBitDepth%.y4m"
       "%aom_dir%aomenc.exe" --help | find "AOMedia Project AV1 Encoder">"%log_dir%%~n2_log%pass_temp%.txt" 2>&1 
       %timer64% "%aom_dir%aomenc.exe" %CommandLine% -o "%movie_dir%%~n2.ivf" "%movie_dir%%~n1_temp%EncodeBitDepth%.y4m" 2>&1 | %safetee% -a "%log_dir%%~n2_log%pass_temp%.txt"
-      %mp4box% -fps %frame_rate% -add "%movie_dir%%~n2.ivf" -new "%movie_dir%%~2" 2>&1 | %safetee% -a "%log_dir%%~n2_log%pass_temp%.txt"
-      chcp 932 >nul 2>&1
-      del "%movie_dir%%~n2.ivf"
    )
-   if "%codec%"=="rav1e" (
-      %ffmpeg% -y -loglevel quiet -i "%~1" -an %EncodePixelFormat% -strict -2 -f yuv4mpegpipe - | %timer64% %rav1e% - %CommandLine% -o "%movie_dir%%~n2.ivf" 2>&1 | %safetee% -o "%log_dir%%~n2_log%pass_temp%.txt"
-   )
-   if "%codec%"=="SVT-AV1" (
-      %ffmpeg% -y -loglevel quiet -i "%~1" -an -nostdin -f rawvideo %EncodePixelFormat% -strict -2 - | %timer64% %SVT-AV1% -i stdin %CommandLine% -n %FrameCount% -w %Width% -h %Height% -fps-num %frame_rate_num% -fps-denom %frame_rate_denom% -b "%movie_dir%%~n2.ivf" 2>&1 | %safetee% -o "%log_dir%%~n2_log%pass_temp%.txt"
-      %mp4box% -fps %frame_rate% -add "%movie_dir%%~n2.ivf" -new "%movie_dir%%~2" 2>&1 | %safetee% -a "%log_dir%%~n2_log%pass_temp%.txt"
-      chcp 932 >nul 2>&1
-      del "%movie_dir%%~n2.ivf"
-   )
-   if "%codec%"=="SVT-HEVC" (
-      %ffmpeg% -y -loglevel quiet -i "%~1" -an -nostdin -f rawvideo %EncodePixelFormat% -strict -2 - | %timer64% %SVT-HEVC% -i stdin %CommandLine% -n %FrameCount% -w %Width% -h %Height% -fps-num %frame_rate_num% -fps-denom %frame_rate_denom% -b "%movie_dir%%~n2.hevc" 2>&1 | %safetee% -o "%log_dir%%~n2_log%pass_temp%.txt"
-      %mp4box% -fps %frame_rate% -add "%movie_dir%%~n2.hevc" -new "%movie_dir%%~2" 2>&1 | %safetee% -a "%log_dir%%~n2_log%pass_temp%.txt"
-      chcp 932 >nul 2>&1
-      del "%movie_dir%%~n2.hevc"
-   )
-   if "%codec%"=="SVT-VP9" (
-      %ffmpeg% -y -loglevel quiet -i "%~1" -an -nostdin -f rawvideo %EncodePixelFormat% -strict -2 - | %timer64% %SVT-VP9% -i stdin %CommandLine% -n %FrameCount% -w %Width% -h %Height% -fps-num %frame_rate_num% -fps-denom %frame_rate_denom% -b "%movie_dir%%~n2.ivf" 2>&1 | %safetee% -o "%log_dir%%~n2_log%pass_temp%.txt"
-      %ffmpeg% -y -r %frame_rate% -i "%movie_dir%%~n2.ivf" "%movie_dir%%~2" 2>&1 | %safetee% -a "%log_dir%%~n2_log%pass_temp%.txt"
-      del "%movie_dir%%~n2.ivf"
-   )
+   if "%codec%"=="rav1e" %ffmpeg% -y -loglevel quiet -i "%~1" -an %EncodePixelFormat% -strict -2 -f yuv4mpegpipe - | %timer64% %rav1e% - %CommandLine% -o "%movie_dir%%~n2.ivf" 2>&1 | %safetee% -o "%log_dir%%~n2_log%pass_temp%.txt"
+   if "%codec%"=="SVT-AV1" %ffmpeg% -y -loglevel quiet -i "%~1" -an -nostdin -f rawvideo %EncodePixelFormat% -strict -2 - | %timer64% %SVT-AV1% -i stdin %CommandLine% -n %FrameCount% -w %Width% -h %Height% -fps-num %frame_rate_num% -fps-denom %frame_rate_denom% -b "%movie_dir%%~n2.ivf" 2>&1 | %safetee% -o "%log_dir%%~n2_log%pass_temp%.txt"
+   if "%codec%"=="SVT-HEVC" %ffmpeg% -y -loglevel quiet -i "%~1" -an -nostdin -f rawvideo %EncodePixelFormat% -strict -2 - | %timer64% %SVT-HEVC% -i stdin %CommandLine% -n %FrameCount% -w %Width% -h %Height% -fps-num %frame_rate_num% -fps-denom %frame_rate_denom% -b "%movie_dir%%~n2.h265" 2>&1 | %safetee% -o "%log_dir%%~n2_log%pass_temp%.txt"
+   if "%codec%"=="SVT-VP9" %ffmpeg% -y -loglevel quiet -i "%~1" -an -nostdin -f rawvideo %EncodePixelFormat% -strict -2 - | %timer64% %SVT-VP9% -i stdin %CommandLine% -n %FrameCount% -w %Width% -h %Height% -fps-num %frame_rate_num% -fps-denom %frame_rate_denom% -b "%movie_dir%%~n2.ivf" 2>&1 | %safetee% -o "%log_dir%%~n2_log%pass_temp%.txt"
    if "%codec%"=="libvpx" (
       if not exist "%movie_dir%%~n1_temp%EncodeBitDepth%.y4m" echo 入力に使用する中間ファイルを作成しています&&%ffmpeg% -y -loglevel quiet -i "%~1" -an %EncodePixelFormat% -strict -2 "%movie_dir%%~n1_temp%EncodeBitDepth%.y4m"
       %vpxenc% --help | find "WebM Project">"%log_dir%%~n2_log%pass_temp%.txt" 2>&1 
@@ -190,7 +171,11 @@ echo.
 rem エラーチェック&マルチパスの途中のファイルは削除する
 set ErrorCheckFile="%movie_dir%%~2"
 if "%codec%"=="x265" set ErrorCheckFile="%movie_dir%%~n2.h265"
+if "%codec%"=="SVT-HEVC" set ErrorCheckFile="%movie_dir%%~n2.h265"
 if "%codec%"=="rav1e" set ErrorCheckFile="%movie_dir%%~n2.ivf"
+if "%codec%"=="libaom" set ErrorCheckFile="%movie_dir%%~n2.ivf"
+if "%codec%"=="SVT-AV1" set ErrorCheckFile="%movie_dir%%~n2.ivf"
+if "%codec%"=="SVT-VP9" set ErrorCheckFile="%movie_dir%%~n2.ivf"
 
 if not "%enc_skip%"=="1" call :error_check "%~1" %ErrorCheckFile%
 if "%multipass%"=="1" if not "%enc_skip%"=="1" if not "%pass_temp%"=="%pass_orig%" if exist %ErrorCheckFile% del %ErrorCheckFile%
@@ -214,9 +199,17 @@ if "%multipass%"=="1" (
    if exist x265_2pass.log.cutree del x265_2pass.log.cutree
    if exist rav1e_stats.json del rav1e_stats.json
 )
-rem h.265をmp4に格納
-if exist "%movie_dir%%~n2.h265" %mp4box% -fps %frame_rate% -add "%movie_dir%%~n2.h265" -new "%movie_dir%%~2" 2>&1 | %safetee% -a "%log_dir%%~n2_log%pass_temp%.txt" &&echo.&&del "%movie_dir%%~n2.h265"
-if exist "%movie_dir%%~n2.ivf" %mp4box% -fps %frame_rate% -add "%movie_dir%%~n2.ivf" -new "%movie_dir%%~2" 2>&1 | %safetee% -a "%log_dir%%~n2_log%pass_temp%.txt" &&echo.&&del "%movie_dir%%~n2.ivf"
+rem rawファイルをコンテナに格納
+if exist "%movie_dir%%~n2.h265" %mp4box% -fps %frame_rate_mp4box% -add "%movie_dir%%~n2.h265" -new "%movie_dir%%~2" 2>&1 | %safetee% -a "%log_dir%%~n2_log%pass_temp%.txt" &&echo.&&del "%movie_dir%%~n2.h265"
+if exist "%movie_dir%%~n2.ivf" (
+   if "%codec%"=="SVT-VP9" (
+      %ffmpeg% -y -r %frame_rate% -i "%movie_dir%%~n2.ivf" "%movie_dir%%~2" 2>&1 | %safetee% -a "%log_dir%%~n2_log%pass_temp%.txt"
+   ) else (
+      %mp4box% -fps %frame_rate_mp4box% -add "%movie_dir%%~n2.ivf" -new "%movie_dir%%~2" 2>&1 | %safetee% -a "%log_dir%%~n2_log%pass_temp%.txt" 
+   )
+   echo.
+   del "%movie_dir%%~n2.ivf"
+)
 chcp 932 >nul 2>&1
 
 rem SSIMを算出する
