@@ -418,6 +418,7 @@ set /a echo_hour=%echo_sec%/3600
 set /a echo_min=(echo_sec%%3600)/60
 set /a echo_sec=echo_sec%%60
 if %msec_total% geq 1000 set echo_msec=%msec_total:~-3%
+if %msec_total% lss 1000 set echo_msec=%msec_total%
 
 if not "%multipass%"=="1" set /a echo_enc_fps=%FrameCount%000/%msec_total:~0,-2%
 if "%multipass%"=="1" set /a echo_enc_fps=(%FrameCount%000*%pass_orig%)/(%msec_total:~0,-2%)
