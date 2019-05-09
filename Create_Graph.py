@@ -9,7 +9,7 @@ input = input.replace('_benchmark_log','')
 BitDepth = sys.argv[2]
 markers = [ 'o', 'v', '^', '<', '>' , 's', 'D', 'd', 'p', '*', 'h', 'H', '+', 'x', '|', '_' , '.', ',', '8', '1', '2', '3', '4' ]
 
-metric_array = ['PSNR_Y', 'PSNR_Average', 'SSIM_Y', 'SSIM_All', 'VMAF']
+metric_array = ['PSNR_Y', 'PSNR_Average', 'SSIM_Y', 'SSIM_All', 'VMAF', 'FPS' , 'Time']
 for metric in metric_array:
    csv_list = glob.glob('*_' + metric + '(' + BitDepth + ').csv')
    plt.figure(figsize=(12, 8))
@@ -30,8 +30,14 @@ for metric in metric_array:
        if metric == 'PSNR_Y' or metric == 'PSNR_Average':
           plt.ylabel(metric + ' (dB)')
        else:
-          plt.ylabel(metric)
+       	  if metric == 'Time':
+              plt.ylabel(metric + ' (sec)')
+          else:
+             plt.ylabel(metric)
        plt.grid(True,linestyle='dashed')
-       plt.legend(loc='lower right')
-       plt.savefig(input + '_' +  metric + '(' + BitDepth + ')_Graph.png')
+       if metric == 'PSNR_Y' or metric == 'PSNR_Average' or metric == 'SSIM_Y' or metric == 'SSIM_All' or metric == 'VMAF':
+       	  plt.legend(loc='lower right')
+       else:
+          plt.legend(bbox_to_anchor=(1.01, 1), loc='upper left', borderaxespad=0)
+       plt.savefig(input + '_' +  metric + '(' + BitDepth + ')_Graph.png' ,  bbox_inches='tight')
    plt.close()
