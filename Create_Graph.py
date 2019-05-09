@@ -7,12 +7,14 @@ import re
 input = sys.argv[1]
 input = input.replace('_benchmark_log','')
 BitDepth = sys.argv[2]
+markers = [ 'o', 'v', '^', '<', '>' , 's', 'D', 'd', 'p', '*', 'h', 'H', '+', 'x', '|', '_' , '.', ',', '8', '1', '2', '3', '4' ]
 
 metric_array = ['PSNR_Y', 'PSNR_Average', 'SSIM_Y', 'SSIM_All', 'VMAF']
 for metric in metric_array:
    csv_list = glob.glob('*_' + metric + '(' + BitDepth + ').csv')
    plt.figure(figsize=(12, 8))
    csvFileExist = False
+   MNum = 0
    for csv_name in csv_list:
        csvFileExist = True
        codec_name = csv_name
@@ -20,8 +22,8 @@ for metric in metric_array:
        data = np.loadtxt(csv_name ,comments='#' ,dtype='float' ,delimiter=',')
        x_txt = data[:,0]
        y_txt = data[:,1]
-       plt.plot(x_txt,y_txt , label = codec_name)
-       plt.scatter(x_txt,y_txt)
+       plt.plot(x_txt,y_txt , label = codec_name , marker=markers[MNum])
+       MNum = MNum + 1
    if csvFileExist:
        plt.title(input)
        plt.xlabel("bitrate(kbps)")
