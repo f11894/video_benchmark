@@ -10,7 +10,7 @@ input = os.path.basename(sys.argv[1])
 input = input.replace('_benchmark_log','')
 BitDepth_array = ['8bit', '10bit', 'Unspecified']
 markers = [ 'o', 'v', '^', '<', '>' , 's', 'D', 'd', 'p', '*', 'h', 'H', '+', 'x', '|', '_' , '.', ',', '8', '1', '2', '3', '4' ]
-metric_array = ['PSNR_Y', 'PSNR_Average', 'SSIM_Y', 'SSIM_All', 'VMAF', 'FPS' , 'Time']
+metric_array = ['PSNR_Y', 'PSNR_Average', 'SSIM_Y', 'SSIM_All', 'VMAF', 'fps' , 'Time']
 
 for BitDepth in BitDepth_array:
    for metric in metric_array:
@@ -34,7 +34,7 @@ for BitDepth in BitDepth_array:
              plt.ylabel(metric + ' (dB)')
           else:
              if metric == 'Time':
-                plt.ylabel(metric + ' (sec)')
+                plt.ylabel('Elapsed ' + metric + ' (sec)')
              else:
                 plt.ylabel(metric)
           plt.grid(True,linestyle='dashed')
