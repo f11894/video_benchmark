@@ -431,12 +431,12 @@ if %echo_enc_fps% lss 10 set echo_enc_fps2=0.0%echo_enc_fps%
 exit /b
 
 :error_check
-if not exist %2 goto error_check2
+if not exist "%~2" goto error_check2
 if "%~z2"=="0" goto error_check2
 exit /b
 :error_check2
 set enc_error=1
-if not exist %2 del %2
+if exist "%~2" del "%~2"
 
 echo 動画のエンコードに失敗した可能性があります
 echo 入力ファイルに問題がないか、コマンドラインが間違っていないか確認してください
