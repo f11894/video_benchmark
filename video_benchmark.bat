@@ -98,7 +98,6 @@ echo.
 set "ffmediaInfo_file=%~1"
 
 :start
-if "%~2"=="setting" exit /b
 setlocal
 
 pushd "%movie_dir%"
@@ -455,7 +454,4 @@ timeout /t %wait%
 exit /b
 
 :end
-rem echo.
-rem echo ‘S‚Ä‚Ìˆ—‚ªI—¹‚µ‚Ü‚µ‚½
-rem pause >nul
 exit /b
