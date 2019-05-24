@@ -314,9 +314,8 @@ if not "%enc_error%"=="1" if not "%Compare_error%"=="1" (
    echo %bitrate%,%enc_sec_calc%>>"%~n1_%csv_name%_Time(%CompareBitDepth%).csv"
 )
 for %%i in ("%~n1_%csv_name%*.csv") do (
-   %awk% '!a[$0]++' "%%~i" | %awk% 'sub^(/$/,"\r"^)' >"%%~dpni_temp.txt"
-   del "%%~i"
-   ren "%%~dpni_temp.txt" "%%~nxi"
+   move /Y "%%~i" "%TEMP%\video_benchmark_temp.txt">nul
+   %awk% '!a[$0]++' "%TEMP%\video_benchmark_temp.txt" | %awk% 'sub^(/$/,"\r"^)' >"%%~i"
 )
 popd
 

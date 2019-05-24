@@ -4,7 +4,9 @@ import glob
 import sys
 import re
 import os
+import matplotlib.font_manager
 
+font_prop = matplotlib.font_manager.FontProperties(fname=r'C:\Windows\Fonts\meiryo.ttc')
 os.chdir(sys.argv[1])
 input = os.path.basename(sys.argv[1])
 input = input.replace('_benchmark_log','')
@@ -21,26 +23,27 @@ for BitDepth in BitDepth_array:
       for csv_name in csv_list:
           csvFileExist = True
           codec_name = csv_name
-          codec_name = re.sub(input + '_' + '(.+)' + '_' + metric + '\(' + BitDepth + '\)\.csv','\\1',codec_name)
+          codec_name = csv_name.replace(input,'')
+          codec_name = re.sub('_' + '(.+)' + '_' + metric + '\(' + BitDepth + '\)\.csv','\\1',codec_name)
           data = np.loadtxt(csv_name ,comments='#' ,dtype='float' ,delimiter=',')
           x_txt = data[:,0]
           y_txt = data[:,1]
           plt.plot(x_txt,y_txt , label = codec_name , marker=markers[MNum])
           MNum = MNum + 1
       if csvFileExist:
-          plt.title(input)
-          plt.xlabel("bitrate(kbps)")
+          plt.title(input, fontproperties=font_prop)
+          plt.xlabel("bitrate(kbps)", fontproperties=font_prop)
           if metric == 'PSNR_Y' or metric == 'PSNR_Average':
-             plt.ylabel(metric + ' (dB)')
+             plt.ylabel(metric + ' (dB)', fontproperties=font_prop)
           else:
              if metric == 'Time':
-                plt.ylabel('Elapsed ' + metric + ' (sec)')
+                plt.ylabel('Elapsed ' + metric + ' (sec)', fontproperties=font_prop)
              else:
-                plt.ylabel(metric)
+                plt.ylabel(metric, fontproperties=font_prop)
           plt.grid(True,linestyle='dashed')
           if metric == 'PSNR_Y' or metric == 'PSNR_Average' or metric == 'SSIM_Y' or metric == 'SSIM_All' or metric == 'VMAF':
-          	  plt.legend(loc='lower right')
+          	  plt.legend(loc='lower right', prop=font_prop)
           else:
-             plt.legend(bbox_to_anchor=(1.01, 1), loc='upper left', borderaxespad=0)
+             plt.legend(bbox_to_anchor=(1.01, 1), loc='upper left', borderaxespad=0, prop=font_prop)
           plt.savefig(input + '_' +  metric + '(' + BitDepth + ')_Graph.png' ,  bbox_inches='tight')
       plt.close()
