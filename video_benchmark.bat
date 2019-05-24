@@ -310,7 +310,7 @@ if not "%enc_error%"=="1" if not "%Compare_error%"=="1" (
    echo %bitrate%,%SSIM_Y%>>"%~n1_%csv_name%_SSIM_Y(%CompareBitDepth%).csv"
    echo %bitrate%,%SSIM_All%>>"%~n1_%csv_name%_SSIM_All(%CompareBitDepth%).csv"
    if "%EnableVMAF%"=="1" echo %bitrate%,%VMAF%>>"%~n1_%csv_name%_VMAF(%CompareBitDepth%).csv"
-   echo %bitrate%,%enc_fps_calc%>>"%~n1_%csv_name%_FPS(%CompareBitDepth%).csv"
+   echo %bitrate%,%enc_fps_calc%>>"%~n1_%csv_name%_fps(%CompareBitDepth%).csv"
    echo %bitrate%,%enc_sec_calc%>>"%~n1_%csv_name%_Time(%CompareBitDepth%).csv"
 )
 for %%i in ("%~n1_%csv_name%*.csv") do (
