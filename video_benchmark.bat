@@ -45,7 +45,7 @@ set ffmpeg_VMAF="%~dp0tools\ffmpeg_vmaf.exe"
 set mediaInfo="%~dp0tools\MediaInfo.exe"
 set timer64="%~dp0tools\timer64.exe"
 set safetee="%~dp0tools\safetee.exe"
-set awk="%~dp0tools\awk.exe"
+set busybox64="%~dp0tools\busybox64.exe"
 
 set x264="%~dp0tools\x264_2969_x64.exe"
 set x265="%~dp0tools\x265_3.0_Au+21_x64.exe"
@@ -315,7 +315,8 @@ if not "%enc_error%"=="1" if not "%Compare_error%"=="1" (
 )
 for %%i in ("%~n1_%csv_name%*.csv") do (
    move /Y "%%~i" "%TEMP%\video_benchmark_temp.txt">nul
-   %awk% '!a[$0]++' "%TEMP%\video_benchmark_temp.txt" | %awk% 'sub^(/$/,"\r"^)' >"%%~i"
+   %busybox64% awk "!a[$0]++" "%TEMP%\video_benchmark_temp.txt" | %busybox64% awk -v ORS="\r\n" "{print}" >"%%~i"
+   del "%TEMP%\video_benchmark_temp.txt">nul 2>&1
 )
 popd
 

@@ -3,7 +3,7 @@ cd "%~dp0"
 for %%i in ("..\video_benchmark.bat") do set benchmark_bat="%%~dpnxi"
 for %%i in ("..\ffmediaInfo.bat") do set ffmediaInfo_bat="%%~dpnxi"
 
-for %%i in ("..\tools\xargs.exe") do set xargs="%%~dpnxi"
+for %%i in ("..\tools\busybox64.exe") do set busybox64="%%~dpnxi"
 for %%i in ("..\tools\ffmpeg.exe") do set ffmpeg="%%~dpnxi"
 for %%i in ("..\tools\timer64.exe") do set timer64="%%~dpnxi"
 for %%i in ("..\tools\vtm\EncoderApp.exe") do set VTM="%%~dpnxi"
@@ -22,6 +22,6 @@ for /L %%i in (38,-2,22) do (
    echo "%~1" "VTM_q%%i" %VTM_option%>>%xargs_txt%
 )
 chcp 932
-%xargs% -a %xargs_txt% -n 3 -P %thread% "%~dp0VTM_xargs.bat"
+%busybox64% xargs -a %xargs_txt%  -n 3 -P %thread% "%~dp0VTM_xargs.bat"
 for /L %%i in (38,-2,22) do call %benchmark_bat% "%~1" "%~n1_VTM_q%%i.bin" %VTM_option% VTM q
 exit /b
