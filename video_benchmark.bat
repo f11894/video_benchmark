@@ -302,7 +302,7 @@ if not "%enc_error%"=="1" if not "%Compare_error%"=="1" (
    set /a "echo_bitrare=%Filesize%/%Duration2%*8"
    for /f "DELIMS=" %%i IN ('PowerShell %Filesize%*8/%Duration2%') DO SET "bitrate=%%i"
    for /f "DELIMS=" %%i IN ('PowerShell "%enc_fps%"') DO SET "enc_fps_calc=%%i"
-   for /f "DELIMS=" %%i IN ('PowerShell "%enc_sec%"') DO SET "enc_sec_calc=%%i"
+   for /f "DELIMS=" %%i IN ('PowerShell "%msec_total%/1000"') DO SET "enc_sec_calc=%%i"
 )
 if not "%enc_error%"=="1" if not "%Compare_error%"=="1" (
    echo %bitrate%,%PSNR_Y%>>"%~n1_%csv_name%_PSNR_Y(%CompareBitDepth%).csv"
@@ -328,8 +328,8 @@ if not "%enc_error%"=="1" if not "%Compare_error%"=="1" (
    echo PSNR  ^(Y^)                   : %PSNR_Y% ^(%CompareBitDepth%^)
    echo PSNR  ^(AVERAGE^)             : %PSNR_Average% ^(%CompareBitDepth%^)
    if "%EnableVMAF%"=="1" echo VMAF                        : %VMAF% ^(%CompareBitDepth%^)
-   if not "%multipass%"=="1" echo エンコード FPS              : %echo_enc_fps2% fps
-   if "%multipass%"=="1" echo エンコード FPS              : %echo_enc_fps2% fps ^(%pass_orig%パス平均^)
+   if not "%multipass%"=="1" echo エンコード FPS              : %enc_fps_calc% fps
+   if "%multipass%"=="1" echo エンコード FPS              : %enc_fps_calc% fps ^(%pass_orig%パス平均^)
    if not "%multipass%"=="1" echo エンコード時間              : %echo_hour%時間%echo_min%分%echo_sec%.%echo_msec%秒
    if "%multipass%"=="1" echo エンコード時間              : %echo_hour%時間%echo_min%分%echo_sec%.%echo_msec%秒 ^(%pass_orig%パス合計^)
    echo.
@@ -388,32 +388,15 @@ exit /b
 
 :msec_to_sec
 rem csvに書き込むデータを計算
-call set enc_msec_temp=%%enc_msec%pass_temp%%%
-
-if %enc_msec_temp% geq 1000 call set enc_sec%pass_temp%=%%enc_msec%pass_temp%:~0,-3%%.%%enc_msec%pass_temp%:~-3%%
-if %enc_msec_temp% lss 1000 call set enc_sec%pass_temp%=0.%%enc_msec%pass_temp%%%
-if %enc_msec_temp% lss 100 call set enc_sec%pass_temp%=0.0%%enc_msec%pass_temp%%%
-if %enc_msec_temp% lss 10 call set enc_sec%pass_temp%=0.00%%enc_msec%pass_temp%%%
-
-set enc_msec_temp=
-
-if "%multipass%"=="1" if "%pass_temp%"=="1" (
-   call set enc_sec=%%enc_sec%pass_temp%%%
-) else (
-   call set enc_sec=%enc_sec%+%%enc_sec%pass_temp%%%
-)
-if "%multipass%"=="1" if "%pass_orig%"=="1" call set enc_sec=%%enc_sec%pass_temp%%%
-
-if not "%multipass%"=="1" set enc_fps=%FrameCount%/%enc_sec%
-if "%multipass%"=="1" if "%pass_temp%"=="1" call set enc_fps=(%FrameCount%*%pass_orig%)/(%%enc_sec%pass_temp%%%
-if "%multipass%"=="1" if not "%pass_temp%"=="1" if not "%pass_temp%"=="%pass_orig%" call set enc_fps=%enc_fps%+%%enc_sec%pass_temp%%%
-if "%multipass%"=="1" if "%pass_temp%"=="%pass_orig%" call set enc_fps=%enc_fps%+%%enc_sec%pass_temp%%%)
-if "%multipass%"=="1" if "%pass_orig%"=="1" call set enc_fps=%FrameCount%/%%enc_sec%pass_temp%%%
+if not "%multipass%"=="1" set enc_fps=%FrameCount%/(%enc_msec%/1000)
+if "%multipass%"=="1" if "%pass_temp%"=="1" call set enc_fps=(%FrameCount%*%pass_orig%)/((%%enc_msec%pass_temp%%%/1000)
+if "%multipass%"=="1" if not "%pass_temp%"=="1" if not "%pass_temp%"=="%pass_orig%" call set enc_fps=%enc_fps%+(%%enc_msec%pass_temp%%%/1000)
+if "%multipass%"=="1" if "%pass_temp%"=="%pass_orig%" call set enc_fps=%enc_fps%+(%%enc_msec%pass_temp%%%/1000))
+if "%multipass%"=="1" if "%pass_orig%"=="1" call set enc_fps=%FrameCount%/(%%enc_msec%pass_temp%%%/1000)
 
 rem 表示用のデータを計算
-if not "%multipass%"=="1" set msec_total=%enc_msec%
-if "%multipass%"=="1" if "%pass_temp%"=="1" call set msec_total=%%enc_msec%pass_temp%%%
-if "%multipass%"=="1" if not "%pass_temp%"=="1" call set /a msec_total=msec_total+%%enc_msec%pass_temp%%%
+if not defined msec_total set msec_total=0
+call set /a msec_total=msec_total+%%enc_msec%pass_temp%%%
 
 set /a echo_sec=%msec_total%/1000
 set /a echo_hour=%echo_sec%/3600
@@ -421,12 +404,6 @@ set /a echo_min=(echo_sec%%3600)/60
 set /a echo_sec=echo_sec%%60
 if %msec_total% geq 1000 set echo_msec=%msec_total:~-3%
 if %msec_total% lss 1000 set echo_msec=%msec_total%
-
-if not "%multipass%"=="1" set /a echo_enc_fps=%FrameCount%000/%msec_total:~0,-2%
-if "%multipass%"=="1" set /a echo_enc_fps=(%FrameCount%000*%pass_orig%)/(%msec_total:~0,-2%)
-if %echo_enc_fps% geq 100 set echo_enc_fps2=%echo_enc_fps:~0,-2%.%echo_enc_fps:~-2%
-if %echo_enc_fps% lss 100 set  echo_enc_fps2=0.%echo_enc_fps%
-if %echo_enc_fps% lss 10 set echo_enc_fps2=0.0%echo_enc_fps%
 exit /b
 
 :error_check
