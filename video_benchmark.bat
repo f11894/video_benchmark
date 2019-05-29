@@ -252,7 +252,7 @@ if not "%EnableVMAF%"=="1" goto VMAF_skip
 
 for %%i in (%ffmpeg_VMAF%) do set "vmaf_model_dir=%%~dpi\model"
 pushd %vmaf_model_dir%
-if "%verbose_log%"=="1" set ffmpeg_vmaf_option="libvmaf=model_path=vmaf_v0.6.1.pkl:log_path='%~n2_vmaf(%CompareBitDepth%).xml'"
+if "%verbose_log%"=="1" set ffmpeg_vmaf_option="libvmaf=model_path=vmaf_v0.6.1.pkl:ms_ssim=1:psnr=1:log_fmt=json:log_path='%~n2_vmaf(%CompareBitDepth%).json'"
 if not "%verbose_log%"=="1" set ffmpeg_vmaf_option="libvmaf=model_path=vmaf_v0.6.1.pkl"
 
 find "VMAF score" "%log_dir%%~n2_vmaf(%CompareBitDepth%)_log%pass_orig%.txt">nul 2>&1
@@ -264,7 +264,7 @@ if "%VMAF_check%"=="1" (
    echo.
 )
 :vmaf2
-if "%verbose_log%"=="1" if exist "%~n2_vmaf(%CompareBitDepth%).xml" move /Y "%~n2_vmaf(%CompareBitDepth%).xml" "%log_dir%%~n2_vmaf(%CompareBitDepth%).xml" >nul
+if "%verbose_log%"=="1" if exist "%~n2_vmaf(%CompareBitDepth%).json" move /Y "%~n2_vmaf(%CompareBitDepth%).json" "%log_dir%%~n2_vmaf(%CompareBitDepth%).json" >nul
 find "VMAF score" "%log_dir%%~n2_vmaf(%CompareBitDepth%)_log%pass_orig%.txt">nul 2>&1
 if not "%ERRORLEVEL%"=="0" if not "%enc_error%"=="1" (
    echo VMAF‚ÌŽZo‚ÉŽ¸”s‚µ‚Ü‚µ‚½
