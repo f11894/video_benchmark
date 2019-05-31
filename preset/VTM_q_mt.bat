@@ -18,10 +18,10 @@ if not exist "%~dpn1_temp8bit.yuv" echo 入力に使用する中間ファイルを作成していま
 
 chcp 65001
 set xargs_txt="%TEMP%\xargs_%RANDOM%_%RANDOM%_%RANDOM%.txt"
-for /L %%i in (38,-2,22) do (
+for /L %%i in (36,-2,22) do (
    echo "%~1" "VTM_q%%i" %VTM_option%>>%xargs_txt%
 )
 chcp 932
 %busybox64% xargs -a %xargs_txt%  -n 3 -P %thread% "%~dp0VTM_xargs.bat"
-for /L %%i in (38,-2,22) do call %benchmark_bat% "%~1" "%~n1_VTM_q%%i.bin" %VTM_option% VTM q
+for /L %%i in (36,-2,22) do call %benchmark_bat% "%~1" "%~n1_VTM_q%%i.bin" %VTM_option% VTM q
 exit /b
