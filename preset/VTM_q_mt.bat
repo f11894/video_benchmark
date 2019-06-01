@@ -24,4 +24,13 @@ for /L %%i in (36,-2,22) do (
 chcp 932
 %busybox64% xargs -a %xargs_txt%  -n 3 -P %thread% "%~dp0VTM_xargs.bat"
 for /L %%i in (36,-2,22) do call %benchmark_bat% "%~1" "%~n1_VTM_q%%i.bin" %VTM_option% VTM q
+
+rem î‰äróp
+for /L %%i in (32,-2,18) do call %benchmark_bat% "%~1" "%~n1_x264_placebo_tunessim_kf32_crf%%i.mp4" "--preset placebo --tune ssim --keyint 32 --crf %%i" x264 placebo_tunessim_kf32_crf
+for /L %%i in (32,-2,18) do call %benchmark_bat% "%~1" "%~n1_x265_placebo_tunessim_kf32_crf%%i.mp4" "--preset placebo --tune ssim --keyint 32 --crf %%i" x265 placebo_tunessim_kf32_crf
+
+for /L %%i in (55,-5,25) do call %benchmark_bat% "%~1" "%~n1_libvpx_vp9_c0_kf32_2pass_q%%i.webm" "--codec=vp9 --frame-parallel=0 --tile-columns=2 --good --cpu-used=0 --tune=psnr --passes=2 --threads=2 --end-usage=q --cq-level=%%i --webm --auto-alt-ref=6 --kf-max-dist=32" libvpx vp9_c0_kf32_2pass_q
+
+for /L %%i in (55,-5,25) do call %benchmark_bat% "%~1" "%~n1_libaom_c0_kf32_2pass_q%%i.mp4" "--ivf --cpu-used=0 --threads=8 --tile-columns=2 --tile-rows=2 --passes=2 --end-usage=q --cq-level=%%i --kf-max-dist=32" libaom c0_kf32_2pass_q
+
 exit /b
