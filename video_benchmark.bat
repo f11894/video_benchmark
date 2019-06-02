@@ -184,8 +184,8 @@ if not "%enc_skip%"=="1" call :error_check "%~1" %ErrorCheckFile%
 if "%multipass%"=="1" if not "%enc_skip%"=="1" if not "%pass_temp%"=="%pass_orig%" if exist %ErrorCheckFile% del %ErrorCheckFile%
 
 rem 処理時間をログファイルから拾う
-if not "%enc_error%"=="1" findstr "^[0-9][0-9]*$" "%log_dir%%~n2_log%pass_temp%.txt">nul||set enc_error=1
-if not "%enc_error%"=="1" FOR /f "DELIMS=" %%i IN ('findstr "^[0-9][0-9]*$" "%log_dir%%~n2_log%pass_temp%.txt"') DO SET enc_msec%pass_temp%=%%i
+if not "%enc_error%"=="1" findstr "^[0-9][0-9]*$" "%log_dir%%~n2_log%pass_temp%.txt">nul 2>&1||set timer_error=1&&SET enc_msec%pass_temp%=0
+if not "%enc_error%"=="1" if not "%timer_error%"=="1" FOR /f "DELIMS=" %%i IN ('findstr "^[0-9][0-9]*$" "%log_dir%%~n2_log%pass_temp%.txt"') DO SET enc_msec%pass_temp%=%%i
 if not "%enc_error%"=="1" call :msec_to_sec
 rem マルチパスなら最終パスになるまで処理をループする
 if "%multipass%"=="1" if not "%pass_temp%"=="%pass_orig%" (
@@ -300,8 +300,8 @@ if not "%enc_error%"=="1" if not "%Compare_error%"=="1" (
    set "PSNR_Average=%PSNR_Average:~8%"
    set /a "echo_bitrare=%Filesize%/%Duration2%*8"
    for /f "DELIMS=" %%i IN ('PowerShell %Filesize%*8/%Duration2%') DO SET "bitrate=%%i"
-   for /f "DELIMS=" %%i IN ('PowerShell "%enc_fps%"') DO SET "enc_fps_calc=%%i"
-   for /f "DELIMS=" %%i IN ('PowerShell "%msec_total%/1000"') DO SET "enc_sec_calc=%%i"
+   if not "%msec_total%"=="0" for /f "DELIMS=" %%i IN ('PowerShell "%enc_fps%"') DO SET "enc_fps_calc=%%i"
+   if not "%msec_total%"=="0" for /f "DELIMS=" %%i IN ('PowerShell "%msec_total%/1000"') DO SET "enc_sec_calc=%%i"
 )
 if not "%enc_error%"=="1" if not "%Compare_error%"=="1" (
    echo %bitrate%,%PSNR_Y%>>"%~n1_%csv_name%_PSNR_Y(%CompareBitDepth%).csv"
@@ -309,8 +309,8 @@ if not "%enc_error%"=="1" if not "%Compare_error%"=="1" (
    echo %bitrate%,%SSIM_Y%>>"%~n1_%csv_name%_SSIM_Y(%CompareBitDepth%).csv"
    echo %bitrate%,%SSIM_All%>>"%~n1_%csv_name%_SSIM_All(%CompareBitDepth%).csv"
    if "%EnableVMAF%"=="1" echo %bitrate%,%VMAF%>>"%~n1_%csv_name%_VMAF(%CompareBitDepth%).csv"
-   echo %bitrate%,%enc_fps_calc%>>"%~n1_%csv_name%_fps(%CompareBitDepth%).csv"
-   echo %bitrate%,%enc_sec_calc%>>"%~n1_%csv_name%_Time(%CompareBitDepth%).csv"
+   if not "%msec_total%"=="0" echo %bitrate%,%enc_fps_calc%>>"%~n1_%csv_name%_fps(%CompareBitDepth%).csv"
+   if not "%msec_total%"=="0" echo %bitrate%,%enc_sec_calc%>>"%~n1_%csv_name%_Time(%CompareBitDepth%).csv"
 )
 for %%i in ("%~n1_%csv_name%*.csv") do (
    move /Y "%%~i" "%TEMP%\video_benchmark_temp.txt">nul
@@ -327,10 +327,10 @@ if not "%enc_error%"=="1" if not "%Compare_error%"=="1" (
    echo PSNR  ^(Y^)                   : %PSNR_Y% ^(%CompareBitDepth%^)
    echo PSNR  ^(AVERAGE^)             : %PSNR_Average% ^(%CompareBitDepth%^)
    if "%EnableVMAF%"=="1" echo VMAF                        : %VMAF% ^(%CompareBitDepth%^)
-   if not "%multipass%"=="1" echo エンコード FPS              : %enc_fps_calc% fps
-   if "%multipass%"=="1" echo エンコード FPS              : %enc_fps_calc% fps ^(%pass_orig%パス平均^)
-   if not "%multipass%"=="1" echo エンコード時間              : %echo_hour%時間%echo_min%分%echo_sec%.%echo_msec%秒
-   if "%multipass%"=="1" echo エンコード時間              : %echo_hour%時間%echo_min%分%echo_sec%.%echo_msec%秒 ^(%pass_orig%パス合計^)
+   if not "%msec_total%"=="0" if not "%multipass%"=="1" echo エンコード FPS              : %enc_fps_calc% fps
+   if not "%msec_total%"=="0" if "%multipass%"=="1" echo エンコード FPS              : %enc_fps_calc% fps ^(%pass_orig%パス平均^)
+   if not "%msec_total%"=="0" if not "%multipass%"=="1" echo エンコード時間              : %echo_hour%時間%echo_min%分%echo_sec%.%echo_msec%秒
+   if not "%msec_total%"=="0" if "%multipass%"=="1" echo エンコード時間              : %echo_hour%時間%echo_min%分%echo_sec%.%echo_msec%秒 ^(%pass_orig%パス合計^)
    echo.
    echo.
    echo.
