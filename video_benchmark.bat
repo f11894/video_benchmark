@@ -8,7 +8,7 @@ if "%~5"=="" set ArgumentError=1
 
 if "%ArgumentError%"=="1" (
    echo エラー batを呼び出す引数が正しくありません
-   echo video_benchmark.bat 入力動画 出力ファイル名 エンコーダーのコマンドライン csvファイル名 で呼び出してください
+   echo video_benchmark.bat 入力動画 出力ファイル名 エンコーダーのコマンドライン エンコーダー名 csvファイル名 で呼び出してください
    timeout /t 30
    exit /b
 )
