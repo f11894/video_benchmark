@@ -303,6 +303,7 @@ if not "%enc_error%"=="1" if not "%Compare_error%"=="1" (
    for /f "DELIMS=" %%i IN ('PowerShell %Filesize%*8/%Duration2%') DO SET "bitrate=%%i"
    if not "%msec_total%"=="0" for /f "DELIMS=" %%i IN ('PowerShell "%enc_fps%"') DO SET "enc_fps_calc=%%i"
    if not "%msec_total%"=="0" for /f "DELIMS=" %%i IN ('PowerShell "%msec_total%/1000"') DO SET "enc_sec_calc=%%i"
+   for /f "DELIMS=" %%i IN ('PowerShell "(%Filesize%*8)/(%Width%*%Height%*%FrameCount%)"') DO SET "bpp=%%i"
 )
 if not "%enc_error%"=="1" if not "%Compare_error%"=="1" (
    echo %bitrate%,%PSNR_Y%>>"%~n1_%csv_name%_PSNR_Y(%CompareBitDepth%).csv"
@@ -313,6 +314,15 @@ if not "%enc_error%"=="1" if not "%Compare_error%"=="1" (
    if "%EnableVMAF%"=="1" echo %bitrate%,%MS-SSIM%>>"%~n1_%csv_name%_MS-SSIM(%CompareBitDepth%).csv"
    if not "%msec_total%"=="0" echo %bitrate%,%enc_fps_calc%>>"%~n1_%csv_name%_fps(%CompareBitDepth%).csv"
    if not "%msec_total%"=="0" echo %bitrate%,%enc_sec_calc%>>"%~n1_%csv_name%_Time(%CompareBitDepth%).csv"
+   rem bpp
+   echo %bpp%,%PSNR_Y%>>"%~n1_%csv_name%_PSNR_Y(%CompareBitDepth%)_bpp.csv"
+   echo %bpp%,%PSNR_Average%>>"%~n1_%csv_name%_PSNR_Average(%CompareBitDepth%)_bpp.csv"
+   echo %bpp%,%SSIM_Y%>>"%~n1_%csv_name%_SSIM_Y(%CompareBitDepth%)_bpp.csv"
+   echo %bpp%,%SSIM_All%>>"%~n1_%csv_name%_SSIM_All(%CompareBitDepth%)_bpp.csv"
+   if "%EnableVMAF%"=="1" echo %bpp%,%VMAF%>>"%~n1_%csv_name%_VMAF(%CompareBitDepth%)_bpp.csv"
+   if "%EnableVMAF%"=="1" echo %bpp%,%MS-SSIM%>>"%~n1_%csv_name%_MS-SSIM(%CompareBitDepth%)_bpp.csv"
+   if not "%msec_total%"=="0" echo %bpp%,%enc_fps_calc%>>"%~n1_%csv_name%_fps(%CompareBitDepth%)_bpp.csv"
+   if not "%msec_total%"=="0" echo %bpp%,%enc_sec_calc%>>"%~n1_%csv_name%_Time(%CompareBitDepth%)_bpp.csv"
 )
 for %%i in ("%~n1_%csv_name%*.csv") do (
    move /Y "%%~i" "%TEMP%\video_benchmark_temp.txt">nul
