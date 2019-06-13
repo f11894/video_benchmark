@@ -9,9 +9,19 @@ FOR /f "tokens=4 DELIMS='" %%i IN ("%frame_rate%") DO SET frame_rate=%%i
 FOR /f "tokens=1 DELIMS=/" %%i IN ("%frame_rate%") DO SET frame_rate_num=%%i
 FOR /f "tokens=2 DELIMS=/" %%i IN ("%frame_rate%") DO SET frame_rate_denom=%%i
 set frame_rate_mp4box=%frame_rate_num%
-if "%frame_rate%"=="60000/1001" set frame_rate_mp4box=59.940060
-if "%frame_rate%"=="30000/1001" set frame_rate_mp4box=29.970030
-if "%frame_rate%"=="24000/1001" set frame_rate_mp4box=23.976025
+set frame_rate_integer=%frame_rate_num%
+if "%frame_rate%"=="60000/1001" (
+   set frame_rate_mp4box=59.940060
+   set frame_rate_integer=60
+)
+if "%frame_rate%"=="30000/1001" (
+   set frame_rate_mp4box=29.970030
+   set frame_rate_integer=30
+)
+if "%frame_rate%"=="24000/1001" (
+   set frame_rate_mp4box=23.976025
+   set frame_rate_integer=24
+)
 FOR /f "tokens=4 DELIMS='" %%i IN ("%video_size%") DO SET video_size=%%i
 FOR /f "tokens=1 DELIMS=x" %%i IN ("%video_size%") DO SET Width=%%i
 FOR /f "tokens=2 DELIMS=x" %%i IN ("%video_size%") DO SET Height=%%i
