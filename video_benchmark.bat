@@ -93,6 +93,7 @@ set /a Duration_Minute=(1%Duration_Minute%-100)*60000
 set Duration_Hour=%Duration:~0,2%
 set /a Duration_Hour=(1%Duration_Hour%-100)*3600000
 set /a Duration2=%Duration_msec%+%Duration_sec%+%Duration_Minute%+%Duration_Hour%
+echo 入力ファイル                : "%~nx1"
 echo 動画サイズ                  : %video_size%
 echo フレームレート              : %frame_rate%
 echo 総フレーム数                : %FrameCount%
