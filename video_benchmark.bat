@@ -35,6 +35,9 @@ rem VMAFの算出を行うかどうか 1だと算出する
 rem VMAFは優秀なメトリックだが算出に時間がかかる
 set EnableVMAF=1
 
+rem VMAFの算出を行う時にMS-SSIMも算出を行うかどうか 1だと算出する
+set EnableMSSSIM=1
+
 rem SSIMやVMAFを算出する時のビット深度
 set ComparePixelFormat=-pix_fmt yuv420p
 
@@ -254,10 +257,14 @@ if not "%EnableVMAF%"=="1" goto VMAF_skip
 for %%i in (%ffmpeg_VMAF%) do set "vmaf_model_dir=%%~dpi\model"
 pushd %vmaf_model_dir%
 if "%verbose_log%"=="1" set ffmpeg_vmaf_option="libvmaf=model_path=vmaf_v0.6.1.pkl:ms_ssim=1:psnr=1:log_fmt=json:log_path='%~n2_vmaf(%CompareBitDepth%).json'"
-if not "%verbose_log%"=="1" set ffmpeg_vmaf_option="libvmaf=model_path=vmaf_v0.6.1.pkl:ms_ssim=1"
+if not "%verbose_log%"=="1" if "%EnableMSSSIM%"=="1" (
+   set ffmpeg_vmaf_option="libvmaf=model_path=vmaf_v0.6.1.pkl:ms_ssim=1"
+) else (
+   set ffmpeg_vmaf_option="libvmaf=model_path=vmaf_v0.6.1.pkl"
+)
 
 find "VMAF score" "%log_dir%%~n2_vmaf(%CompareBitDepth%)_log%pass_orig%.txt">nul 2>&1
-if not "%ERRORLEVEL%"=="0" if not "%enc_error%"=="1" echo "%~nx2"のVMAFとMS-SSIMを算出しています&&set VMAF_check=1
+if not "%ERRORLEVEL%"=="0" if not "%enc_error%"=="1" echo "%~nx2"のVMAFを算出しています&&set VMAF_check=1
 if "%VMAF_check%"=="1" (
    echo しばらくお待ちください
    %ffmpeg% -r %frame_rate% -i %CompareFile% -an %ComparePixelFormat% -strict -2 -f yuv4mpegpipe - 2>"%log_dir%%~n2_vmaf(%CompareBitDepth%)_pipelog%pass_orig%.txt" | %ffmpeg_VMAF% -i - -r %frame_rate% -i "%~1" -filter_complex %ffmpeg_vmaf_option% -an -f null - >>"%log_dir%%~n2_vmaf(%CompareBitDepth%)_log%pass_orig%.txt" 2>&1
@@ -292,7 +299,7 @@ if not "%enc_error%"=="1" if not "%Compare_error%"=="1" (
    for /f "tokens=5" %%i in ("%Parsed_psnr%") do set "PSNR_Y=%%i"
    for /f "tokens=8" %%i in ("%Parsed_psnr%") do set "PSNR_Average=%%i"
    if "%EnableVMAF%"=="1" FOR /f "tokens=4" %%i IN ('find "VMAF score = " "%~n2_vmaf(%CompareBitDepth%)_log%pass_orig%.txt"') DO SET "VMAF=%%i"
-   if "%EnableVMAF%"=="1" FOR /f "tokens=4" %%i IN ('find "MS-SSIM score = " "%~n2_vmaf(%CompareBitDepth%)_log%pass_orig%.txt"') DO SET "MS-SSIM=%%i"
+   if "%EnableVMAF%"=="1" if "%EnableMSSSIM%"=="1" FOR /f "tokens=4" %%i IN ('find "MS-SSIM score = " "%~n2_vmaf(%CompareBitDepth%)_log%pass_orig%.txt"') DO SET "MS-SSIM=%%i"
 )
 if not "%enc_error%"=="1" if not "%Compare_error%"=="1" (
    set "SSIM_Y=%SSIM_Y:~2%"
@@ -311,7 +318,7 @@ if not "%enc_error%"=="1" if not "%Compare_error%"=="1" (
    echo %bitrate%,%SSIM_Y%|%safetee% -a "%~n1_%csv_name%_SSIM_Y(%CompareBitDepth%).csv" >nul
    echo %bitrate%,%SSIM_All%|%safetee% -a "%~n1_%csv_name%_SSIM_All(%CompareBitDepth%).csv" >nul
    if "%EnableVMAF%"=="1" echo %bitrate%,%VMAF%|%safetee% -a "%~n1_%csv_name%_VMAF(%CompareBitDepth%).csv" >nul
-   if "%EnableVMAF%"=="1" echo %bitrate%,%MS-SSIM%|%safetee% -a "%~n1_%csv_name%_MS-SSIM(%CompareBitDepth%).csv" >nul
+   if "%EnableVMAF%"=="1" if "%EnableMSSSIM%"=="1" echo %bitrate%,%MS-SSIM%|%safetee% -a "%~n1_%csv_name%_MS-SSIM(%CompareBitDepth%).csv" >nul
    if not "%msec_total%"=="0" echo %bitrate%,%enc_fps_calc%|%safetee% -a "%~n1_%csv_name%_fps(%CompareBitDepth%).csv" >nul
    if not "%msec_total%"=="0" echo %bitrate%,%enc_sec_calc%|%safetee% -a "%~n1_%csv_name%_Time(%CompareBitDepth%).csv" >nul
    rem bpp
@@ -320,7 +327,7 @@ if not "%enc_error%"=="1" if not "%Compare_error%"=="1" (
    echo %bpp%,%SSIM_Y%|%safetee% -a "%~n1_%csv_name%_SSIM_Y(%CompareBitDepth%)_bpp.csv" >nul
    echo %bpp%,%SSIM_All%|%safetee% -a "%~n1_%csv_name%_SSIM_All(%CompareBitDepth%)_bpp.csv" >nul
    if "%EnableVMAF%"=="1" echo %bpp%,%VMAF%|%safetee% -a "%~n1_%csv_name%_VMAF(%CompareBitDepth%)_bpp.csv" >nul
-   if "%EnableVMAF%"=="1" echo %bpp%,%MS-SSIM%|%safetee% -a "%~n1_%csv_name%_MS-SSIM(%CompareBitDepth%)_bpp.csv" >nul
+   if "%EnableVMAF%"=="1" if "%EnableMSSSIM%"=="1" echo %bpp%,%MS-SSIM%|%safetee% -a "%~n1_%csv_name%_MS-SSIM(%CompareBitDepth%)_bpp.csv" >nul
    if not "%msec_total%"=="0" echo %bpp%,%enc_fps_calc%|%safetee% -a "%~n1_%csv_name%_fps(%CompareBitDepth%)_bpp.csv" >nul
    if not "%msec_total%"=="0" echo %bpp%,%enc_sec_calc%|%safetee% -a "%~n1_%csv_name%_Time(%CompareBitDepth%)_bpp.csv" >nul
 )
@@ -339,7 +346,7 @@ if not "%enc_error%"=="1" if not "%Compare_error%"=="1" (
    echo PSNR  ^(Y^)                   : %PSNR_Y% ^(%CompareBitDepth%^)
    echo PSNR  ^(AVERAGE^)             : %PSNR_Average% ^(%CompareBitDepth%^)
    if "%EnableVMAF%"=="1" echo VMAF                        : %VMAF% ^(%CompareBitDepth%^)
-   if "%EnableVMAF%"=="1" echo MS-SSIM                     : %MS-SSIM% ^(%CompareBitDepth%^)
+   if "%EnableVMAF%"=="1" if "%EnableMSSSIM%"=="1" echo MS-SSIM                     : %MS-SSIM% ^(%CompareBitDepth%^)
    if not "%msec_total%"=="0" if not "%multipass%"=="1" echo エンコード FPS              : %enc_fps_calc% fps
    if not "%msec_total%"=="0" if "%multipass%"=="1" echo エンコード FPS              : %enc_fps_calc% fps ^(%pass_orig%パス平均^)
    if not "%msec_total%"=="0" if not "%multipass%"=="1" echo エンコード時間              : %echo_hour%時間%echo_min%分%echo_sec%.%echo_msec%秒
