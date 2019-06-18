@@ -36,7 +36,7 @@ rem VMAFは優秀なメトリックだが算出に時間がかかる
 set EnableVMAF=1
 
 rem VMAFの算出を行う時にMS-SSIMも算出を行うかどうか 1だと算出する
-set EnableMSSSIM=1
+set EnableMSSSIM=0
 
 rem SSIMやVMAFを算出する時のビット深度
 set ComparePixelFormat=-pix_fmt yuv420p
