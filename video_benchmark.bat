@@ -102,6 +102,7 @@ echo.
 set "ffmediaInfo_file=%~1"
 
 :start
+if "%verbose_log%"=="1" set EnableMSSSIM=1
 setlocal
 
 pushd "%movie_dir%"
@@ -221,7 +222,7 @@ chcp 932 >nul 2>&1
 
 rem SSIM‚ðŽZo‚·‚é
 for %%i in ("%movie_dir%%~2") do set Filesize=%%~zi
-if "%verbose_log%"=="1" set ffmpeg_ssim_option="ssim='%~n2_ssim(%CompareBitDepth%).txt';[0:v][1:v]psnr='%~n2_psnr(%CompareBitDepth%).txt'"
+if "%verbose_log%"=="1" set ffmpeg_ssim_option="ssim='%~n2_ssim(%CompareBitDepth%)_verbose_log.txt';[0:v][1:v]psnr='%~n2_psnr(%CompareBitDepth%)_verbose_log.txt'"
 if not "%verbose_log%"=="1" set ffmpeg_ssim_option="ssim;[0:v][1:v]psnr"
 popd
 pushd "%log_dir%"
@@ -229,11 +230,14 @@ pushd "%log_dir%"
 set CompareFile="%movie_dir%%~2"
 if "%codec%"=="VTM" set CompareFile="%movie_dir%%~n2.y4m"
 
-find "Parsed_ssim" "%~n2_ssim(%CompareBitDepth%)_log%pass_orig%.txt">nul 2>&1
-if not "%ERRORLEVEL%"=="0" if not "%enc_error%"=="1" echo "%~nx2"‚ÌSSIM‚ÆPSNR‚ðŽZo‚µ‚Ä‚¢‚Ü‚·&&set SSIM_check=1
-if "%SSIM_check%"=="1" (
+find "Parsed_ssim" "%~n2_ssim(%CompareBitDepth%)_log%pass_orig%.txt">nul 2>&1 || set SSIM_check=1
+if "%verbose_log%"=="1" if not exist "%log_dir%%~n2_ssim(%CompareBitDepth%)_verbose_log.txt" set SSIM_check=1
+if "%verbose_log%"=="1" if not exist "%log_dir%%~n2_psnr(%CompareBitDepth%)_verbose_log.txt" set SSIM_check=1
+
+if "%SSIM_check%"=="1" if not "%enc_error%"=="1" (
+   echo "%~nx2"‚ÌSSIM‚ÆPSNR‚ðŽZo‚µ‚Ä‚¢‚Ü‚·
    echo ‚µ‚Î‚ç‚­‚¨‘Ò‚¿‚­‚¾‚³‚¢
-   %ffmpeg% -r %frame_rate% -i %CompareFile% -an %ComparePixelFormat% -strict -2 -f yuv4mpegpipe - 2>"%~n2_ssim(%CompareBitDepth%)_pipelog%pass_orig%.txt" | %ffmpeg% -i - -r %frame_rate% -i "%~1" -lavfi %ffmpeg_ssim_option% -an -f null ->>"%~n2_ssim(%CompareBitDepth%)_log%pass_orig%.txt" 2>&1
+   %ffmpeg% -r %frame_rate% -i %CompareFile% -an %ComparePixelFormat% -strict -2 -f yuv4mpegpipe - 2>"%~n2_ssim(%CompareBitDepth%)_pipelog%pass_orig%.txt" | %ffmpeg% -i - -r %frame_rate% -i "%~1" -lavfi %ffmpeg_ssim_option% -an -f null - >"%~n2_ssim(%CompareBitDepth%)_log%pass_orig%.txt" 2>&1
    echo.
 )
 find "Parsed_ssim" "%~n2_ssim(%CompareBitDepth%)_log%pass_orig%.txt">nul 2>&1
@@ -264,11 +268,15 @@ if not "%verbose_log%"=="1" if "%EnableMSSSIM%"=="1" (
    set ffmpeg_vmaf_option="libvmaf=model_path=vmaf_v0.6.1.pkl"
 )
 
-find "VMAF score" "%log_dir%%~n2_vmaf(%CompareBitDepth%)_log%pass_orig%.txt">nul 2>&1
-if not "%ERRORLEVEL%"=="0" if not "%enc_error%"=="1" echo "%~nx2"‚ÌVMAF‚ðŽZo‚µ‚Ä‚¢‚Ü‚·&&set VMAF_check=1
-if "%VMAF_check%"=="1" (
+find "VMAF score" "%log_dir%%~n2_vmaf(%CompareBitDepth%)_log%pass_orig%.txt">nul 2>&1 || set VMAF_check=1
+if "%EnableMSSSIM%"=="1" find "MS-SSIM score" "%log_dir%%~n2_vmaf(%CompareBitDepth%)_log%pass_orig%.txt">nul 2>&1 || set VMAF_check=1
+if "%verbose_log%"=="1" find "PSNR score" "%log_dir%%~n2_vmaf(%CompareBitDepth%)_log%pass_orig%.txt">nul 2>&1 || set VMAF_check=1
+if "%verbose_log%"=="1" if not exist "%log_dir%%~n2_vmaf(%CompareBitDepth%).json" set VMAF_check=1
+
+if "%VMAF_check%"=="1" if not "%enc_error%"=="1" (
+   echo "%~nx2"‚ÌVMAF‚ðŽZo‚µ‚Ä‚¢‚Ü‚·
    echo ‚µ‚Î‚ç‚­‚¨‘Ò‚¿‚­‚¾‚³‚¢
-   %ffmpeg% -r %frame_rate% -i %CompareFile% -an %ComparePixelFormat% -strict -2 -f yuv4mpegpipe - 2>"%log_dir%%~n2_vmaf(%CompareBitDepth%)_pipelog%pass_orig%.txt" | %ffmpeg_VMAF% -i - -r %frame_rate% -i "%~1" -filter_complex %ffmpeg_vmaf_option% -an -f null - >>"%log_dir%%~n2_vmaf(%CompareBitDepth%)_log%pass_orig%.txt" 2>&1
+   %ffmpeg% -r %frame_rate% -i %CompareFile% -an %ComparePixelFormat% -strict -2 -f yuv4mpegpipe - 2>"%log_dir%%~n2_vmaf(%CompareBitDepth%)_pipelog%pass_orig%.txt" | %ffmpeg_VMAF% -i - -r %frame_rate% -i "%~1" -filter_complex %ffmpeg_vmaf_option% -an -f null - >"%log_dir%%~n2_vmaf(%CompareBitDepth%)_log%pass_orig%.txt" 2>&1
    echo.
 )
 if "%verbose_log%"=="1" if exist "%~n2_vmaf(%CompareBitDepth%).json" move /Y "%~n2_vmaf(%CompareBitDepth%).json" "%log_dir%%~n2_vmaf(%CompareBitDepth%).json" >nul
