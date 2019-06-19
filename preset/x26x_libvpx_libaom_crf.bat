@@ -3,7 +3,7 @@ cd "%~dp0"
 for %%i in ("..\video_benchmark.bat") do set benchmark_bat="%%~dpnxi"
 :loop
 if "%~1"=="" goto end
-for /L %%i in (160,-20,60) do call %benchmark_bat% "%~1" "%~n1_rav1e_20190427_s2_tunepsnr_low_latency_false_q%%i.mp4" "--quantizer %%i --speed 2 --tune psnr --keyint 250 --threads 8 --tile-cols-log2 2 --tile-rows-log2 2" rav1e 20190427_s2_tunepsnr_low_latency_false
+for /L %%i in (160,-20,60) do call %benchmark_bat% "%~1" "%~n1_rav1e_20190616_s2_tunepsnr_q%%i.mp4" "--quantizer %%i --speed 2 --tune psnr --keyint 250 --threads 8 --tile-cols-log2 2 --tile-rows-log2 2" rav1e 20190616_s2_tunepsnr
 for /L %%i in (32,-2,18) do call %benchmark_bat% "%~1" "%~n1_x264_placebo_tunessim_crf%%i.mp4" "--preset placebo --tune ssim --keyint 250 --crf %%i" x264 placebo_tunessim_crf
 for /L %%i in (32,-2,18) do call %benchmark_bat% "%~1" "%~n1_x265_placebo_tunessim_crf%%i.mp4" "--preset placebo --tune ssim --keyint 250 --crf %%i" x265 placebo_tunessim_crf
 for /L %%i in (55,-5,25) do call %benchmark_bat% "%~1" "%~n1_libvpx_vp9_c0_2pass_q%%i.webm" "--codec=vp9 --frame-parallel=0 --tile-columns=2 --good --cpu-used=0 --tune=psnr --passes=2 --threads=2 --end-usage=q --cq-level=%%i --webm --auto-alt-ref=6 --kf-max-dist=250" libvpx vp9_c0_2pass_q

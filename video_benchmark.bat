@@ -59,7 +59,7 @@ set NVEncC="%~dp0tools\VCEEncC\x64\NVEncC64.exe"
 
 set vpxenc="%~dp0tools\vpxenc.exe"
 set aomenc="%~dp0tools\aomenc.exe"
-set rav1e="%~dp0tools\rav1e-20190427-v0.1.0-5eb7b87.exe"
+set rav1e="%~dp0tools\rav1e-20190616-v0.1.0-6d330d2.exe"
 set SVT-AV1="%~dp0tools\SvtAv1EncApp.exe"
 set SVT-VP9="%~dp0tools\SvtVp9EncApp.exe"
 set SVT-HEVC="%~dp0tools\SvtHevcEncApp.exe"
