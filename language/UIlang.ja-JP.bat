@@ -1,5 +1,5 @@
 set "MessageArgumentErrorLine1=エラー batを呼び出す引数が正しくありません"
-set "MessageArgumentErrorLine2=video_benchmark.bat 入力動画 出力ファイル名 エンコーダーのコマンドライン エンコーダー名 csvファイル名 で呼び出してください"
+set "MessageArgumentErrorLine2=usage: video_benchmark.bat 入力動画 出力ファイル名 エンコーダーのコマンドライン エンコーダー名 csvファイル名"
 set "MessageInputVideoCheck=入力ファイルの情報を調べています"
 set "MessageInputVideoCheckError=入力ファイルは動画ではない可能性があります"
 set "MessageInputVideoInfoFileName=入力ファイル                : "%%~nx1""

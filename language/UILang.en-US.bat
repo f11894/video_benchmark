@@ -1,5 +1,5 @@
 set "MessageArgumentErrorLine1=error.Invalid argument to call bat."
-set "MessageArgumentErrorLine2=video_benchmark.bat InputVideo OutputFileName EncoderCommandLine EncoderName csvFileName"
+set "MessageArgumentErrorLine2=usage: video_benchmark.bat InputVideo OutputFileName EncoderCommandLine EncoderName csvFileName"
 set "MessageInputVideoCheck=Checking information of input file."
 set "MessageInputVideoCheckError=Input file may not be a video."
 set "MessageInputVideoInfoFileName=Input file                  : "%%~nx1""
