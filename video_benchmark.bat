@@ -295,10 +295,11 @@ if not "%enc_error%"=="1" if not "%Compare_error%"=="1" (
    if not "%msec_total%"=="0" echo %bpp%,%enc_fps_calc%|%safetee% -a "%~n1_%csv_name%_fps(%CompareBitDepth%)_bpp.csv" >nul
    if not "%msec_total%"=="0" echo %bpp%,%enc_sec_calc%|%safetee% -a "%~n1_%csv_name%_Time(%CompareBitDepth%)_bpp.csv" >nul
 )
+set random3x=%random%_%random%_%random%
 for %%i in ("%~n1_%csv_name%*.csv") do (
-   move /Y "%%~i" "%TEMP%\video_benchmark_temp.txt">nul
-   %busybox64% awk "!a[$0]++" "%TEMP%\video_benchmark_temp.txt" | %busybox64% awk -v ORS="\r\n" "{print}" >"%%~i"
-   del "%TEMP%\video_benchmark_temp.txt">nul 2>&1
+   copy /Y "%%~i" "%TEMP%\%%~ni_%random3x%.txt">nul
+   %busybox64% awk "!a[$0]++" "%TEMP%\%%~ni_%random3x%.txt" | %busybox64% awk -v ORS="\r\n" "{print}" >"%%~i"
+   del "%TEMP%\%%~ni_%random3x%.txt">nul 2>&1
 )
 popd
 
