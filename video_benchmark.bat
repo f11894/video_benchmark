@@ -401,7 +401,7 @@ set enc_error=1
 if exist "%~2" del "%~2"
 
 echo %MessageEncodeErrorLine1%
-echo %MessageEncodeErrorLine1%
+echo %MessageEncodeErrorLine2%
 echo Input File "%~1"
 echo Output File "%~2"
 echo CommandLine "%codec% %CommandLine%"
