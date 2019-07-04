@@ -90,9 +90,6 @@ if not exist "%movie_dir%%~2" (
    rem ログフォルダに以前のログが残っていたら削除する
    if exist "%log_dir%%~n2_ssim(%CompareBitDepth%)_log%pass_orig%.txt" del "%log_dir%%~n2_ssim(%CompareBitDepth%)_log%pass_orig%.txt"
    if exist "%log_dir%%~n2_vmaf(%CompareBitDepth%)_log%pass_orig%.txt" del "%log_dir%%~n2_vmaf(%CompareBitDepth%)_log%pass_orig%.txt"
-   echo %codec% %CommandLine%でエンコードしています
-   echo しばらくお待ちください
-   echo.
    if "%multipass%"=="1" echo マルチパス %pass_temp%/%pass_orig%&&echo.
    echo "%codec% %CommandLine%">"%log_dir%%~n2_log%pass_temp%.txt"
    if "%codec%"=="QSVEncC" %timer64% "%QSVEncC%" -i "%~1" %CommandLine% -o "%movie_dir%%~2" 2>&1 | %safetee% -a "%log_dir%%~n2_log%pass_temp%.txt"
@@ -144,8 +141,8 @@ if not "%enc_skip%"=="1" call :error_check "%~1" %ErrorCheckFile%
 if "%multipass%"=="1" if not "%enc_skip%"=="1" if not "%pass_temp%"=="%pass_orig%" if exist %ErrorCheckFile% del %ErrorCheckFile%
 
 rem 処理時間をログファイルから拾う
-if not "%enc_error%"=="1" findstr "^[0-9][0-9]*$" "%log_dir%%~n2_log%pass_temp%.txt">nul 2>&1||set timer_error=1&&SET enc_msec%pass_temp%=0
-if not "%enc_error%"=="1" if not "%timer_error%"=="1" FOR /f "DELIMS=" %%i IN ('findstr "^[0-9][0-9]*$" "%log_dir%%~n2_log%pass_temp%.txt"') DO SET enc_msec%pass_temp%=%%i
+if not "%enc_error%"=="1" findstr "^TotalMilliseconds : [0-9][0-9]*$" "%log_dir%%~n2_log%pass_temp%.txt">nul 2>&1||set timer_error=1&&SET enc_msec%pass_temp%=0
+if not "%enc_error%"=="1" if not "%timer_error%"=="1" FOR /f "tokens=3" %%i IN ('findstr "^TotalMilliseconds : [0-9][0-9]*$" "%log_dir%%~n2_log%pass_temp%.txt"') DO SET enc_msec%pass_temp%=%%i
 if not "%enc_error%"=="1" call :msec_to_sec
 rem マルチパスなら最終パスになるまで処理をループする
 if "%multipass%"=="1" if not "%pass_temp%"=="%pass_orig%" (
