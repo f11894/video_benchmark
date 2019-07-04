@@ -8,6 +8,7 @@ set "MessageInputVideoInfoFrameRate=フレームレート              : %%frame
 set "MessageInputVideoInfoFrameCount=総フレーム数                : %%FrameCount%%"
 set "MessageInputVideoInfoDuration=動画の長さ                  : %%Duration%%"
 set "MessagePleaseWait=しばらくお待ちください"
+set "MessageMultiPass=マルチパス"
 set "MessageIntermediateFileEncode=入力に使用する中間ファイルを作成しています"
 set "MessageEncodeSkip=出力先に同名のファイルが存在するのでエンコード処理をスキップします"
 set "MessageSSIMCompare="%%~nx2"のSSIMとPSNRを算出しています"
