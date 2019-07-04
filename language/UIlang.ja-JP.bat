@@ -7,7 +7,6 @@ set "MessageInputVideoInfoVideoSize=動画サイズ                  : %%video_s
 set "MessageInputVideoInfoFrameRate=フレームレート              : %%frame_rate%%"
 set "MessageInputVideoInfoFrameCount=総フレーム数                : %%FrameCount%%"
 set "MessageInputVideoInfoDuration=動画の長さ                  : %%Duration%%"
-set "MessageEncodeStart=%%codec%% %%CommandLine%%でエンコードしています"
 set "MessagePleaseWait=しばらくお待ちください"
 set "MessageIntermediateFileEncode=入力に使用する中間ファイルを作成しています"
 set "MessageEncodeSkip=出力先に同名のファイルが存在するのでエンコード処理をスキップします"

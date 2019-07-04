@@ -7,7 +7,6 @@ set "MessageInputVideoInfoVideoSize=Video size                  : %%video_size%%
 set "MessageInputVideoInfoFrameRate=Frame rate                  : %%frame_rate%%"
 set "MessageInputVideoInfoFrameCount=Frame count                 : %%FrameCount%%"
 set "MessageInputVideoInfoDuration=Duration                    : %%Duration%%"
-set "MessageEncodeStart=Run %%codec%% %%CommandLine%%"
 set "MessagePleaseWait=Please wait."
 set "MessageIntermediateFileEncode=Creating intermediate file for input."
 set "MessageEncodeSkip=Since the file with the same name exists in the output destination, encoding processing is skipped."
