@@ -1,14 +1,22 @@
 @echo off
+if "%language_configured%"=="1" goto ArgumentCheck
+for /f "tokens=2" %%i in ('PowerShell Get-WinSystemLocale') do set "SystemLocale=%%i"
+chcp 65001 >nul
+call "%~dp0language\UILang.en-US.bat"
+if exist "%~dp0language\UIlang.%SystemLocale%.bat" call "%~dp0language\UIlang.%SystemLocale%.bat"
+set language_configured=1
+chcp 932 >nul
+
+:ArgumentCheck
 rem 引数チェック
 if "%~1"=="" set ArgumentError=1
 if "%~2"=="" set ArgumentError=1
 if "%~3"=="" set ArgumentError=1
 if "%~4"=="" set ArgumentError=1
 if "%~5"=="" set ArgumentError=1
-
 if "%ArgumentError%"=="1" (
-   echo エラー batを呼び出す引数が正しくありません
-   echo video_benchmark.bat 入力動画 出力ファイル名 エンコーダーのコマンドライン エンコーダー名 csvファイル名 で呼び出してください
+   echo %MessageArgumentErrorLine1%
+   echo %MessageArgumentErrorLine2%
    timeout /t 30
    exit /b
 )
@@ -25,12 +33,12 @@ rem 動画の情報を調べる
 if not exist "%log_dir%" mkdir "%log_dir%"
 if not exist "%movie_dir%" mkdir "%movie_dir%"
 if "%ffmediaInfo_file%"=="%~1" goto start
-echo 入力ファイルの情報を調べています
+echo %MessageInputVideoCheck%
 
 call "%~dp0ffmediaInfo.bat" "%~1"
 
 if "%Duration%"=="" if "%FrameCount%"=="" (
-   echo 入力ファイルは動画ではない可能性があります
+   echo %MessageInputVideoCheckError%
    echo.
    timeout /t %wait%
    goto input_error_skip
@@ -44,11 +52,11 @@ set /a Duration_Minute=(1%Duration_Minute%-100)*60000
 set Duration_Hour=%Duration:~0,2%
 set /a Duration_Hour=(1%Duration_Hour%-100)*3600000
 set /a Duration2=%Duration_msec%+%Duration_sec%+%Duration_Minute%+%Duration_Hour%
-echo 入力ファイル                : "%~nx1"
-echo 動画サイズ                  : %video_size%
-echo フレームレート              : %frame_rate%
-echo 総フレーム数                : %FrameCount%
-echo 動画の長さ                  : %Duration%
+call echo %MessageInputVideoInfoFileName%
+call echo %MessageInputVideoInfoVideoSize%
+call echo %MessageInputVideoInfoFrameRate%
+call echo %MessageInputVideoInfoFrameCount%
+call echo %MessageInputVideoInfoDuration%
 echo.
 set "ffmediaInfo_file=%~1"
 
@@ -90,30 +98,30 @@ if not exist "%movie_dir%%~2" (
    rem ログフォルダに以前のログが残っていたら削除する
    if exist "%log_dir%%~n2_ssim(%CompareBitDepth%)_log%pass_orig%.txt" del "%log_dir%%~n2_ssim(%CompareBitDepth%)_log%pass_orig%.txt"
    if exist "%log_dir%%~n2_vmaf(%CompareBitDepth%)_log%pass_orig%.txt" del "%log_dir%%~n2_vmaf(%CompareBitDepth%)_log%pass_orig%.txt"
-   if "%multipass%"=="1" echo マルチパス %pass_temp%/%pass_orig%&&echo.
-   echo "%codec% %CommandLine%">"%log_dir%%~n2_log%pass_temp%.txt"
-   if "%codec%"=="QSVEncC" %timer64% "%QSVEncC%" -i "%~1" %CommandLine% -o "%movie_dir%%~2" 2>&1 | %safetee% -a "%log_dir%%~n2_log%pass_temp%.txt"
-   if "%codec%"=="VCEEncC" %timer64% "%VCEEncC%" -i "%~1" %CommandLine% -o "%movie_dir%%~2" 2>&1 | %safetee% -a "%log_dir%%~n2_log%pass_temp%.txt"
-   if "%codec%"=="NVEncC" %timer64% "%NVEncC%" -i "%~1" %CommandLine% -o "%movie_dir%%~2" 2>&1 | %safetee% -a "%log_dir%%~n2_log%pass_temp%.txt"
-   if "%codec%"=="FFmpeg" %timer64% %ffmpeg_enc% -y -i "%~1" -an %EncodePixelFormat% %CommandLine% "%movie_dir%%~2" 2>&1 | %safetee% -a "%log_dir%%~n2_log%pass_temp%.txt"
-   if "%codec%"=="x264" %ffmpeg% -y -i "%~1" -an %EncodePixelFormat% -strict -2 -f yuv4mpegpipe - 2>"%log_dir%%~n2_pipelog%pass_temp%.txt" | %timer64% %x264% %CommandLine% --demuxer y4m -o "%movie_dir%%~2" - 2>&1 | %safetee% -a "%log_dir%%~n2_log%pass_temp%.txt"
-   if "%codec%"=="x265" %ffmpeg% -y -i "%~1" -an %EncodePixelFormat% -strict -2 -f yuv4mpegpipe - 2>"%log_dir%%~n2_pipelog%pass_temp%.txt" | %timer64% %x265% %CommandLine% --input - --y4m "%movie_dir%%~n2.h265" 2>&1 | %safetee% -a "%log_dir%%~n2_log%pass_temp%.txt"
+
+   if "%multipass%"=="1" echo %MessageMultiPass% %pass_temp%/%pass_orig%&&echo.
+   if "%codec%"=="QSVEncC" %timer64% "%QSVEncC%" -i "%~1" %CommandLine% -o "%movie_dir%%~2" 2>&1 | %safetee% -o "%log_dir%%~n2_log%pass_temp%.txt"
+   if "%codec%"=="VCEEncC" %timer64% "%VCEEncC%" -i "%~1" %CommandLine% -o "%movie_dir%%~2" 2>&1 | %safetee% -o "%log_dir%%~n2_log%pass_temp%.txt"
+   if "%codec%"=="NVEncC" %timer64% "%NVEncC%" -i "%~1" %CommandLine% -o "%movie_dir%%~2" 2>&1 | %safetee% -o "%log_dir%%~n2_log%pass_temp%.txt"
+   if "%codec%"=="FFmpeg" %timer64% %ffmpeg_enc% -y -i "%~1" -an %EncodePixelFormat% %CommandLine% "%movie_dir%%~2" 2>&1 | %safetee% -o "%log_dir%%~n2_log%pass_temp%.txt"
+   if "%codec%"=="x264" %ffmpeg% -y -i "%~1" -an %EncodePixelFormat% -strict -2 -f yuv4mpegpipe - 2>"%log_dir%%~n2_pipelog%pass_temp%.txt" | %timer64% %x264% %CommandLine% --demuxer y4m -o "%movie_dir%%~2" - 2>&1 | %safetee% -o "%log_dir%%~n2_log%pass_temp%.txt"
+   if "%codec%"=="x265" %ffmpeg% -y -i "%~1" -an %EncodePixelFormat% -strict -2 -f yuv4mpegpipe - 2>"%log_dir%%~n2_pipelog%pass_temp%.txt" | %timer64% %x265% %CommandLine% --input - --y4m "%movie_dir%%~n2.h265" 2>&1 | %safetee% -o "%log_dir%%~n2_log%pass_temp%.txt"
    if "%codec%"=="libaom" (
-      if not exist "%movie_dir%%~n1_temp%EncodeBitDepth%.y4m" echo 入力に使用する中間ファイルを作成しています&&%ffmpeg% -i "%~1" -an %EncodePixelFormat% -strict -2 "%movie_dir%%~n1_temp%EncodeBitDepth%.y4m" >>"%log_dir%%~n2_log%pass_temp%.txt" 2>&1
+      if not exist "%movie_dir%%~n1_temp%EncodeBitDepth%.y4m" echo %MessageIntermediateFileEncode% &&%ffmpeg% -i "%~1" -an %EncodePixelFormat% -strict -2 "%movie_dir%%~n1_temp%EncodeBitDepth%.y4m" >"%log_dir%%~n2_log%pass_temp%.txt" 2>&1
       %aomenc% --help | find "AOMedia Project AV1 Encoder">>"%log_dir%%~n2_log%pass_temp%.txt" 2>&1 
       %timer64% %aomenc% %CommandLine% -o "%movie_dir%%~n2.ivf" "%movie_dir%%~n1_temp%EncodeBitDepth%.y4m" 2>&1 | %safetee% -a "%log_dir%%~n2_log%pass_temp%.txt"
    )
-   if "%codec%"=="rav1e" %ffmpeg% -y -i "%~1" -an %EncodePixelFormat% -strict -2 -f yuv4mpegpipe - 2>"%log_dir%%~n2_pipelog%pass_temp%.txt" | %timer64% %rav1e% - %CommandLine% -o "%movie_dir%%~n2.ivf" 2>&1 | %safetee% -a "%log_dir%%~n2_log%pass_temp%.txt"
-   if "%codec%"=="SVT-AV1" %ffmpeg% -y -i "%~1" -an -nostdin -f rawvideo %EncodePixelFormat% -strict -2 - 2>"%log_dir%%~n2_pipelog%pass_temp%.txt" | %timer64% %SVT-AV1% -i stdin %CommandLine% -n %FrameCount% -w %Width% -h %Height% -fps-num %frame_rate_num% -fps-denom %frame_rate_denom% -b "%movie_dir%%~n2.ivf" 2>&1 | %safetee% -a "%log_dir%%~n2_log%pass_temp%.txt"
-   if "%codec%"=="SVT-HEVC" %ffmpeg% -y -i "%~1" -an -nostdin -f rawvideo %EncodePixelFormat% -strict -2 - 2>"%log_dir%%~n2_pipelog%pass_temp%.txt" | %timer64% %SVT-HEVC% -i stdin %CommandLine% -n %FrameCount% -w %Width% -h %Height% -fps-num %frame_rate_num% -fps-denom %frame_rate_denom% -b "%movie_dir%%~n2.h265" 2>&1 | %safetee% -a "%log_dir%%~n2_log%pass_temp%.txt"
-   if "%codec%"=="SVT-VP9" %ffmpeg% -y -i "%~1" -an -nostdin -f rawvideo %EncodePixelFormat% -strict -2 - 2>"%log_dir%%~n2_pipelog%pass_temp%.txt" | %timer64% %SVT-VP9% -i stdin %CommandLine% -n %FrameCount% -w %Width% -h %Height% -fps-num %frame_rate_num% -fps-denom %frame_rate_denom% -b "%movie_dir%%~n2.ivf" 2>&1 | %safetee% -a "%log_dir%%~n2_log%pass_temp%.txt"
+   if "%codec%"=="rav1e" %ffmpeg% -y -i "%~1" -an %EncodePixelFormat% -strict -2 -f yuv4mpegpipe - 2>"%log_dir%%~n2_pipelog%pass_temp%.txt" | %timer64% %rav1e% - %CommandLine% -o "%movie_dir%%~n2.ivf" 2>&1 | %safetee% -o "%log_dir%%~n2_log%pass_temp%.txt"
+   if "%codec%"=="SVT-AV1" %ffmpeg% -y -i "%~1" -an -nostdin -f rawvideo %EncodePixelFormat% -strict -2 - 2>"%log_dir%%~n2_pipelog%pass_temp%.txt" | %timer64% %SVT-AV1% -i stdin %CommandLine% -n %FrameCount% -w %Width% -h %Height% -fps-num %frame_rate_num% -fps-denom %frame_rate_denom% -b "%movie_dir%%~n2.ivf" 2>&1 | %safetee% -o "%log_dir%%~n2_log%pass_temp%.txt"
+   if "%codec%"=="SVT-HEVC" %ffmpeg% -y -i "%~1" -an -nostdin -f rawvideo %EncodePixelFormat% -strict -2 - 2>"%log_dir%%~n2_pipelog%pass_temp%.txt" | %timer64% %SVT-HEVC% -i stdin %CommandLine% -n %FrameCount% -w %Width% -h %Height% -fps-num %frame_rate_num% -fps-denom %frame_rate_denom% -b "%movie_dir%%~n2.h265" 2>&1 | %safetee% -o "%log_dir%%~n2_log%pass_temp%.txt"
+   if "%codec%"=="SVT-VP9" %ffmpeg% -y -i "%~1" -an -nostdin -f rawvideo %EncodePixelFormat% -strict -2 - 2>"%log_dir%%~n2_pipelog%pass_temp%.txt" | %timer64% %SVT-VP9% -i stdin %CommandLine% -n %FrameCount% -w %Width% -h %Height% -fps-num %frame_rate_num% -fps-denom %frame_rate_denom% -b "%movie_dir%%~n2.ivf" 2>&1 | %safetee% -o "%log_dir%%~n2_log%pass_temp%.txt"
    if "%codec%"=="libvpx" (
-      if not exist "%movie_dir%%~n1_temp%EncodeBitDepth%.y4m" echo 入力に使用する中間ファイルを作成しています&&%ffmpeg% -i "%~1" -an %EncodePixelFormat% -strict -2 "%movie_dir%%~n1_temp%EncodeBitDepth%.y4m" >>"%log_dir%%~n2_log%pass_temp%.txt" 2>&1
+      if not exist "%movie_dir%%~n1_temp%EncodeBitDepth%.y4m" echo %MessageIntermediateFileEncode% &&%ffmpeg% -i "%~1" -an %EncodePixelFormat% -strict -2 "%movie_dir%%~n1_temp%EncodeBitDepth%.y4m" >"%log_dir%%~n2_log%pass_temp%.txt" 2>&1
       %vpxenc% --help | find "WebM Project">>"%log_dir%%~n2_log%pass_temp%.txt" 2>&1 
       %timer64% %vpxenc% %CommandLine% -o "%movie_dir%%~2" "%movie_dir%%~n1_temp%EncodeBitDepth%.y4m" 2>&1 | %safetee% -a "%log_dir%%~n2_log%pass_temp%.txt"
    )
    if "%codec%"=="VTM" (
-       if not exist "%movie_dir%%~n1_temp%EncodeBitDepth%.yuv" echo 入力に使用する中間ファイルを作成しています&&%ffmpeg% -i "%~1" -an %EncodePixelFormat% -f rawvideo -strict -2 "%movie_dir%%~n1_temp%EncodeBitDepth%.yuv" >>"%log_dir%%~n2_log%pass_temp%.txt" 2>&1
+       if not exist "%movie_dir%%~n1_temp%EncodeBitDepth%.yuv" echo %MessageIntermediateFileEncode% &&%ffmpeg% -i "%~1" -an %EncodePixelFormat% -f rawvideo -strict -2 "%movie_dir%%~n1_temp%EncodeBitDepth%.yuv" >"%log_dir%%~n2_log%pass_temp%.txt" 2>&1
        %timer64% %VTM%  %CommandLine% -fr %frame_rate_integer% -wdt %Width% -hgt %Height% -f %FrameCount% -i "%movie_dir%%~n1_temp%EncodeBitDepth%.yuv" -o "%movie_dir%%~n2.yuv" -b "%movie_dir%%~2" 2>&1 | %safetee% -a "%log_dir%%~n2_log%pass_temp%.txt"
        %ffmpeg% -y -f rawvideo -s %video_size% -r %frame_rate% %EncodePixelFormat% -strict -2 -i "%movie_dir%%~n2.yuv" "%movie_dir%%~n2.y4m" >>"%log_dir%%~n2_log%pass_temp%.txt" 2>&1 &&del "%movie_dir%%~n2.yuv"
    )
@@ -123,7 +131,7 @@ if not exist "%movie_dir%%~2" (
    )
 ) else (
    set enc_skip=1
-   echo 出力先に同名のファイルが存在するのでエンコード処理をスキップします
+   echo %MessageEncodeSkip%
 )
 
 rem エンコード後の処理
@@ -187,19 +195,19 @@ if "%verbose_log%"=="1" if not exist "%log_dir%%~n2_ssim(%CompareBitDepth%)_verb
 if "%verbose_log%"=="1" if not exist "%log_dir%%~n2_psnr(%CompareBitDepth%)_verbose_log.txt" set SSIM_check=1
 
 if "%SSIM_check%"=="1" if not "%enc_error%"=="1" (
-   echo "%~nx2"のSSIMとPSNRを算出しています
-   echo しばらくお待ちください
+   call echo %MessageSSIMCompare%
+   echo %MessagePleaseWait%
    %ffmpeg% -r %frame_rate% -i %CompareFile% -an %ComparePixelFormat% -strict -2 -f yuv4mpegpipe - 2>"%~n2_ssim(%CompareBitDepth%)_pipelog%pass_orig%.txt" | %ffmpeg% -i - -r %frame_rate% -i "%~1" -lavfi %ffmpeg_ssim_option% -an -f null - >"%~n2_ssim(%CompareBitDepth%)_log%pass_orig%.txt" 2>&1
    echo.
 )
 find "Parsed_ssim" "%~n2_ssim(%CompareBitDepth%)_log%pass_orig%.txt">nul 2>&1
 if not "%ERRORLEVEL%"=="0" if not "%enc_error%"=="1" (
-   echo SSIMとPSNRの算出に失敗しました
+   echo %MessageSSIMCompareError%
    echo %date% %time%>>%error_log%
-   echo SSIMとPSNRの算出に失敗しました>>%error_log%
-   echo 入力ファイル>>%error_log%
+   echo %MessageSSIMCompareError% >>%error_log%
+   echo Input File>>%error_log%
    echo "%~1">>%error_log%
-   echo 比較ファイル>>%error_log%
+   echo Comparison file>>%error_log%
    echo "%movie_dir%%~2">>%error_log%
    echo.>>%error_log%
    set Compare_error=1
@@ -226,20 +234,20 @@ if "%verbose_log%"=="1" find "PSNR score" "%log_dir%%~n2_vmaf(%CompareBitDepth%)
 if "%verbose_log%"=="1" if not exist "%log_dir%%~n2_vmaf(%CompareBitDepth%).json" set VMAF_check=1
 
 if "%VMAF_check%"=="1" if not "%enc_error%"=="1" (
-   echo "%~nx2"のVMAFを算出しています
-   echo しばらくお待ちください
+   call echo %MessageVMAFCompare%
+   echo %MessagePleaseWait%
    %ffmpeg% -r %frame_rate% -i %CompareFile% -an %ComparePixelFormat% -strict -2 -f yuv4mpegpipe - 2>"%log_dir%%~n2_vmaf(%CompareBitDepth%)_pipelog%pass_orig%.txt" | %ffmpeg_VMAF% -i - -r %frame_rate% -i "%~1" -filter_complex %ffmpeg_vmaf_option% -an -f null - >"%log_dir%%~n2_vmaf(%CompareBitDepth%)_log%pass_orig%.txt" 2>&1
    echo.
 )
 if "%verbose_log%"=="1" if exist "%~n2_vmaf(%CompareBitDepth%).json" move /Y "%~n2_vmaf(%CompareBitDepth%).json" "%log_dir%%~n2_vmaf(%CompareBitDepth%).json" >nul
 find "VMAF score" "%log_dir%%~n2_vmaf(%CompareBitDepth%)_log%pass_orig%.txt">nul 2>&1
 if not "%ERRORLEVEL%"=="0" if not "%enc_error%"=="1" (
-   echo VMAFの算出に失敗しました
+   echo %MessageVMAFCompareError%
    echo %date% %time%>>%error_log%
-   echo VMAFの算出に失敗しました>>%error_log%
-   echo 入力ファイル>>%error_log%
+   echo %MessageVMAFCompareError% >>%error_log%
+   echo Input File>>%error_log%
    echo "%~1">>%error_log%
-   echo 比較ファイル>>%error_log%
+   echo Comparison file>>%error_log%
    echo "%movie_dir%%~2">>%error_log%
    echo.>>%error_log%
    set Compare_error=1
@@ -300,19 +308,19 @@ for %%i in ("%~n1_%csv_name%*.csv") do (
 )
 popd
 
-if not "%enc_error%"=="1" if not "%Compare_error%"=="1" echo 出力ファイル                : "%~nx2"
+if not "%enc_error%"=="1" if not "%Compare_error%"=="1" call echo %MessageResultOutputName%
 if not "%enc_error%"=="1" if not "%Compare_error%"=="1" (
-   echo ビットレート^(簡易的な計算値^): %echo_bitrare% kbps
+   echo bitrate                     : %echo_bitrare% kbps
    echo SSIM  ^(Y^)                   : %SSIM_Y% ^(%CompareBitDepth%^)
    echo SSIM  ^(All^)                 : %SSIM_All% ^(%CompareBitDepth%^)
    echo PSNR  ^(Y^)                   : %PSNR_Y% ^(%CompareBitDepth%^)
    echo PSNR  ^(AVERAGE^)             : %PSNR_Average% ^(%CompareBitDepth%^)
    if "%EnableVMAF%"=="1" echo VMAF                        : %VMAF% ^(%CompareBitDepth%^)
    if "%EnableVMAF%"=="1" if "%EnableMSSSIM%"=="1" echo MS-SSIM                     : %MS-SSIM% ^(%CompareBitDepth%^)
-   if not "%msec_total%"=="0" if not "%multipass%"=="1" echo エンコード FPS              : %enc_fps_calc% fps
-   if not "%msec_total%"=="0" if "%multipass%"=="1" echo エンコード FPS              : %enc_fps_calc% fps ^(%pass_orig%パス平均^)
-   if not "%msec_total%"=="0" if not "%multipass%"=="1" echo エンコード時間              : %echo_hour%時間%echo_min%分%echo_sec%.%echo_msec%秒
-   if not "%msec_total%"=="0" if "%multipass%"=="1" echo エンコード時間              : %echo_hour%時間%echo_min%分%echo_sec%.%echo_msec%秒 ^(%pass_orig%パス合計^)
+   if not "%msec_total%"=="0" if not "%multipass%"=="1" call echo %MessageResultFPS%
+   if not "%msec_total%"=="0" if "%multipass%"=="1" call echo %MessageResultFPSMultiPass%
+   if not "%msec_total%"=="0" if not "%multipass%"=="1" call echo %MessageResultTime%
+   if not "%msec_total%"=="0" if "%multipass%"=="1" call echo %MessageResultTimeMultiPass%
    echo.
    echo.
    echo.
@@ -395,18 +403,18 @@ exit /b
 set enc_error=1
 if exist "%~2" del "%~2"
 
-echo 動画のエンコードに失敗した可能性があります
-echo 入力ファイルに問題がないか、コマンドラインが間違っていないか確認してください
-echo 入力ファイル "%~1"
-echo 出力ファイル "%~2"
-echo コマンドライン "%codec% %CommandLine%"
+echo %MessageEncodeErrorLine1%
+echo %MessageEncodeErrorLine2%
+echo Input File "%~1"
+echo Output File "%~2"
+echo CommandLine "%codec% %CommandLine%"
 echo.
 (echo %date% %time%
-echo 動画のエンコードに失敗した可能性があります
-echo 入力ファイルに問題がないか、コマンドラインが間違っていないか確認してください
-echo 入力ファイル "%~1"
-echo 出力ファイル "%~2"
-echo コマンドライン "%codec% %CommandLine%"
+echo %MessageEncodeErrorLine1%
+echo %MessageEncodeErrorLine2%
+echo Input File  "%~1"
+echo Output File "%~2"
+echo CommandLine "%codec% %CommandLine%"
 echo.) >>%error_log%
 timeout /t %wait%
 exit /b
