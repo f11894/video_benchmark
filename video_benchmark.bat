@@ -1,14 +1,13 @@
 @echo off
 if "%language_configured%"=="1" goto ArgumentCheck
 for /f "tokens=2" %%i in ('PowerShell Get-WinSystemLocale') do set "SystemLocale=%%i"
-chcp 65001 >nul
+chcp 65001 >nul 2>&1
 call "%~dp0language\UILang.en-US.bat"
 if exist "%~dp0language\UIlang.%SystemLocale%.bat" call "%~dp0language\UIlang.%SystemLocale%.bat"
 set language_configured=1
-chcp 932 >nul
 
 :ArgumentCheck
-rem ˆø”ƒ`ƒFƒbƒN
+rem å¼•æ•°ãƒã‚§ãƒƒã‚¯
 if "%~1"=="" set ArgumentError=1
 if "%~2"=="" set ArgumentError=1
 if "%~3"=="" set ArgumentError=1
@@ -21,14 +20,14 @@ if "%ArgumentError%"=="1" (
    exit /b
 )
 
-rem İ’èƒtƒ@ƒCƒ‹‚Ì“Ç‚İ‚İ
-rem user_setting‚ª–³‚¯‚ê‚Îdefault_setting‚ğƒRƒs[‚·‚é
+rem è¨­å®šãƒ•ã‚¡ã‚¤ãƒ«ã®èª­ã¿è¾¼ã¿
+rem user_settingãŒç„¡ã‘ã‚Œã°default_settingã‚’ã‚³ãƒ”ãƒ¼ã™ã‚‹
 if not exist "%~dp0user_setting.bat" copy /y "%~dp0setting\default_setting.bat" "%~dp0setting\user_setting.bat" >nul 2>&1
 
 call "%~dp0setting\default_setting.bat" "%~1" "%~dpnx0"
 call "%~dp0setting\user_setting.bat" "%~1" "%~dpnx0"
 
-rem “®‰æ‚Ìî•ñ‚ğ’²‚×‚é
+rem å‹•ç”»ã®æƒ…å ±ã‚’èª¿ã¹ã‚‹
 :ffmediaInfo
 if not exist "%log_dir%" mkdir "%log_dir%"
 if not exist "%movie_dir%" mkdir "%movie_dir%"
@@ -67,7 +66,7 @@ setlocal
 pushd "%movie_dir%"
 
 :enc_process
-rem ƒGƒ“ƒR[ƒh‘O‚Ì‰ºˆ—
+rem ã‚¨ãƒ³ã‚³ãƒ¼ãƒ‰å‰ã®ä¸‹å‡¦ç†
 set "CommandLine=%~3"
 set "codec=%~4"
 set "csv_name=%codec%_%~5"
@@ -81,7 +80,7 @@ if "%~6"=="10bit" (
    set "EncodeBitDepth=10bit"
 )
 
-rem qsv_enc—p‘Oˆ—
+rem qsv_encç”¨å‰å‡¦ç†
 echo "%codec%"|findstr "QSVEncC VCEEncC" >nul&& echo "%CommandLine%"|findstr /r /c:"--cqp [0-9]">nul&&call :cqp_number_set --cqp
 echo "%codec%"|findstr "QSVEncC VCEEncC" >nul&& echo "%CommandLine%"|findstr /r /c:"--vqp [0-9]">nul&&call :cqp_number_set --vqp
 set /a QP_p=%QSVQP%+%QP_p_n%
@@ -89,13 +88,13 @@ set /a QP_b=%QSVQP%+%QP_b_n%
 echo "%codec%"|findstr "QSVEncC VCEEncC" >nul&& echo "%CommandLine%"|findstr /r /c:"--cqp [0-9]">nul&&call set "CommandLine=%%CommandLine:--cqp %QSVQP%=--cqp %QSVQP%:%QP_p%:%QP_b%%%"
 echo "%codec%"|findstr "QSVEncC VCEEncC" >nul&& echo "%CommandLine%"|findstr /r /c:"--vqp [0-9]">nul&&call set "CommandLine=%%CommandLine:--vqp %QSVQP%=--vqp %QSVQP%:%QP_p%:%QP_b%%%"
 
-rem ƒ}ƒ‹ƒ`ƒpƒX—p‚Ìˆ—
+rem ãƒãƒ«ãƒãƒ‘ã‚¹ç”¨ã®å‡¦ç†
 if not "%multipass%"=="1" echo "%CommandLine%"|findstr /r /c:"--pass [0-9]">nul&&call :pass_number_set --pass
 if not "%multipass%"=="1" echo "%CommandLine%"|findstr /r /c:"-pass [0-9]">nul&&call :pass_number_set -pass
 if "%multipass%"=="1" call :multi_pass_set
-rem ŠeƒGƒ“ƒR[ƒ_[‚ÅƒGƒ“ƒR[ƒh
+rem å„ã‚¨ãƒ³ã‚³ãƒ¼ãƒ€ãƒ¼ã§ã‚¨ãƒ³ã‚³ãƒ¼ãƒ‰
 if not exist "%movie_dir%%~2" (
-   rem ƒƒOƒtƒHƒ‹ƒ_‚ÉˆÈ‘O‚ÌƒƒO‚ªc‚Á‚Ä‚¢‚½‚çíœ‚·‚é
+   rem ãƒ­ã‚°ãƒ•ã‚©ãƒ«ãƒ€ã«ä»¥å‰ã®ãƒ­ã‚°ãŒæ®‹ã£ã¦ã„ãŸã‚‰å‰Šé™¤ã™ã‚‹
    if exist "%log_dir%%~n2_ssim(%CompareBitDepth%)_log%pass_orig%.txt" del "%log_dir%%~n2_ssim(%CompareBitDepth%)_log%pass_orig%.txt"
    if exist "%log_dir%%~n2_vmaf(%CompareBitDepth%)_log%pass_orig%.txt" del "%log_dir%%~n2_vmaf(%CompareBitDepth%)_log%pass_orig%.txt"
 
@@ -134,9 +133,9 @@ if not exist "%movie_dir%%~2" (
    echo %MessageEncodeSkip%
 )
 
-rem ƒGƒ“ƒR[ƒhŒã‚Ìˆ—
+rem ã‚¨ãƒ³ã‚³ãƒ¼ãƒ‰å¾Œã®å‡¦ç†
 echo.
-rem ƒGƒ‰[ƒ`ƒFƒbƒN&ƒ}ƒ‹ƒ`ƒpƒX‚Ì“r’†‚Ìƒtƒ@ƒCƒ‹‚Ííœ‚·‚é
+rem ã‚¨ãƒ©ãƒ¼ãƒã‚§ãƒƒã‚¯&ãƒãƒ«ãƒãƒ‘ã‚¹ã®é€”ä¸­ã®ãƒ•ã‚¡ã‚¤ãƒ«ã¯å‰Šé™¤ã™ã‚‹
 set ErrorCheckFile="%movie_dir%%~2"
 if "%codec%"=="x265" set ErrorCheckFile="%movie_dir%%~n2.h265"
 if "%codec%"=="SVT-HEVC" set ErrorCheckFile="%movie_dir%%~n2.h265"
@@ -148,11 +147,11 @@ if "%codec%"=="SVT-VP9" set ErrorCheckFile="%movie_dir%%~n2.ivf"
 if not "%enc_skip%"=="1" call :error_check "%~1" %ErrorCheckFile%
 if "%multipass%"=="1" if not "%enc_skip%"=="1" if not "%pass_temp%"=="%pass_orig%" if exist %ErrorCheckFile% del %ErrorCheckFile%
 
-rem ˆ—ŠÔ‚ğƒƒOƒtƒ@ƒCƒ‹‚©‚çE‚¤
+rem å‡¦ç†æ™‚é–“ã‚’ãƒ­ã‚°ãƒ•ã‚¡ã‚¤ãƒ«ã‹ã‚‰æ‹¾ã†
 if not "%enc_error%"=="1" findstr "^TotalMilliseconds : [0-9][0-9]*$" "%log_dir%%~n2_log%pass_temp%.txt">nul 2>&1||set timer_error=1&&SET enc_msec%pass_temp%=0
 if not "%enc_error%"=="1" if not "%timer_error%"=="1" FOR /f "tokens=3" %%i IN ('findstr "^TotalMilliseconds : [0-9][0-9]*$" "%log_dir%%~n2_log%pass_temp%.txt"') DO SET enc_msec%pass_temp%=%%i
 if not "%enc_error%"=="1" call :msec_to_sec
-rem ƒ}ƒ‹ƒ`ƒpƒX‚È‚çÅIƒpƒX‚É‚È‚é‚Ü‚Åˆ—‚ğƒ‹[ƒv‚·‚é
+rem ãƒãƒ«ãƒãƒ‘ã‚¹ãªã‚‰æœ€çµ‚ãƒ‘ã‚¹ã«ãªã‚‹ã¾ã§å‡¦ç†ã‚’ãƒ«ãƒ¼ãƒ—ã™ã‚‹
 if "%multipass%"=="1" if not "%pass_temp%"=="%pass_orig%" (
    set /a pass_temp=pass_temp+1
    goto enc_process
@@ -167,7 +166,7 @@ if "%multipass%"=="1" (
    if exist x265_2pass.log.cutree del x265_2pass.log.cutree
    if exist rav1e_stats.json del rav1e_stats.json
 )
-rem rawƒtƒ@ƒCƒ‹‚ğƒRƒ“ƒeƒi‚ÉŠi”[
+rem rawãƒ•ã‚¡ã‚¤ãƒ«ã‚’ã‚³ãƒ³ãƒ†ãƒŠã«æ ¼ç´
 if not "%enc_skip%"=="1" if exist "%movie_dir%%~n2.h265" %mp4box% -fps %frame_rate_mp4box% -add "%movie_dir%%~n2.h265" -new "%movie_dir%%~2" >>"%log_dir%%~n2_log%pass_temp%.txt" 2>&1 && del "%movie_dir%%~n2.h265" & echo.
 if not "%enc_skip%"=="1" if exist "%movie_dir%%~n2.ivf" (
    if "%codec%"=="SVT-VP9" (
@@ -177,9 +176,9 @@ if not "%enc_skip%"=="1" if exist "%movie_dir%%~n2.ivf" (
    )
    echo.
 )
-chcp 932 >nul 2>&1
+chcp 65001 >nul 2>&1
 
-rem SSIM‚ğZo‚·‚é
+rem SSIMã‚’ç®—å‡ºã™ã‚‹
 for %%i in ("%movie_dir%%~2") do set Filesize=%%~zi
 if "%verbose_log%"=="1" set ffmpeg_ssim_option="ssim='%~n2_ssim(%CompareBitDepth%)_verbose_log.txt';[0:v][1:v]psnr='%~n2_psnr(%CompareBitDepth%)_verbose_log.txt'"
 if not "%verbose_log%"=="1" set ffmpeg_ssim_option="ssim;[0:v][1:v]psnr"
@@ -216,7 +215,7 @@ if not "%ERRORLEVEL%"=="0" if not "%enc_error%"=="1" (
 )
 popd
 
-rem VMAF‚ÌZoˆ—‚ğskip‚·‚é
+rem VMAFã®ç®—å‡ºå‡¦ç†ã‚’skipã™ã‚‹
 if not "%EnableVMAF%"=="1" goto VMAF_skip
 
 for %%i in (%ffmpeg_VMAF%) do set "vmaf_model_dir=%%~dpi\model"
@@ -329,13 +328,13 @@ if not "%enc_error%"=="1" if not "%Compare_error%"=="1" (
 if "%del_enc_file%"=="1" del "%movie_dir%%~2"
 
 :input_error_skip
-rem ˆê’Ê‚è‚Ìˆ—‚ªI—¹
+rem ä¸€é€šã‚Šã®å‡¦ç†ãŒçµ‚äº†
 endlocal
 
 set input_error=
 goto end
 
-rem ƒTƒuƒ‹[ƒ`ƒ“
+rem ã‚µãƒ–ãƒ«ãƒ¼ãƒãƒ³
 :cqp_number_set
 set qt=1
 set qt2=2
@@ -376,14 +375,14 @@ if "%pass_temp%"=="%pass_orig%" (
 exit /b
 
 :msec_to_sec
-rem csv‚É‘‚«‚Şƒf[ƒ^‚ğŒvZ
+rem csvã«æ›¸ãè¾¼ã‚€ãƒ‡ãƒ¼ã‚¿ã‚’è¨ˆç®—
 if not "%multipass%"=="1" set enc_fps=%FrameCount%/(%enc_msec%/1000)
 if "%multipass%"=="1" if "%pass_temp%"=="1" call set enc_fps=(%FrameCount%*%pass_orig%)/((%%enc_msec%pass_temp%%%/1000)
 if "%multipass%"=="1" if not "%pass_temp%"=="1" if not "%pass_temp%"=="%pass_orig%" call set enc_fps=%enc_fps%+(%%enc_msec%pass_temp%%%/1000)
 if "%multipass%"=="1" if "%pass_temp%"=="%pass_orig%" call set enc_fps=%enc_fps%+(%%enc_msec%pass_temp%%%/1000))
 if "%multipass%"=="1" if "%pass_orig%"=="1" call set enc_fps=%FrameCount%/(%%enc_msec%pass_temp%%%/1000)
 
-rem •\¦—p‚Ìƒf[ƒ^‚ğŒvZ
+rem è¡¨ç¤ºç”¨ã®ãƒ‡ãƒ¼ã‚¿ã‚’è¨ˆç®—
 if not defined msec_total set msec_total=0
 call set /a msec_total=msec_total+%%enc_msec%pass_temp%%%
 
