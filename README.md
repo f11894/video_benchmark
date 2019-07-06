@@ -38,6 +38,7 @@ SVT-HEVC
 SVT-VP9   
 SVT-AV1  
 VTM  
+XVC  
 
 ### 注意点  
 10bitでベンチマークする際はuser_setting.batのComparePixelFormatをyuv420pからyuv420p10leに書き換えてください(8bitと10bitの混在したベンチマークの場合も)  
