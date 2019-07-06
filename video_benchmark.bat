@@ -218,13 +218,15 @@ popd
 rem VMAFの算出処理をskipする
 if not "%EnableVMAF%"=="1" goto VMAF_skip
 
+set "vmaf_model_file=vmaf_v0.6.1.pkl"
+if %Height% GTR 2000 set "vmaf_model_file=vmaf_4k_v0.6.1.pkl"
 for %%i in (%ffmpeg_VMAF%) do set "vmaf_model_dir=%%~dpi\model"
 pushd %vmaf_model_dir%
-if "%verbose_log%"=="1" set ffmpeg_vmaf_option="libvmaf=model_path=vmaf_v0.6.1.pkl:ms_ssim=1:psnr=1:log_fmt=json:log_path='%~n2_vmaf(%CompareBitDepth%).json'"
+if "%verbose_log%"=="1" set ffmpeg_vmaf_option="libvmaf=model_path=%vmaf_model_file%:ms_ssim=1:psnr=1:log_fmt=json:log_path='%~n2_vmaf(%CompareBitDepth%).json'"
 if not "%verbose_log%"=="1" if "%EnableMSSSIM%"=="1" (
-   set ffmpeg_vmaf_option="libvmaf=model_path=vmaf_v0.6.1.pkl:ms_ssim=1"
+   set ffmpeg_vmaf_option="libvmaf=model_path=%vmaf_model_file%:ms_ssim=1"
 ) else (
-   set ffmpeg_vmaf_option="libvmaf=model_path=vmaf_v0.6.1.pkl"
+   set ffmpeg_vmaf_option="libvmaf=model_path=%vmaf_model_file%"
 )
 
 find "VMAF score" "%log_dir%%~n2_vmaf(%CompareBitDepth%)_log%pass_orig%.txt">nul 2>&1 || set VMAF_check=1
@@ -236,6 +238,7 @@ if "%VMAF_check%"=="1" if not "%enc_error%"=="1" (
    call echo %MessageVMAFCompare%
    echo %MessagePleaseWait%
    %ffmpeg% -r %frame_rate% -i %CompareFile% -an %ComparePixelFormat% -strict -2 -f yuv4mpegpipe - 2>"%log_dir%%~n2_vmaf(%CompareBitDepth%)_pipelog%pass_orig%.txt" | %ffmpeg_VMAF% -i - -r %frame_rate% -i "%~1" -filter_complex %ffmpeg_vmaf_option% -an -f null - >"%log_dir%%~n2_vmaf(%CompareBitDepth%)_log%pass_orig%.txt" 2>&1
+   echo VMAF model file = %vmaf_model_file%>>"%log_dir%%~n2_vmaf(%CompareBitDepth%)_log%pass_orig%.txt"
    echo.
 )
 if "%verbose_log%"=="1" if exist "%~n2_vmaf(%CompareBitDepth%).json" move /Y "%~n2_vmaf(%CompareBitDepth%).json" "%log_dir%%~n2_vmaf(%CompareBitDepth%).json" >nul
