@@ -1,8 +1,8 @@
 @echo off
-rem benchmark_logフォルダをドロップして使う
+rem Drag and drop the benchmark_log folder
 
 cd "%~1"
-echo グラフを作成しています
+echo Creating graph
 "%~dp0tools\Create_Graph.exe" "%~1"
-echo グラフの作成が終了しました
+echo Graph creation finished
 pause

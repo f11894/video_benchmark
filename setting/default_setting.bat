@@ -1,30 +1,30 @@
-rem 出力ファイルの保存場所と名前
+rem Output file save location and name.
 set "log_dir=%~dp1%~n1_benchmark_log\"
 set "movie_dir=%~dp1"
 set error_log="%log_dir%%~n1__error_log.txt"
 
-rem QSVのcqpとvqpの時PフレームとBフレームの数値をIフレームよりいくつ上の数字にするか
+rem How much higher is the QP of P frame and B frame higher than I frame in cqp and vqp mode of QSV
 set QP_p_n=2
 set QP_b_n=5
 
-rem エンコードして出来たファイルを削除する 1で有効
+rem Delete the encoded file (1: on)
 set del_enc_file=0
-rem SSIMとPSNRの1フレーム毎の詳細なログを取る 1で有効
+rem Verbose log per frame of SSIM and PSNR (1: on)
 set verbose_log=0
-rem エラーが起きた時に何秒待機するか
+rem How many seconds to wait when an error occurs
 set wait=60
 
-rem VMAFの算出を行うかどうか 1だと算出する
-rem VMAFは優秀なメトリックだが算出に時間がかかる
+rem Whether to calculate VMAF (1: on)
+rem VMAF is an excellent metric but it takes time to calculate
 set EnableVMAF=1
 
-rem VMAFの算出を行う時にMS-SSIMも算出を行うかどうか 1だと算出する
+rem Whether MS-SSIM should also be calculated when VMAF is calculated (1: on)
 set EnableMSSSIM=0
 
-rem SSIMやVMAFを算出する時のビット深度
+rem Bit depth when calculating SSIM or VMAF
 set ComparePixelFormat=-pix_fmt yuv420p
 
-rem ソフトのパス
+rem Soft path
 set ffmpeg="%~dp2tools\ffmpeg.exe"
 if "%ffmpeg_enc%"=="" set ffmpeg_enc=%ffmpeg%
 set ffmpeg_VMAF="%~dp2tools\ffmpeg_vmaf.exe"
