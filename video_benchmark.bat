@@ -22,7 +22,7 @@ if "%ArgumentError%"=="1" (
 
 rem 設定ファイルの読み込み
 rem user_settingが無ければdefault_settingをコピーする
-if not exist "%~dp0user_setting.bat" copy /y "%~dp0setting\default_setting.bat" "%~dp0setting\user_setting.bat" >nul 2>&1
+if not exist "%~dp0setting\user_setting.bat" copy /y "%~dp0setting\default_setting.bat" "%~dp0setting\user_setting.bat" >nul 2>&1
 
 call "%~dp0setting\default_setting.bat" "%~1" "%~dpnx0"
 call "%~dp0setting\user_setting.bat" "%~1" "%~dpnx0"
