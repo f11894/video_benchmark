@@ -148,8 +148,8 @@ if not "%enc_skip%"=="1" call :error_check "%~1" %ErrorCheckFile%
 if "%multipass%"=="1" if not "%enc_skip%"=="1" if not "%pass_temp%"=="%pass_orig%" if exist %ErrorCheckFile% del %ErrorCheckFile%
 
 rem 処理時間をログファイルから拾う
-if not "%enc_error%"=="1" findstr /R /C:"^TotalMilliseconds : [0-9][0-9]*$" "%log_dir%%~n2_log%pass_temp%.txt">nul 2>&1||set timer_error=1&&SET enc_msec%pass_temp%=0
-if not "%enc_error%"=="1" if not "%timer_error%"=="1" FOR /f "tokens=3" %%i IN ('findstr /R /C:"^TotalMilliseconds : [0-9][0-9]*$" "%log_dir%%~n2_log%pass_temp%.txt"') DO SET enc_msec%pass_temp%=%%i
+if not "%enc_error%"=="1" type "%log_dir%%~n2_log%pass_temp%.txt" 2>nul | findstr /R /C:"^TotalMilliseconds : [0-9][0-9]*$" >nul 2>&1||set timer_error=1&&SET enc_msec%pass_temp%=0
+if not "%enc_error%"=="1" if not "%timer_error%"=="1" FOR /f "tokens=3" %%i IN ('type "%log_dir%%~n2_log%pass_temp%.txt" ^| findstr /R /C:"^TotalMilliseconds : [0-9][0-9]*$"') DO SET enc_msec%pass_temp%=%%i
 if not "%enc_error%"=="1" call :msec_to_sec
 rem マルチパスなら最終パスになるまで処理をループする
 if "%multipass%"=="1" if not "%pass_temp%"=="%pass_orig%" (
@@ -304,9 +304,9 @@ if not "%enc_error%"=="1" if not "%Compare_error%"=="1" (
 )
 set random3x=%random%_%random%_%random%
 for %%i in ("%~n1_%csv_name%*.csv") do (
-   copy /Y "%%~i" "%TEMP%\%%~ni_%random3x%.txt">nul
-   %busybox64% awk "!a[$0]++" "%TEMP%\%%~ni_%random3x%.txt" | %busybox64% awk -v ORS="\r\n" "{print}" >"%%~i"
-   del "%TEMP%\%%~ni_%random3x%.txt">nul 2>&1
+   copy /Y "%%~i" "%TEMP%\temp_%random3x%.txt">nul
+   %busybox64% awk "!a[$0]++" "%TEMP%\temp_%random3x%.txt" | %busybox64% awk -v ORS="\r\n" "{print}" >"%%~i"
+   del "%TEMP%\temp_%random3x%.txt">nul 2>&1
 )
 popd
 
