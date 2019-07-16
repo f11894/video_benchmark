@@ -148,8 +148,8 @@ if not "%enc_skip%"=="1" call :error_check "%~1" %ErrorCheckFile%
 if "%multipass%"=="1" if not "%enc_skip%"=="1" if not "%pass_temp%"=="%pass_orig%" if exist %ErrorCheckFile% del %ErrorCheckFile%
 
 rem 処理時間をログファイルから拾う
-if not "%enc_error%"=="1" type "%log_dir%%~n2_log%pass_temp%.txt" 2>nul | findstr /R /C:"^TotalMilliseconds : [0-9][0-9]*$" >nul 2>&1||set timer_error=1&&SET enc_msec%pass_temp%=0
-if not "%enc_error%"=="1" if not "%timer_error%"=="1" FOR /f "tokens=3" %%i IN ('type "%log_dir%%~n2_log%pass_temp%.txt" ^| findstr /R /C:"^TotalMilliseconds : [0-9][0-9]*$"') DO SET enc_msec%pass_temp%=%%i
+if not "%enc_error%"=="1" find "TotalMilliseconds : " "%log_dir%%~n2_log%pass_temp%.txt">nul 2>&1||set timer_error=1&&SET enc_msec%pass_temp%=0
+if not "%enc_error%"=="1" if not "%timer_error%"=="1" FOR /f "tokens=3" %%i IN ('find "TotalMilliseconds : " "%log_dir%%~n2_log%pass_temp%.txt"') DO SET enc_msec%pass_temp%=%%i
 if not "%enc_error%"=="1" call :msec_to_sec
 rem マルチパスなら最終パスになるまで処理をループする
 if "%multipass%"=="1" if not "%pass_temp%"=="%pass_orig%" (
