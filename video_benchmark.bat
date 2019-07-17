@@ -89,9 +89,10 @@ echo "%codec%"|findstr "QSVEncC VCEEncC" >nul&& echo "%CommandLine%"|findstr /r 
 echo "%codec%"|findstr "QSVEncC VCEEncC" >nul&& echo "%CommandLine%"|findstr /r /c:"--vqp [0-9]">nul&&call set "CommandLine=%%CommandLine:--vqp %QSVQP%=--vqp %QSVQP%:%QP_p%:%QP_b%%%"
 
 rem マルチパス用の処理
+if not "%multipass%"=="1" echo "%CommandLine%"|find "--second-pass">nul&&set multipass=1&&set pass_temp=1&&set pass_orig=2&&set "CommandLine=%CommandLine:--second-pass=--first-pass%"
 if not "%multipass%"=="1" echo "%CommandLine%"|findstr /r /c:"--pass [0-9]">nul&&call :pass_number_set --pass
 if not "%multipass%"=="1" echo "%CommandLine%"|findstr /r /c:"-pass [0-9]">nul&&call :pass_number_set -pass
-if "%multipass%"=="1" call :multi_pass_set
+if not "%codec%"=="rav1e" if "%multipass%"=="1" call :multi_pass_set
 rem 各エンコーダーでエンコード
 if not exist "%movie_dir%%~2" (
    rem ログフォルダに以前のログが残っていたら削除する
@@ -153,6 +154,7 @@ if not "%enc_error%"=="1" if not "%timer_error%"=="1" FOR /f "tokens=3" %%i IN (
 if not "%enc_error%"=="1" call :msec_to_sec
 rem マルチパスなら最終パスになるまで処理をループする
 if "%multipass%"=="1" if not "%pass_temp%"=="%pass_orig%" (
+   if "%codec%"=="rav1e" set "CommandLine=%CommandLine:--first-pass=--second-pass%"
    set /a pass_temp=pass_temp+1
    goto enc_process
 )
@@ -165,6 +167,7 @@ if "%multipass%"=="1" (
    if exist x265_2pass.log del x265_2pass.log
    if exist x265_2pass.log.cutree del x265_2pass.log.cutree
    if exist rav1e_stats.json del rav1e_stats.json
+   if exist rav1e_stats.log del rav1e_stats.log
 )
 rem rawファイルをコンテナに格納
 if not "%enc_skip%"=="1" if exist "%movie_dir%%~n2.h265" %mp4box% -fps %frame_rate_mp4box% -add "%movie_dir%%~n2.h265" -new "%movie_dir%%~2" >>"%log_dir%%~n2_log%pass_temp%.txt" 2>&1 && del "%movie_dir%%~n2.h265" & echo.

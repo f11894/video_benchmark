@@ -3,6 +3,7 @@ cd "%~dp0"
 for %%i in ("..\video_benchmark.bat") do set benchmark_bat="%%~dpnxi"
 :loop
 if "%~1"=="" goto end
+for /L %%i in (1000,1000,6000) do call %benchmark_bat% "%~1" "%~n1_rav1e_20190713_s2_tunepsnr_q%%i.mp4" "--bitrate %%i --second-pass rav1e_stats.log --speed 2 --tune psnr --keyint 250 --threads 8 --tile-cols-log2 2 --tile-rows-log2 2" rav1e 20190713_s2_tunepsnr
 for /L %%i in (1000,1000,6000) do call %benchmark_bat% "%~1" "%~n1_libaom_c0_%%ikbps.mp4" "--ivf --cpu-used=0 --threads=8 --tile-columns=2 --tile-rows=2 --end-usage=vbr --passes=2 --target-bitrate=%%i --kf-max-dist=250" libaom c0_2pass_bitrate
 for /L %%i in (1000,1000,6000) do call %benchmark_bat% "%~1" "%~n1_x264_placebo_tunessim_%%ikbps.mp4" "--preset placebo --tune ssim --keyint 250 --bitrate %%i --pass 2" x264 placebo_tunessim_2pass_bitrate
 for /L %%i in (1000,1000,6000) do call %benchmark_bat% "%~1" "%~n1_x265_placebo_tunessim_%%ikbps.mp4" "--preset placebo --tune ssim --keyint 250 --bitrate %%i --pass 2" x265 placebo_tunessim_2pass_bitrate
