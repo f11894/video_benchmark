@@ -6,6 +6,7 @@ for %%i in ("..\ffmediaInfo.bat") do set ffmediaInfo_bat="%%~dpnxi"
 for %%i in ("..\tools\busybox64.exe") do set busybox64="%%~dpnxi"
 for %%i in ("..\tools\ffmpeg.exe") do set ffmpeg="%%~dpnxi"
 for %%i in ("..\tools\timer64.exe") do set timer64="%%~dpnxi"
+for %%i in ("..\tools\view_args64.exe") do set view_args64="%%~dpnxi"
 for %%i in ("..\tools\vtm\EncoderApp.exe") do set VTM="%%~dpnxi"
 for %%i in ("..\tools\vtm\encoder_randomaccess_vtm.cfg") do set "VTM_cfg=%%~dpnxi"
 

@@ -104,17 +104,17 @@ if not exist "%movie_dir%%~2" (
    if "%codec%"=="VCEEncC" %timer64% "%VCEEncC%" -i "%~1" %CommandLine% -o "%movie_dir%%~2" 2>&1 | %safetee% -o "%log_dir%%~n2_log%pass_temp%.txt"
    if "%codec%"=="NVEncC" %timer64% "%NVEncC%" -i "%~1" %CommandLine% -o "%movie_dir%%~2" 2>&1 | %safetee% -o "%log_dir%%~n2_log%pass_temp%.txt"
    if "%codec%"=="FFmpeg" %timer64% %ffmpeg_enc% -y -i "%~1" -an %EncodePixelFormat% %CommandLine% "%movie_dir%%~2" 2>&1 | %safetee% -o "%log_dir%%~n2_log%pass_temp%.txt"
-   if "%codec%"=="x264" %ffmpeg% -y -i "%~1" -an %EncodePixelFormat% -strict -2 -f yuv4mpegpipe - 2>"%log_dir%%~n2_pipelog%pass_temp%.txt" | %timer64% %x264% %CommandLine% --demuxer y4m -o "%movie_dir%%~2" - 2>&1 | %safetee% -o "%log_dir%%~n2_log%pass_temp%.txt"
-   if "%codec%"=="x265" %ffmpeg% -y -i "%~1" -an %EncodePixelFormat% -strict -2 -f yuv4mpegpipe - 2>"%log_dir%%~n2_pipelog%pass_temp%.txt" | %timer64% %x265% %CommandLine% --input - --y4m "%movie_dir%%~n2.h265" 2>&1 | %safetee% -o "%log_dir%%~n2_log%pass_temp%.txt"
+   if "%codec%"=="x264" %view_args64% %ffmpeg% -y -i "%~1" -an %EncodePixelFormat% -strict -2 -f yuv4mpegpipe - 2>"%log_dir%%~n2_pipelog%pass_temp%.txt" | %timer64% %x264% %CommandLine% --demuxer y4m -o "%movie_dir%%~2" - 2>&1 | %safetee% -o "%log_dir%%~n2_log%pass_temp%.txt"
+   if "%codec%"=="x265" %view_args64% %ffmpeg% -y -i "%~1" -an %EncodePixelFormat% -strict -2 -f yuv4mpegpipe - 2>"%log_dir%%~n2_pipelog%pass_temp%.txt" | %timer64% %x265% %CommandLine% --input - --y4m "%movie_dir%%~n2.h265" 2>&1 | %safetee% -o "%log_dir%%~n2_log%pass_temp%.txt"
    if "%codec%"=="libaom" (
       if not exist "%movie_dir%%~n1_temp%EncodeBitDepth%.y4m" echo %MessageIntermediateFileEncode% &&%ffmpeg% -i "%~1" -an %EncodePixelFormat% -strict -2 "%movie_dir%%~n1_temp%EncodeBitDepth%.y4m" >"%log_dir%%~n2_log%pass_temp%.txt" 2>&1
       %aomenc% --help | find "AOMedia Project AV1 Encoder">>"%log_dir%%~n2_log%pass_temp%.txt" 2>&1 
       %timer64% %aomenc% %CommandLine% -o "%movie_dir%%~n2.ivf" "%movie_dir%%~n1_temp%EncodeBitDepth%.y4m" 2>&1 | %safetee% -a "%log_dir%%~n2_log%pass_temp%.txt"
    )
-   if "%codec%"=="rav1e" %ffmpeg% -y -i "%~1" -an %EncodePixelFormat% -strict -2 -f yuv4mpegpipe - 2>"%log_dir%%~n2_pipelog%pass_temp%.txt" | %timer64% %rav1e% - %CommandLine% -o "%movie_dir%%~n2.ivf" 2>&1 | %safetee% -o "%log_dir%%~n2_log%pass_temp%.txt"
-   if "%codec%"=="SVT-AV1" %ffmpeg% -y -i "%~1" -an -nostdin -f rawvideo %EncodePixelFormat% -strict -2 - 2>"%log_dir%%~n2_pipelog%pass_temp%.txt" | %timer64% %SVT-AV1% -i stdin %CommandLine% -n %FrameCount% -w %Width% -h %Height% -fps-num %frame_rate_num% -fps-denom %frame_rate_denom% -b "%movie_dir%%~n2.ivf" 2>&1 | %safetee% -o "%log_dir%%~n2_log%pass_temp%.txt"
-   if "%codec%"=="SVT-HEVC" %ffmpeg% -y -i "%~1" -an -nostdin -f rawvideo %EncodePixelFormat% -strict -2 - 2>"%log_dir%%~n2_pipelog%pass_temp%.txt" | %timer64% %SVT-HEVC% -i stdin %CommandLine% -n %FrameCount% -w %Width% -h %Height% -fps-num %frame_rate_num% -fps-denom %frame_rate_denom% -b "%movie_dir%%~n2.h265" 2>&1 | %safetee% -o "%log_dir%%~n2_log%pass_temp%.txt"
-   if "%codec%"=="SVT-VP9" %ffmpeg% -y -i "%~1" -an -nostdin -f rawvideo %EncodePixelFormat% -strict -2 - 2>"%log_dir%%~n2_pipelog%pass_temp%.txt" | %timer64% %SVT-VP9% -i stdin %CommandLine% -n %FrameCount% -w %Width% -h %Height% -fps-num %frame_rate_num% -fps-denom %frame_rate_denom% -b "%movie_dir%%~n2.ivf" 2>&1 | %safetee% -o "%log_dir%%~n2_log%pass_temp%.txt"
+   if "%codec%"=="rav1e" %view_args64% %ffmpeg% -y -i "%~1" -an %EncodePixelFormat% -strict -2 -f yuv4mpegpipe - 2>"%log_dir%%~n2_pipelog%pass_temp%.txt" | %timer64% %rav1e% - %CommandLine% -o "%movie_dir%%~n2.ivf" 2>&1 | %safetee% -o "%log_dir%%~n2_log%pass_temp%.txt"
+   if "%codec%"=="SVT-AV1" %view_args64% %ffmpeg% -y -i "%~1" -an -nostdin -f rawvideo %EncodePixelFormat% -strict -2 - 2>"%log_dir%%~n2_pipelog%pass_temp%.txt" | %timer64% %SVT-AV1% -i stdin %CommandLine% -n %FrameCount% -w %Width% -h %Height% -fps-num %frame_rate_num% -fps-denom %frame_rate_denom% -b "%movie_dir%%~n2.ivf" 2>&1 | %safetee% -o "%log_dir%%~n2_log%pass_temp%.txt"
+   if "%codec%"=="SVT-HEVC" %view_args64% %ffmpeg% -y -i "%~1" -an -nostdin -f rawvideo %EncodePixelFormat% -strict -2 - 2>"%log_dir%%~n2_pipelog%pass_temp%.txt" | %timer64% %SVT-HEVC% -i stdin %CommandLine% -n %FrameCount% -w %Width% -h %Height% -fps-num %frame_rate_num% -fps-denom %frame_rate_denom% -b "%movie_dir%%~n2.h265" 2>&1 | %safetee% -o "%log_dir%%~n2_log%pass_temp%.txt"
+   if "%codec%"=="SVT-VP9" %view_args64% %ffmpeg% -y -i "%~1" -an -nostdin -f rawvideo %EncodePixelFormat% -strict -2 - 2>"%log_dir%%~n2_pipelog%pass_temp%.txt" | %timer64% %SVT-VP9% -i stdin %CommandLine% -n %FrameCount% -w %Width% -h %Height% -fps-num %frame_rate_num% -fps-denom %frame_rate_denom% -b "%movie_dir%%~n2.ivf" 2>&1 | %safetee% -o "%log_dir%%~n2_log%pass_temp%.txt"
    if "%codec%"=="libvpx" (
       if not exist "%movie_dir%%~n1_temp%EncodeBitDepth%.y4m" echo %MessageIntermediateFileEncode% &&%ffmpeg% -i "%~1" -an %EncodePixelFormat% -strict -2 "%movie_dir%%~n1_temp%EncodeBitDepth%.y4m" >"%log_dir%%~n2_log%pass_temp%.txt" 2>&1
       %vpxenc% --help | find "WebM Project">>"%log_dir%%~n2_log%pass_temp%.txt" 2>&1 
@@ -123,11 +123,11 @@ if not exist "%movie_dir%%~2" (
    if "%codec%"=="VTM" (
        if not exist "%movie_dir%%~n1_temp%EncodeBitDepth%.yuv" echo %MessageIntermediateFileEncode% &&%ffmpeg% -i "%~1" -an %EncodePixelFormat% -f rawvideo -strict -2 "%movie_dir%%~n1_temp%EncodeBitDepth%.yuv" >"%log_dir%%~n2_log%pass_temp%.txt" 2>&1
        %timer64% %VTM%  %CommandLine% -fr %frame_rate_integer% -wdt %Width% -hgt %Height% -f %FrameCount% -i "%movie_dir%%~n1_temp%EncodeBitDepth%.yuv" -o "%movie_dir%%~n2.yuv" -b "%movie_dir%%~2" 2>&1 | %safetee% -a "%log_dir%%~n2_log%pass_temp%.txt"
-       %ffmpeg% -y -f rawvideo -s %video_size% -r %frame_rate% %EncodePixelFormat% -i "%movie_dir%%~n2.yuv" -strict -2 "%movie_dir%%~n2.y4m" >>"%log_dir%%~n2_log%pass_temp%.txt" 2>&1 &&del "%movie_dir%%~n2.yuv"
+       %view_args64% %ffmpeg% -y -f rawvideo -s %video_size% -r %frame_rate% %EncodePixelFormat% -i "%movie_dir%%~n2.yuv" -strict -2 "%movie_dir%%~n2.y4m" >>"%log_dir%%~n2_log%pass_temp%.txt" 2>&1 &&del "%movie_dir%%~n2.yuv"
    )
    if "%codec%"=="xvc" (
-       %ffmpeg% -y -i "%~1" -an %EncodePixelFormat% -strict -2 -f yuv4mpegpipe - 2>"%log_dir%%~n2_pipelog%pass_temp%.txt" | %timer64% %xvcenc% -verbose 1 -input-file - -output-file "%movie_dir%%~2" -rec-file "%movie_dir%%~n2.yuv" %CommandLine% 2>&1 | %safetee% -a "%log_dir%%~n2_log%pass_temp%.txt"
-       %ffmpeg% -y -f rawvideo -s %video_size% -r %frame_rate% %EncodePixelFormat% -i "%movie_dir%%~n2.yuv" -strict -2 "%movie_dir%%~n2.y4m" >>"%log_dir%%~n2_log%pass_temp%.txt" 2>&1 &&del "%movie_dir%%~n2.yuv"
+       %timer64% %ffmpeg% -y -i "%~1" -an %EncodePixelFormat% -strict -2 -f yuv4mpegpipe - 2>"%log_dir%%~n2_pipelog%pass_temp%.txt" | %timer64% %xvcenc% -verbose 1 -input-file - -output-file "%movie_dir%%~2" -rec-file "%movie_dir%%~n2.yuv" %CommandLine% 2>&1 | %safetee% -a "%log_dir%%~n2_log%pass_temp%.txt"
+       %view_args64% %ffmpeg% -y -f rawvideo -s %video_size% -r %frame_rate% %EncodePixelFormat% -i "%movie_dir%%~n2.yuv" -strict -2 "%movie_dir%%~n2.y4m" >>"%log_dir%%~n2_log%pass_temp%.txt" 2>&1 &&del "%movie_dir%%~n2.yuv"
    )
 ) else (
    set enc_skip=1
@@ -170,12 +170,12 @@ if "%multipass%"=="1" (
    if exist rav1e_stats.log del rav1e_stats.log
 )
 rem rawファイルをコンテナに格納
-if not "%enc_skip%"=="1" if exist "%movie_dir%%~n2.h265" %mp4box% -fps %frame_rate_mp4box% -add "%movie_dir%%~n2.h265" -new "%movie_dir%%~2" >>"%log_dir%%~n2_log%pass_temp%.txt" 2>&1 && del "%movie_dir%%~n2.h265" & echo.
+if not "%enc_skip%"=="1" if exist "%movie_dir%%~n2.h265" %view_args64% %mp4box% -fps %frame_rate_mp4box% -add "%movie_dir%%~n2.h265" -new "%movie_dir%%~2" >>"%log_dir%%~n2_log%pass_temp%.txt" 2>&1 && del "%movie_dir%%~n2.h265" & echo.
 if not "%enc_skip%"=="1" if exist "%movie_dir%%~n2.ivf" (
    if "%codec%"=="SVT-VP9" (
-      %ffmpeg% -y -r %frame_rate% -i "%movie_dir%%~n2.ivf" -c copy "%movie_dir%%~2" >>"%log_dir%%~n2_log%pass_temp%.txt" 2>&1 && del "%movie_dir%%~n2.ivf"
+      %view_args64% %ffmpeg% -y -r %frame_rate% -i "%movie_dir%%~n2.ivf" -c copy "%movie_dir%%~2" >>"%log_dir%%~n2_log%pass_temp%.txt" 2>&1 && del "%movie_dir%%~n2.ivf"
    ) else (
-      %mp4box% -fps %frame_rate_mp4box% -add "%movie_dir%%~n2.ivf" -new "%movie_dir%%~2" >>"%log_dir%%~n2_log%pass_temp%.txt" 2>&1 && del "%movie_dir%%~n2.ivf"
+      %view_args64% %mp4box% -fps %frame_rate_mp4box% -add "%movie_dir%%~n2.ivf" -new "%movie_dir%%~2" >>"%log_dir%%~n2_log%pass_temp%.txt" 2>&1 && del "%movie_dir%%~n2.ivf"
    )
    echo.
 )
@@ -199,7 +199,7 @@ if "%verbose_log%"=="1" if not exist "%log_dir%%~n2_psnr(%CompareBitDepth%)_verb
 if "%SSIM_check%"=="1" if not "%enc_error%"=="1" (
    call echo %MessageSSIMCompare%
    echo %MessagePleaseWait%
-   %ffmpeg% -r %frame_rate% -i %CompareFile% -an %ComparePixelFormat% -strict -2 -f yuv4mpegpipe - 2>"%~n2_ssim(%CompareBitDepth%)_pipelog%pass_orig%.txt" | %ffmpeg% -i - -r %frame_rate% -i "%~1" -lavfi %ffmpeg_ssim_option% -an -f null - >"%~n2_ssim(%CompareBitDepth%)_log%pass_orig%.txt" 2>&1
+   %view_args64% %ffmpeg% -r %frame_rate% -i %CompareFile% -an %ComparePixelFormat% -strict -2 -f yuv4mpegpipe - 2>"%~n2_ssim(%CompareBitDepth%)_pipelog%pass_orig%.txt" | %view_args64% %ffmpeg% -i - -r %frame_rate% -i "%~1" -lavfi %ffmpeg_ssim_option% -an -f null - >"%~n2_ssim(%CompareBitDepth%)_log%pass_orig%.txt" 2>&1
    echo.
 )
 find "Parsed_ssim" "%~n2_ssim(%CompareBitDepth%)_log%pass_orig%.txt">nul 2>&1
@@ -240,8 +240,7 @@ if "%verbose_log%"=="1" if not exist "%log_dir%%~n2_vmaf(%CompareBitDepth%).json
 if "%VMAF_check%"=="1" if not "%enc_error%"=="1" (
    call echo %MessageVMAFCompare%
    echo %MessagePleaseWait%
-   %ffmpeg% -r %frame_rate% -i %CompareFile% -an %ComparePixelFormat% -strict -2 -f yuv4mpegpipe - 2>"%log_dir%%~n2_vmaf(%CompareBitDepth%)_pipelog%pass_orig%.txt" | %ffmpeg_VMAF% -i - -r %frame_rate% -i "%~1" -filter_complex %ffmpeg_vmaf_option% -an -f null - >"%log_dir%%~n2_vmaf(%CompareBitDepth%)_log%pass_orig%.txt" 2>&1
-   echo VMAF model file = %vmaf_model_file%>>"%log_dir%%~n2_vmaf(%CompareBitDepth%)_log%pass_orig%.txt"
+   %view_args64% %ffmpeg% -r %frame_rate% -i %CompareFile% -an %ComparePixelFormat% -strict -2 -f yuv4mpegpipe - 2>"%log_dir%%~n2_vmaf(%CompareBitDepth%)_pipelog%pass_orig%.txt" | %view_args64% %ffmpeg_VMAF% -i - -r %frame_rate% -i "%~1" -filter_complex %ffmpeg_vmaf_option% -an -f null - >"%log_dir%%~n2_vmaf(%CompareBitDepth%)_log%pass_orig%.txt" 2>&1
    echo.
 )
 if "%verbose_log%"=="1" if exist "%~n2_vmaf(%CompareBitDepth%).json" move /Y "%~n2_vmaf(%CompareBitDepth%).json" "%log_dir%%~n2_vmaf(%CompareBitDepth%).json" >nul

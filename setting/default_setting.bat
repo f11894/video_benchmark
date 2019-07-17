@@ -30,6 +30,7 @@ if "%ffmpeg_enc%"=="" set ffmpeg_enc=%ffmpeg%
 set ffmpeg_VMAF="%~dp2tools\ffmpeg_vmaf.exe"
 set mediaInfo="%~dp2tools\MediaInfo.exe"
 set timer64="%~dp2tools\timer64.exe"
+set view_args64="%~dp2tools\view_args64.exe"
 set safetee="%~dp2tools\safetee.exe"
 set busybox64="%~dp2tools\busybox64.exe"
 set x264="%~dp2tools\x264_2969_x64.exe"
