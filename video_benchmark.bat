@@ -74,10 +74,10 @@ set "CompareBitDepth=Unspecified"
 echo "%ComparePixelFormat%"|find "yuv420p" >nul&&set "CompareBitDepth=8bit"
 echo "%ComparePixelFormat%"|find "yuv420p10le" >nul&&set "CompareBitDepth=10bit"
 set "EncodePixelFormat=-pix_fmt yuv420p"
-set "EncodeBitDepth=8bit"
+set "EncodeBitDepth=8"
 if "%~6"=="10bit" (
    set "EncodePixelFormat=-pix_fmt yuv420p10le"
-   set "EncodeBitDepth=10bit"
+   set "EncodeBitDepth=10"
 )
 
 rem qsv_enc用前処理
@@ -107,27 +107,25 @@ if not exist "%movie_dir%%~2" (
    if "%codec%"=="x264" %view_args64% %ffmpeg% -y -i "%~1" -an %EncodePixelFormat% -strict -2 -f yuv4mpegpipe - 2>"%log_dir%%~n2_pipelog%pass_temp%.txt" | %timer64% %x264% %CommandLine% --demuxer y4m -o "%movie_dir%%~2" - 2>&1 | %safetee% -o "%log_dir%%~n2_log%pass_temp%.txt"
    if "%codec%"=="x265" %view_args64% %ffmpeg% -y -i "%~1" -an %EncodePixelFormat% -strict -2 -f yuv4mpegpipe - 2>"%log_dir%%~n2_pipelog%pass_temp%.txt" | %timer64% %x265% %CommandLine% --input - --y4m "%movie_dir%%~n2.h265" 2>&1 | %safetee% -o "%log_dir%%~n2_log%pass_temp%.txt"
    if "%codec%"=="libaom" (
-      if not exist "%movie_dir%%~n1_temp%EncodeBitDepth%.y4m" echo %MessageIntermediateFileEncode% &&%ffmpeg% -i "%~1" -an %EncodePixelFormat% -strict -2 "%movie_dir%%~n1_temp%EncodeBitDepth%.y4m" >"%log_dir%%~n2_log%pass_temp%.txt" 2>&1
+      if not exist "%movie_dir%%~n1_temp%EncodeBitDepth%bit.y4m" echo %MessageIntermediateFileEncode% &&%ffmpeg% -i "%~1" -an %EncodePixelFormat% -strict -2 "%movie_dir%%~n1_temp%EncodeBitDepth%bit.y4m" >"%log_dir%%~n2_log%pass_temp%.txt" 2>&1
       %aomenc% --help | find "AOMedia Project AV1 Encoder">>"%log_dir%%~n2_log%pass_temp%.txt" 2>&1 
-      %timer64% %aomenc% %CommandLine% -o "%movie_dir%%~n2.ivf" "%movie_dir%%~n1_temp%EncodeBitDepth%.y4m" 2>&1 | %safetee% -a "%log_dir%%~n2_log%pass_temp%.txt"
+      %timer64% %aomenc% %CommandLine% -o "%movie_dir%%~n2.ivf" "%movie_dir%%~n1_temp%EncodeBitDepth%bit.y4m" 2>&1 | %safetee% -a "%log_dir%%~n2_log%pass_temp%.txt"
    )
    if "%codec%"=="rav1e" %view_args64% %ffmpeg% -y -i "%~1" -an %EncodePixelFormat% -strict -2 -f yuv4mpegpipe - 2>"%log_dir%%~n2_pipelog%pass_temp%.txt" | %timer64% %rav1e% - %CommandLine% -o "%movie_dir%%~n2.ivf" 2>&1 | %safetee% -o "%log_dir%%~n2_log%pass_temp%.txt"
    if "%codec%"=="SVT-AV1" %view_args64% %ffmpeg% -y -i "%~1" -an -nostdin -f rawvideo %EncodePixelFormat% -strict -2 - 2>"%log_dir%%~n2_pipelog%pass_temp%.txt" | %timer64% %SVT-AV1% -i stdin %CommandLine% -n %FrameCount% -w %Width% -h %Height% -fps-num %frame_rate_num% -fps-denom %frame_rate_denom% -b "%movie_dir%%~n2.ivf" 2>&1 | %safetee% -o "%log_dir%%~n2_log%pass_temp%.txt"
    if "%codec%"=="SVT-HEVC" %view_args64% %ffmpeg% -y -i "%~1" -an -nostdin -f rawvideo %EncodePixelFormat% -strict -2 - 2>"%log_dir%%~n2_pipelog%pass_temp%.txt" | %timer64% %SVT-HEVC% -i stdin %CommandLine% -n %FrameCount% -w %Width% -h %Height% -fps-num %frame_rate_num% -fps-denom %frame_rate_denom% -b "%movie_dir%%~n2.h265" 2>&1 | %safetee% -o "%log_dir%%~n2_log%pass_temp%.txt"
    if "%codec%"=="SVT-VP9" %view_args64% %ffmpeg% -y -i "%~1" -an -nostdin -f rawvideo %EncodePixelFormat% -strict -2 - 2>"%log_dir%%~n2_pipelog%pass_temp%.txt" | %timer64% %SVT-VP9% -i stdin %CommandLine% -n %FrameCount% -w %Width% -h %Height% -fps-num %frame_rate_num% -fps-denom %frame_rate_denom% -b "%movie_dir%%~n2.ivf" 2>&1 | %safetee% -o "%log_dir%%~n2_log%pass_temp%.txt"
    if "%codec%"=="libvpx" (
-      if not exist "%movie_dir%%~n1_temp%EncodeBitDepth%.y4m" echo %MessageIntermediateFileEncode% &&%ffmpeg% -i "%~1" -an %EncodePixelFormat% -strict -2 "%movie_dir%%~n1_temp%EncodeBitDepth%.y4m" >"%log_dir%%~n2_log%pass_temp%.txt" 2>&1
+      if not exist "%movie_dir%%~n1_temp%EncodeBitDepth%bit.y4m" echo %MessageIntermediateFileEncode% &&%ffmpeg% -i "%~1" -an %EncodePixelFormat% -strict -2 "%movie_dir%%~n1_temp%EncodeBitDepth%bit.y4m" >"%log_dir%%~n2_log%pass_temp%.txt" 2>&1
       %vpxenc% --help | find "WebM Project">>"%log_dir%%~n2_log%pass_temp%.txt" 2>&1 
-      %timer64% %vpxenc% %CommandLine% -o "%movie_dir%%~2" "%movie_dir%%~n1_temp%EncodeBitDepth%.y4m" 2>&1 | %safetee% -a "%log_dir%%~n2_log%pass_temp%.txt"
+      %timer64% %vpxenc% %CommandLine% -o "%movie_dir%%~2" "%movie_dir%%~n1_temp%EncodeBitDepth%bit.y4m" 2>&1 | %safetee% -a "%log_dir%%~n2_log%pass_temp%.txt"
    )
    if "%codec%"=="VTM" (
-       if not exist "%movie_dir%%~n1_temp%EncodeBitDepth%.yuv" echo %MessageIntermediateFileEncode% &&%ffmpeg% -i "%~1" -an %EncodePixelFormat% -f rawvideo -strict -2 "%movie_dir%%~n1_temp%EncodeBitDepth%.yuv" >"%log_dir%%~n2_log%pass_temp%.txt" 2>&1
-       %timer64% %VTM%  %CommandLine% -fr %frame_rate_integer% -wdt %Width% -hgt %Height% -f %FrameCount% -i "%movie_dir%%~n1_temp%EncodeBitDepth%.yuv" -o "%movie_dir%%~n2.yuv" -b "%movie_dir%%~2" 2>&1 | %safetee% -a "%log_dir%%~n2_log%pass_temp%.txt"
-       %view_args64% %ffmpeg% -y -f rawvideo -s %video_size% -r %frame_rate% %EncodePixelFormat% -i "%movie_dir%%~n2.yuv" -strict -2 "%movie_dir%%~n2.y4m" >>"%log_dir%%~n2_log%pass_temp%.txt" 2>&1 &&del "%movie_dir%%~n2.yuv"
+       if not exist "%movie_dir%%~n1_temp%EncodeBitDepth%bit.yuv" echo %MessageIntermediateFileEncode% &&%ffmpeg% -i "%~1" -an %EncodePixelFormat% -f rawvideo -strict -2 "%movie_dir%%~n1_temp%EncodeBitDepth%bit.yuv" >"%log_dir%%~n2_log%pass_temp%.txt" 2>&1
+       %timer64% %VTM%  %CommandLine% -fr %frame_rate_integer% -wdt %Width% -hgt %Height% -f %FrameCount% -i "%movie_dir%%~n1_temp%EncodeBitDepth%bit.yuv" -b "%movie_dir%%~2" 2>&1 | %safetee% -a "%log_dir%%~n2_log%pass_temp%.txt"
    )
    if "%codec%"=="xvc" (
-       %timer64% %ffmpeg% -y -i "%~1" -an %EncodePixelFormat% -strict -2 -f yuv4mpegpipe - 2>"%log_dir%%~n2_pipelog%pass_temp%.txt" | %timer64% %xvcenc% -verbose 1 -input-file - -output-file "%movie_dir%%~2" -rec-file "%movie_dir%%~n2.yuv" %CommandLine% 2>&1 | %safetee% -a "%log_dir%%~n2_log%pass_temp%.txt"
-       %view_args64% %ffmpeg% -y -f rawvideo -s %video_size% -r %frame_rate% %EncodePixelFormat% -i "%movie_dir%%~n2.yuv" -strict -2 "%movie_dir%%~n2.y4m" >>"%log_dir%%~n2_log%pass_temp%.txt" 2>&1 &&del "%movie_dir%%~n2.yuv"
+       %ffmpeg% -y -i "%~1" -an %EncodePixelFormat% -strict -2 -f yuv4mpegpipe - 2>"%log_dir%%~n2_pipelog%pass_temp%.txt" | %timer64% %xvcenc% -verbose 1 -input-file - -output-file "%movie_dir%%~2" %CommandLine% 2>&1 | %safetee% -a "%log_dir%%~n2_log%pass_temp%.txt"
    )
 ) else (
    set enc_skip=1
@@ -147,6 +145,18 @@ if "%codec%"=="SVT-VP9" set ErrorCheckFile="%movie_dir%%~n2.ivf"
 
 if not "%enc_skip%"=="1" call :error_check "%~1" %ErrorCheckFile%
 if "%multipass%"=="1" if not "%enc_skip%"=="1" if not "%pass_temp%"=="%pass_orig%" if exist %ErrorCheckFile% del %ErrorCheckFile%
+
+rem そのままではFFmpegで扱えないビットストリームをy4mにデコードする
+if not "%enc_error%"=="1" if not exist "%movie_dir%%~n2.y4m" (
+   if "%codec%"=="VTM" (
+      %VTMdec% -d %EncodeBitDepth% -b "%movie_dir%%~2" -o "%movie_dir%%~n2.yuv" 2>&1 | %safetee% -a "%log_dir%%~n2_log%pass_temp%.txt"
+      %view_args64% %ffmpeg% -y -f rawvideo -s %video_size% -r %frame_rate% %EncodePixelFormat% -i "%movie_dir%%~n2.yuv" -strict -2 "%movie_dir%%~n2.y4m" >>"%log_dir%%~n2_log%pass_temp%.txt" 2>&1 &&del "%movie_dir%%~n2.yuv"
+   )
+   if "%codec%"=="xvc" (
+      %xvcdec% -bitstream-file "%movie_dir%%~2" -output-file "%movie_dir%%~n2.yuv" 2>&1 | %safetee% -a "%log_dir%%~n2_log%pass_temp%.txt"
+      %view_args64% %ffmpeg% -y -f rawvideo -s %video_size% -r %frame_rate% %EncodePixelFormat% -i "%movie_dir%%~n2.yuv" -strict -2 "%movie_dir%%~n2.y4m" >>"%log_dir%%~n2_log%pass_temp%.txt" 2>&1 &&del "%movie_dir%%~n2.yuv"
+   )
+)
 
 rem 処理時間をログファイルから拾う
 if not "%enc_error%"=="1" find "TotalMilliseconds : " "%log_dir%%~n2_log%pass_temp%.txt">nul 2>&1||set timer_error=1&&SET enc_msec%pass_temp%=0
