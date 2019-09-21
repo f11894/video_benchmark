@@ -7,7 +7,7 @@ for %%i in ("..\tools\busybox64.exe") do set busybox64="%%~dpnxi"
 for %%i in ("..\tools\ffmpeg.exe") do set ffmpeg="%%~dpnxi"
 for %%i in ("..\tools\timer64.exe") do set timer64="%%~dpnxi"
 for %%i in ("..\tools\view_args64.exe") do set view_args64="%%~dpnxi"
-for %%i in ("..\tools\vtm\EncoderApp.exe") do set VTM="%%~dpnxi"
+for %%i in ("..\tools\vtm\EncoderApp.exe") do set VTMenc="%%~dpnxi"
 for %%i in ("..\tools\vtm\encoder_randomaccess_vtm.cfg") do set "VTM_cfg=%%~dpnxi"
 
 set VTM_option="-c %VTM_cfg% --InputBitDepth=8 --OutputBitDepth=8 -q %%i"
