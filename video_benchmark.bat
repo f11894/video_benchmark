@@ -146,15 +146,15 @@ if "%codec%"=="SVT-VP9" set ErrorCheckFile="%movie_dir%%~n2.ivf"
 if not "%enc_skip%"=="1" call :error_check "%~1" %ErrorCheckFile%
 if "%multipass%"=="1" if not "%enc_skip%"=="1" if not "%pass_temp%"=="%pass_orig%" if exist %ErrorCheckFile% del %ErrorCheckFile%
 
-rem そのままではFFmpegで扱えないビットストリームをy4mにデコードする
-if not "%enc_error%"=="1" if not exist "%movie_dir%%~n2.y4m" (
+rem そのままではFFmpegで扱えないビットストリームを可逆圧縮のH.264にデコードする
+if not "%enc_error%"=="1" if not exist "%movie_dir%%~n2.mp4" (
    if "%codec%"=="VTM" (
       %VTMdec% -d %EncodeBitDepth% -b "%movie_dir%%~2" -o "%movie_dir%%~n2.yuv" 2>&1 | %safetee% -a "%log_dir%%~n2_log%pass_temp%.txt"
-      %view_args64% %ffmpeg% -y -f rawvideo -s %video_size% -r %frame_rate% %EncodePixelFormat% -i "%movie_dir%%~n2.yuv" -strict -2 "%movie_dir%%~n2.y4m" >>"%log_dir%%~n2_log%pass_temp%.txt" 2>&1 &&del "%movie_dir%%~n2.yuv"
+      %view_args64% %ffmpeg% -y -f rawvideo -s %video_size% -r %frame_rate% %EncodePixelFormat% -i "%movie_dir%%~n2.yuv" -vcodec libx264 -qp 0 "%movie_dir%%~n2.mp4" >>"%log_dir%%~n2_log%pass_temp%.txt" 2>&1 &&del "%movie_dir%%~n2.yuv"
    )
    if "%codec%"=="xvc" (
       %xvcdec% -bitstream-file "%movie_dir%%~2" -output-file "%movie_dir%%~n2.yuv" 2>&1 | %safetee% -a "%log_dir%%~n2_log%pass_temp%.txt"
-      %view_args64% %ffmpeg% -y -f rawvideo -s %video_size% -r %frame_rate% %EncodePixelFormat% -i "%movie_dir%%~n2.yuv" -strict -2 "%movie_dir%%~n2.y4m" >>"%log_dir%%~n2_log%pass_temp%.txt" 2>&1 &&del "%movie_dir%%~n2.yuv"
+      %view_args64% %ffmpeg% -y -f rawvideo -s %video_size% -r %frame_rate% %EncodePixelFormat% -i "%movie_dir%%~n2.yuv" -vcodec libx264 -qp 0 "%movie_dir%%~n2.mp4" >>"%log_dir%%~n2_log%pass_temp%.txt" 2>&1 &&del "%movie_dir%%~n2.yuv"
    )
 )
 
@@ -199,8 +199,8 @@ popd
 pushd "%log_dir%"
 
 set CompareFile="%movie_dir%%~2"
-if "%codec%"=="VTM" set CompareFile="%movie_dir%%~n2.y4m"
-if "%codec%"=="xvc" set CompareFile="%movie_dir%%~n2.y4m"
+if "%codec%"=="VTM" set CompareFile="%movie_dir%%~n2.mp4"
+if "%codec%"=="xvc" set CompareFile="%movie_dir%%~n2.mp4"
 
 find "Parsed_ssim" "%~n2_ssim(%CompareBitDepth%)_log%pass_orig%.txt">nul 2>&1 || set SSIM_check=1
 if "%verbose_log%"=="1" if not exist "%log_dir%%~n2_ssim(%CompareBitDepth%)_verbose_log.txt" set SSIM_check=1
