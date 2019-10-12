@@ -107,7 +107,7 @@ if not exist "%movie_dir%%~2" (
    if "%codec%"=="x264" %view_args64% %ffmpeg% -y -i "%~1" -an %EncodePixelFormat% -strict -2 -f yuv4mpegpipe - 2>"%log_dir%%~n2_pipelog%pass_temp%.txt" | %timer64% %x264% %CommandLine% --demuxer y4m -o "%movie_dir%%~2" - 2>&1 | %safetee% -o "%log_dir%%~n2_log%pass_temp%.txt"
    if "%codec%"=="x265" %view_args64% %ffmpeg% -y -i "%~1" -an %EncodePixelFormat% -strict -2 -f yuv4mpegpipe - 2>"%log_dir%%~n2_pipelog%pass_temp%.txt" | %timer64% %x265% %CommandLine% --input - --y4m "%movie_dir%%~n2.h265" 2>&1 | %safetee% -o "%log_dir%%~n2_log%pass_temp%.txt"
    if "%codec%"=="libaom" (
-      if not exist "%movie_dir%%~n1_temp%EncodeBitDepth%bit.y4m" echo %MessageIntermediateFileEncode% &&%ffmpeg% -i "%~1" -an %EncodePixelFormat% -strict -2 "%movie_dir%%~n1_temp%EncodeBitDepth%bit.y4m" >"%log_dir%%~n2_log%pass_temp%.txt" 2>&1
+      if not exist "%movie_dir%%~n1_temp%EncodeBitDepth%bit.y4m" echo %MessageIntermediateFileEncode% && %view_args64% %ffmpeg% -i "%~1" -an %EncodePixelFormat% -strict -2 "%movie_dir%%~n1_temp%EncodeBitDepth%bit.y4m" >"%log_dir%%~n2_log%pass_temp%.txt" 2>&1
       %aomenc% --help | find "AOMedia Project AV1 Encoder">>"%log_dir%%~n2_log%pass_temp%.txt" 2>&1 
       %timer64% %aomenc% %CommandLine% -o "%movie_dir%%~n2.ivf" "%movie_dir%%~n1_temp%EncodeBitDepth%bit.y4m" 2>&1 | %safetee% -a "%log_dir%%~n2_log%pass_temp%.txt"
    )
@@ -116,12 +116,12 @@ if not exist "%movie_dir%%~2" (
    if "%codec%"=="SVT-HEVC" %view_args64% %ffmpeg% -y -i "%~1" -an -nostdin -f rawvideo %EncodePixelFormat% -strict -2 - 2>"%log_dir%%~n2_pipelog%pass_temp%.txt" | %timer64% %SVT-HEVC% -i stdin %CommandLine% -n %FrameCount% -w %Width% -h %Height% -fps-num %frame_rate_num% -fps-denom %frame_rate_denom% -b "%movie_dir%%~n2.h265" 2>&1 | %safetee% -o "%log_dir%%~n2_log%pass_temp%.txt"
    if "%codec%"=="SVT-VP9" %view_args64% %ffmpeg% -y -i "%~1" -an -nostdin -f rawvideo %EncodePixelFormat% -strict -2 - 2>"%log_dir%%~n2_pipelog%pass_temp%.txt" | %timer64% %SVT-VP9% -i stdin %CommandLine% -n %FrameCount% -w %Width% -h %Height% -fps-num %frame_rate_num% -fps-denom %frame_rate_denom% -b "%movie_dir%%~n2.ivf" 2>&1 | %safetee% -o "%log_dir%%~n2_log%pass_temp%.txt"
    if "%codec%"=="libvpx" (
-      if not exist "%movie_dir%%~n1_temp%EncodeBitDepth%bit.y4m" echo %MessageIntermediateFileEncode% &&%ffmpeg% -i "%~1" -an %EncodePixelFormat% -strict -2 "%movie_dir%%~n1_temp%EncodeBitDepth%bit.y4m" >"%log_dir%%~n2_log%pass_temp%.txt" 2>&1
+      if not exist "%movie_dir%%~n1_temp%EncodeBitDepth%bit.y4m" echo %MessageIntermediateFileEncode% && %view_args64% %ffmpeg% -i "%~1" -an %EncodePixelFormat% -strict -2 "%movie_dir%%~n1_temp%EncodeBitDepth%bit.y4m" >"%log_dir%%~n2_log%pass_temp%.txt" 2>&1
       %vpxenc% --help | find "WebM Project">>"%log_dir%%~n2_log%pass_temp%.txt" 2>&1 
       %timer64% %vpxenc% %CommandLine% -o "%movie_dir%%~2" "%movie_dir%%~n1_temp%EncodeBitDepth%bit.y4m" 2>&1 | %safetee% -a "%log_dir%%~n2_log%pass_temp%.txt"
    )
    if "%codec%"=="VTM" (
-       if not exist "%movie_dir%%~n1_temp%EncodeBitDepth%bit.yuv" echo %MessageIntermediateFileEncode% &&%ffmpeg% -i "%~1" -an %EncodePixelFormat% -f rawvideo -strict -2 "%movie_dir%%~n1_temp%EncodeBitDepth%bit.yuv" >"%log_dir%%~n2_log%pass_temp%.txt" 2>&1
+       if not exist "%movie_dir%%~n1_temp%EncodeBitDepth%bit.yuv" echo %MessageIntermediateFileEncode% && %view_args64% %ffmpeg% -i "%~1" -an %EncodePixelFormat% -f rawvideo -strict -2 "%movie_dir%%~n1_temp%EncodeBitDepth%bit.yuv" >"%log_dir%%~n2_log%pass_temp%.txt" 2>&1
        %timer64% %VTMenc%  %CommandLine% -fr %frame_rate_integer% -wdt %Width% -hgt %Height% -f %FrameCount% -i "%movie_dir%%~n1_temp%EncodeBitDepth%bit.yuv" -o NUL -b "%movie_dir%%~2" 2>&1 | %safetee% -a "%log_dir%%~n2_log%pass_temp%.txt"
    )
    if "%codec%"=="xvc" (

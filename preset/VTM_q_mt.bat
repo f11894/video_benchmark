@@ -31,7 +31,7 @@ for %%f in (%*) do (
    if not exist "%%~dpf%%~nf_benchmark_log\" mkdir "%%~dpf%%~nf_benchmark_log\"
    for /L %%i in (36,-2,22) do (
       echo "%%~f" "VTM_q%%i" %VTM_option% !Width_delay! !Height_delay! !FrameCount_delay! !frame_rate_delay! !frame_rate_integer_delay!>>%xargs_txt%
-      if not exist "%%~dpnf_temp8bit.yuv" %ffmpeg% -y -i "%%~f" -an -pix_fmt yuv420p -f rawvideo -strict -2 "%%~dpnf_temp8bit.yuv" >"%%~dpf%%~nf_benchmark_log\%%~nf_VTM_q%%i_log.txt" 2>&1 
+      if not exist "%%~dpnf_temp8bit.yuv" %view_args64% %ffmpeg% -y -i "%%~f" -an -pix_fmt yuv420p -f rawvideo -strict -2 "%%~dpnf_temp8bit.yuv" >"%%~dpf%%~nf_benchmark_log\%%~nf_VTM_q%%i_log.txt" 2>&1 
    )
 )
 endlocal
