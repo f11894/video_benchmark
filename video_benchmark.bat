@@ -12,7 +12,7 @@ set "EncodeBitDepth=8"
 call :variable_set -cmd CommandLine %*
 call :variable_set -i InputVideo %*
 call :variable_set -o OutputVideo %*
-call :variable_set -csv CsvNameSuffix %*
+call :variable_set -csvsuf CsvNameSuffix %*
 call :variable_set -codec codec %*
 echo "%*"|find "-encode-depth" >nul&& call :variable_set -encode-depth EncodeBitDepth %*
 if defined CsvNameSuffix set "CsvNameSuffix=_%CsvNameSuffix%"

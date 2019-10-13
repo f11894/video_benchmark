@@ -13,7 +13,7 @@ Usage: video_benchmark.bat [options]...
   -o                   output video name
   -codec               encoder name   
   -cmd                 encoder command line
-  -csv                 CSV file name suffix *optional
+  -csvsuf              CSV file name suffix *optional
   -encode-depth        encoding bit-depth (8 or 10) *optional
 ```
 具体的な使い方は同梱してあるプリセット用のbatを見ればわかるかと思います  

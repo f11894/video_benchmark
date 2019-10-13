@@ -40,12 +40,12 @@ popd
 %busybox64% xargs -a %xargs_txt%  -n 8 -P %thread% "%~dp0VTM_xargs.bat"
 :loop
 if "%~1"=="" goto end
-for /L %%i in (36,-2,22) do call %benchmark_bat% -codec VTM -i "%~1" -o "%~n1_VTM_q%%i.bin" -cmd %VTM_option% -csv q
+for /L %%i in (36,-2,22) do call %benchmark_bat% -codec VTM -i "%~1" -o "%~n1_VTM_q%%i.bin" -cmd %VTM_option% -csvsuf q
 rem For comparison
-for /L %%i in (32,-2,18) do call %benchmark_bat% -codec x264 -i "%~1" -o "%~n1_x264_placebo_tunessim_kf32_crf%%i.mp4" -cmd "--preset placebo --tune ssim --keyint 32 --crf %%i" -csv placebo_tunessim_kf32_crf
-for /L %%i in (32,-2,18) do call %benchmark_bat% -codec x265 -i "%~1" -o "%~n1_x265_placebo_tunessim_kf32_crf%%i.mp4" -cmd "--preset placebo --tune ssim --keyint 32 --crf %%i" -csv placebo_tunessim_kf32_crf
-for /L %%i in (55,-5,25) do call %benchmark_bat% -codec libvpx -i "%~1" -o "%~n1_libvpx_vp9_c0_kf32_2pass_q%%i.webm" -cmd "--codec=vp9 --frame-parallel=0 --tile-columns=2 --good --cpu-used=0 --tune=psnr --passes=2 --threads=2 --end-usage=q --cq-level=%%i --webm --auto-alt-ref=6 --kf-max-dist=32" -csv vp9_c0_kf32_2pass_q
-for /L %%i in (55,-5,25) do call %benchmark_bat% -codec libaom -i "%~1" -o "%~n1_libaom_c0_kf32_2pass_q%%i.mp4" -cmd "--ivf --cpu-used=0 --threads=8 --tile-columns=2 --tile-rows=2 --passes=2 --end-usage=q --cq-level=%%i --kf-max-dist=32" -csv c0_kf32_2pass_q
+for /L %%i in (32,-2,18) do call %benchmark_bat% -codec x264 -i "%~1" -o "%~n1_x264_placebo_tunessim_kf32_crf%%i.mp4" -cmd "--preset placebo --tune ssim --keyint 32 --crf %%i" -csvsuf placebo_tunessim_kf32_crf
+for /L %%i in (32,-2,18) do call %benchmark_bat% -codec x265 -i "%~1" -o "%~n1_x265_placebo_tunessim_kf32_crf%%i.mp4" -cmd "--preset placebo --tune ssim --keyint 32 --crf %%i" -csvsuf placebo_tunessim_kf32_crf
+for /L %%i in (55,-5,25) do call %benchmark_bat% -codec libvpx -i "%~1" -o "%~n1_libvpx_vp9_c0_kf32_2pass_q%%i.webm" -cmd "--codec=vp9 --frame-parallel=0 --tile-columns=2 --good --cpu-used=0 --tune=psnr --passes=2 --threads=2 --end-usage=q --cq-level=%%i --webm --auto-alt-ref=6 --kf-max-dist=32" -csvsuf vp9_c0_kf32_2pass_q
+for /L %%i in (55,-5,25) do call %benchmark_bat% -codec libaom -i "%~1" -o "%~n1_libaom_c0_kf32_2pass_q%%i.mp4" -cmd "--ivf --cpu-used=0 --threads=8 --tile-columns=2 --tile-rows=2 --passes=2 --end-usage=q --cq-level=%%i --kf-max-dist=32" -csvsuf c0_kf32_2pass_q
 shift
 goto loop
 :end
