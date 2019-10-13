@@ -9,7 +9,7 @@ for /L %%i in (1000,1000,6000) do call %benchmark_bat% -codec x264 -i "%~1" -o "
 for /L %%i in (1000,1000,6000) do call %benchmark_bat% -codec x265 -i "%~1" -o "%~n1_x265_placebo_tunessim_%%ikbps.mp4" -cmd "--preset placebo --tune ssim --keyint 250 --bitrate %%i --pass 2" -csvsuf placebo_tunessim_2pass_bitrate
 for /L %%i in (1000,1000,6000) do call %benchmark_bat% -codec libvpx -i "%~1" -o "%~n1_libvpx_vp9_c0_2pass_crf%%i.webm" -cmd "--codec=vp9 --frame-parallel=0 --tile-columns=2 --good --cpu-used=0 --tune=psnr --passes=2 --threads=2 --end-usage=vbr --target-bitrate=%%i --webm --auto-alt-ref=6 --kf-max-dist=250" -csvsuf vp9_c0_2pass_bitrate
 
-rem 10bit sample
+rem 10bit example
 rem for /L %%i in (1000,1000,6000) do call %benchmark_bat% -codec x264 -i "%~1" -o "%~n1_x264_10bit_placebo_tunessim_%%ikbps.mp4" -cmd "--preset placebo --tune ssim --bitrate %%i --pass 2 --input-depth 10 --output-depth 10" -csvsuf 10bit_placebo_tunessim_2pass_bitrate -encode-depth 10
 rem for /L %%i in (1000,1000,6000) do call %benchmark_bat% -codec x265 -i "%~1" -o "%~n1_x265_10bit_placebo_tunessim_%%ikbps.mp4" -cmd "--preset placebo --tune ssim --bitrate %%i --pass 2 --input-depth 10 --output-depth 10" -csvsuf 10bit_placebo_tunessim_2pass_bitrate -encode-depth 10
 shift
