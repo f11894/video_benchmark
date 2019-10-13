@@ -10,6 +10,7 @@ set language_configured=1
 rem 引数チェック
 set "EncodeBitDepth=8"
 set ArgumentError=
+set CommandLine_orig=
 call :variable_set -cmd CommandLine %*
 call :variable_set -i InputVideo %*
 call :variable_set -o OutputVideo %*
@@ -17,6 +18,7 @@ call :variable_set -csvsuf CsvNameSuffix %*
 call :variable_set -codec codec %*
 echo "%*"|find "-encode-depth" >nul&& call :variable_set -encode-depth EncodeBitDepth %*
 if defined CsvNameSuffix set "CsvNameSuffix=_%CsvNameSuffix%"
+if defined CommandLine set "CommandLine_orig=%CommandLine%"
 for %%i in ("%OutputVideo%") do set "OutputVideoNoExt=%%~ni"
 for %%i in ("%InputVideo%") do set "InputVideoNoExt=%%~ni"
 if "%codec%"=="" set ArgumentError=1
@@ -77,6 +79,7 @@ pushd "%movie_dir%"
 
 :enc_process
 rem エンコード前の下処理
+set "CommandLine=%CommandLine_orig%"
 set "CsvName=%codec%%CsvNameSuffix%"
 set "CompareBitDepth=Unspecified"
 echo "%ComparePixelFormat%"|find "yuv420p" >nul&&set "CompareBitDepth=8bit"
@@ -175,7 +178,7 @@ if "%multipass%"=="1" if not "%pass_temp%"=="%pass_orig%" (
    goto enc_process
 )
 if "%multipass%"=="1" (
-   set "CommandLine=%~3"
+   set "CommandLine=%CommandLine_orig%"
    if exist ffmpeg2pass-0.log del ffmpeg2pass-0.log
    if exist ffmpeg2pass-0.log.mbtree del ffmpeg2pass-0.log.mbtree
    if exist x264_2pass.log del x264_2pass.log
