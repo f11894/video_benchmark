@@ -4,16 +4,18 @@
 PSNR、SSIM、VMAFのスコアを算出してcsvに出力したりグラフを作成することが出来ます  
 エンコード速度の計測や自動マルチパスエンコード機能もあります  
 
-### 使い方  
+### 使い方
 
-video_benchmark.batに以下の引数を渡して起動します  
-引数1 ベンチマークしたい元動画  
-引数2 エンコーダーで出力する時のファイル名  
-引数3 エンコーダーに渡す引数  
-引数4 使用するエンコーダー名  
-引数5 csvに出力する際のファイル名  
-引数6 エンコードする時のビット深度(無指定だと8bit、「10bit」だと10bitでエンコードします)   
+```console
+Usage: video_benchmark.bat [options]...
 
+  -i                   input video path
+  -o                   output video name
+  -codec               encoder name   
+  -cmd                 encoder command line
+  -csv                 CSV file name suffix *optional
+  -encode-depth        encoding bit-depth (8 or 10) *optional
+```
 具体的な使い方は同梱してあるプリセット用のbatを見ればわかるかと思います  
 もしくはプリセット用のbatに動画ファイルをドラッグ&ドロップしてください  
 エンコードが終わったらbenchmark_logフォルダをCreate_Graph.batにドラッグ&ドロップしてグラフを作成します  
