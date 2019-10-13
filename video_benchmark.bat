@@ -304,7 +304,7 @@ if not "%enc_error%"=="1" if not "%Compare_error%"=="1" (
 if not "%enc_error%"=="1" if not "%Compare_error%"=="1" (
    for %%i in (PSNR_Y,PSNR_Average,SSIM_Y,SSIM_All,VMAF,MS-SSIM,fps,Sec) do (
       if defined %%i echo %bitrate%,%%%%i%%|%safetee% -a "%InputVideoNoExt%_%CsvName%_%%i(%CompareBitDepth%).csv" >nul
-      if defined %%i echo %bpp%,%%%%i%%|%safetee% -a "%InputVideoNoExt%_%CsvName%_%%i(%CompareBitDepth%)_bpp.csv" >nul
+      if "%EnableBPP%"=="1" if defined %%i echo %bpp%,%%%%i%%|%safetee% -a "%InputVideoNoExt%_%CsvName%_%%i(%CompareBitDepth%)_bpp.csv" >nul
    )
 )
 set random3x=%random%_%random%_%random%

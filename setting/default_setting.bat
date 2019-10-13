@@ -21,6 +21,9 @@ set EnableVMAF=1
 rem Whether MS-SSIM should also be calculated when VMAF is calculated (1: on)
 set EnableMSSSIM=0
 
+rem whether to output csv file for bpp (1: on)
+set EnableBPP=0
+
 rem Bit depth when calculating SSIM or VMAF
 set ComparePixelFormat=-pix_fmt yuv420p
 
