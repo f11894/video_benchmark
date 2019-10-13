@@ -7,7 +7,7 @@ PSNR、SSIM、VMAFのスコアを算出してcsvに出力したりグラフを�
 ### 使い方
 
 ```console
-Usage: video_benchmark.bat [options]...
+Usage: video_benchmark.bat -codec x264 -i C:\enc\input.y4m -o output.mp4 -cmd "--crf 23"
 
   -i                   input video path
   -o                   output video name
