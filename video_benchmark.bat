@@ -9,6 +9,7 @@ set language_configured=1
 :ArgumentCheck
 rem 引数チェック
 set "EncodeBitDepth=8"
+set ArgumentError=
 call :variable_set -cmd CommandLine %*
 call :variable_set -i InputVideo %*
 call :variable_set -o OutputVideo %*
