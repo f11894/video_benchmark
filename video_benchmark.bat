@@ -10,21 +10,19 @@ set language_configured=1
 rem 引数チェック
 set "EncodeBitDepth=8"
 set ArgumentError=
-set CommandLine_orig=
-call :variable_set -cmd CommandLine %*
+call :variable_set -cmd CommandLine_orig %*
 call :variable_set -i InputVideo %*
 call :variable_set -o OutputVideo %*
 call :variable_set -csvsuf CsvNameSuffix %*
 call :variable_set -codec codec %*
 echo "%*"|find "-encode-depth" >nul&& call :variable_set -encode-depth EncodeBitDepth %*
 if defined CsvNameSuffix set "CsvNameSuffix=_%CsvNameSuffix%"
-if defined CommandLine set "CommandLine_orig=%CommandLine%"
 for %%i in ("%OutputVideo%") do set "OutputVideoNoExt=%%~ni"
 for %%i in ("%InputVideo%") do set "InputVideoNoExt=%%~ni"
 if "%codec%"=="" set ArgumentError=1
 if "%InputVideo%"=="" set ArgumentError=1
 if "%OutputVideo%"=="" set ArgumentError=1
-if "%CommandLine%"=="" set ArgumentError=1
+if "%CommandLine_orig%"=="" set ArgumentError=1
 if "%ArgumentError%"=="1" (
    echo %MessageArgumentErrorLine1%
    echo %MessageArgumentErrorLine2%
@@ -178,7 +176,6 @@ if "%multipass%"=="1" if not "%pass_temp%"=="%pass_orig%" (
    goto enc_process
 )
 if "%multipass%"=="1" (
-   set "CommandLine=%CommandLine_orig%"
    if exist ffmpeg2pass-0.log del ffmpeg2pass-0.log
    if exist ffmpeg2pass-0.log.mbtree del ffmpeg2pass-0.log.mbtree
    if exist x264_2pass.log del x264_2pass.log
@@ -300,33 +297,20 @@ if not "%enc_error%"=="1" if not "%Compare_error%"=="1" (
    set "PSNR_Average=%PSNR_Average:~8%"
    set /a "echo_bitrare=%Filesize%/%Duration2%*8"
    for /f "DELIMS=" %%i IN ('PowerShell %Filesize%*8/%Duration2%') DO SET "bitrate=%%i"
-   if not "%msec_total%"=="0" for /f "DELIMS=" %%i IN ('PowerShell "%enc_fps%"') DO SET "enc_fps_calc=%%i"
-   if not "%msec_total%"=="0" for /f "DELIMS=" %%i IN ('PowerShell "%msec_total%/1000"') DO SET "enc_sec_calc=%%i"
+   if not "%msec_total%"=="0" for /f "DELIMS=" %%i IN ('PowerShell "%enc_fps%"') DO SET "fps=%%i"
+   if not "%msec_total%"=="0" for /f "DELIMS=" %%i IN ('PowerShell "%msec_total%/1000"') DO SET "Sec=%%i"
    for /f "DELIMS=" %%i IN ('PowerShell "(%Filesize%*8)/(%Width%*%Height%*%FrameCount%)"') DO SET "bpp=%%i"
 )
 if not "%enc_error%"=="1" if not "%Compare_error%"=="1" (
-   echo %bitrate%,%PSNR_Y%|%safetee% -a "%InputVideoNoExt%_%CsvName%_PSNR_Y(%CompareBitDepth%).csv" >nul
-   echo %bitrate%,%PSNR_Average%|%safetee% -a "%InputVideoNoExt%_%CsvName%_PSNR_Average(%CompareBitDepth%).csv" >nul
-   echo %bitrate%,%SSIM_Y%|%safetee% -a "%InputVideoNoExt%_%CsvName%_SSIM_Y(%CompareBitDepth%).csv" >nul
-   echo %bitrate%,%SSIM_All%|%safetee% -a "%InputVideoNoExt%_%CsvName%_SSIM_All(%CompareBitDepth%).csv" >nul
-   if "%EnableVMAF%"=="1" echo %bitrate%,%VMAF%|%safetee% -a "%InputVideoNoExt%_%CsvName%_VMAF(%CompareBitDepth%).csv" >nul
-   if "%EnableVMAF%"=="1" if "%EnableMSSSIM%"=="1" echo %bitrate%,%MS-SSIM%|%safetee% -a "%InputVideoNoExt%_%CsvName%_MS-SSIM(%CompareBitDepth%).csv" >nul
-   if not "%msec_total%"=="0" echo %bitrate%,%enc_fps_calc%|%safetee% -a "%InputVideoNoExt%_%CsvName%_fps(%CompareBitDepth%).csv" >nul
-   if not "%msec_total%"=="0" echo %bitrate%,%enc_sec_calc%|%safetee% -a "%InputVideoNoExt%_%CsvName%_Time(%CompareBitDepth%).csv" >nul
-   rem bpp
-   echo %bpp%,%PSNR_Y%|%safetee% -a "%InputVideoNoExt%_%CsvName%_PSNR_Y(%CompareBitDepth%)_bpp.csv" >nul
-   echo %bpp%,%PSNR_Average%|%safetee% -a "%InputVideoNoExt%_%CsvName%_PSNR_Average(%CompareBitDepth%)_bpp.csv" >nul
-   echo %bpp%,%SSIM_Y%|%safetee% -a "%InputVideoNoExt%_%CsvName%_SSIM_Y(%CompareBitDepth%)_bpp.csv" >nul
-   echo %bpp%,%SSIM_All%|%safetee% -a "%InputVideoNoExt%_%CsvName%_SSIM_All(%CompareBitDepth%)_bpp.csv" >nul
-   if "%EnableVMAF%"=="1" echo %bpp%,%VMAF%|%safetee% -a "%InputVideoNoExt%_%CsvName%_VMAF(%CompareBitDepth%)_bpp.csv" >nul
-   if "%EnableVMAF%"=="1" if "%EnableMSSSIM%"=="1" echo %bpp%,%MS-SSIM%|%safetee% -a "%InputVideoNoExt%_%CsvName%_MS-SSIM(%CompareBitDepth%)_bpp.csv" >nul
-   if not "%msec_total%"=="0" echo %bpp%,%enc_fps_calc%|%safetee% -a "%InputVideoNoExt%_%CsvName%_fps(%CompareBitDepth%)_bpp.csv" >nul
-   if not "%msec_total%"=="0" echo %bpp%,%enc_sec_calc%|%safetee% -a "%InputVideoNoExt%_%CsvName%_Time(%CompareBitDepth%)_bpp.csv" >nul
+   for %%i in (PSNR_Y,PSNR_Average,SSIM_Y,SSIM_All,VMAF,MS-SSIM,fps,Sec) do (
+      if defined %%i echo %bitrate%,%%%%i%%|%safetee% -a "%InputVideoNoExt%_%CsvName%_%%i(%CompareBitDepth%).csv" >nul
+      if defined %%i echo %bpp%,%%%%i%%|%safetee% -a "%InputVideoNoExt%_%CsvName%_%%i(%CompareBitDepth%)_bpp.csv" >nul
+   )
 )
 set random3x=%random%_%random%_%random%
 for %%i in ("%InputVideoNoExt%_%CsvName%*.csv") do (
    copy /Y "%%~i" "%TEMP%\temp_%random3x%.txt">nul
-   %busybox64% awk "!a[$0]++" "%TEMP%\temp_%random3x%.txt" | %busybox64% awk -v ORS="\r\n" "{print}" >"%%~i"
+   %busybox64% awk -v ORS="\r\n" "!a[$0]++" "%TEMP%\temp_%random3x%.txt" >"%%~i"
    del "%TEMP%\temp_%random3x%.txt">nul 2>&1
 )
 popd

@@ -12,7 +12,7 @@ input = os.path.basename(sys.argv[1])
 input = input.replace('_benchmark_log','')
 BitDepth_array = ['8bit', '10bit', 'Unspecified']
 markers = [ 'o', 'v', '^', '<', '>' , 's', 'D', 'd', 'p', '*', 'h', 'H', '+', 'x', '|', '_' , '.', ',', '8', '1', '2', '3', '4' ]
-metric_array = ['PSNR_Y', 'PSNR_Average', 'SSIM_Y', 'SSIM_All', 'VMAF', 'MS-SSIM', 'fps' , 'Time']
+metric_array = ['PSNR_Y', 'PSNR_Average', 'SSIM_Y', 'SSIM_All', 'VMAF', 'MS-SSIM', 'fps' , 'Sec']
 size_array = ['', '_bpp']
 
 for size in size_array:
@@ -41,8 +41,8 @@ for size in size_array:
              if metric == 'PSNR_Y' or metric == 'PSNR_Average':
                 plt.ylabel(metric + ' (dB)', fontproperties=font_prop)
              else:
-                if metric == 'Time':
-                   plt.ylabel('Elapsed ' + metric + ' (sec)', fontproperties=font_prop)
+                if metric == 'Sec':
+                   plt.ylabel('Elapsed Time (sec)', fontproperties=font_prop)
                 else:
                    plt.ylabel(metric, fontproperties=font_prop)
              plt.grid(True,linestyle='dashed')
