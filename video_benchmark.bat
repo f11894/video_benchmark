@@ -409,19 +409,13 @@ exit /b
 set enc_error=1
 if exist "%~2" del "%~2"
 
-echo %MessageEncodeErrorLine1%
-echo %MessageEncodeErrorLine2%
-echo Input video "%~1"
-echo Output video "%~2"
-echo CommandLine "%codec% %CommandLine%"
-echo.
-(echo %date% %time%
-echo %MessageEncodeErrorLine1%
+echo %date% %time%>>%error_log%
+(echo %MessageEncodeErrorLine1%
 echo %MessageEncodeErrorLine2%
 echo Input video  "%~1"
 echo Output video "%~2"
 echo CommandLine "%codec% %CommandLine%"
-echo.) >>%error_log%
+echo.) | %safetee% -a %error_log%
 timeout /t %wait%
 exit /b
 
