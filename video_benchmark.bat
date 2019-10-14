@@ -307,11 +307,11 @@ if not "%enc_error%"=="1" if not "%Compare_error%"=="1" (
       if "%EnableBPP%"=="1" if defined %%i echo %bpp%,%%%%i%%|%safetee% -a "%InputVideoNoExt%_%CsvName%_%%i(%CompareBitDepth%)_bpp.csv" >nul
    )
 )
-set random3x=%random%_%random%_%random%
+for /f "delims=" %%a in ('PowerShell "-Join (Get-Random -Count 32 -input 0,1,2,3,4,5,6,7,8,9,a,b,c,d,e,f,g,h,i,j,k,l,m,n,o,p,q,r,s,t,u,v,w,x,y,z)"') do set "random32=%%a"
 for %%i in ("%InputVideoNoExt%_%CsvName%*.csv") do (
-   copy /Y "%%~i" "%TEMP%\temp_%random3x%.txt">nul
-   %busybox64% awk -v ORS="\r\n" "!a[$0]++" "%TEMP%\temp_%random3x%.txt" >"%%~i"
-   del "%TEMP%\temp_%random3x%.txt">nul 2>&1
+   copy /Y "%%~i" "%TEMP%\temp_%random32%.txt">nul
+   %busybox64% awk -v ORS="\r\n" "!a[$0]++" "%TEMP%\temp_%random32%.txt" >"%%~i"
+   del "%TEMP%\temp_%random32%.txt">nul 2>&1
 )
 popd
 
