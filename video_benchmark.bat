@@ -29,6 +29,7 @@ if "%ArgumentError%"=="1" (
    timeout /t 30
    exit /b
 )
+for %%i in ("%InputVideo%") do set "InputVideo=%%~dpnxi"
 
 rem 設定ファイルの読み込み
 rem user_settingが無ければdefault_settingをコピーする
