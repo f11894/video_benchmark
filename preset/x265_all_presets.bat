@@ -1,6 +1,5 @@
 @echo off
-cd "%~dp0"
-for %%i in ("..\video_benchmark.bat") do set benchmark_bat="%%~dpnxi"
+for %%i in ("%~dp0.") do set benchmark_bat="%%~dpivideo_benchmark.bat"
 :loop
 if "%~1"=="" goto end
 for %%a in (ultrafast,superfast,veryfast,faster,fast,medium,slow,slower,veryslow,placebo) do (

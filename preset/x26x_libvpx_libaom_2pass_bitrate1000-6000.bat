@@ -1,6 +1,5 @@
 @echo off
-cd "%~dp0"
-for %%i in ("..\video_benchmark.bat") do set benchmark_bat="%%~dpnxi"
+for %%i in ("%~dp0.") do set benchmark_bat="%%~dpivideo_benchmark.bat"
 :loop
 if "%~1"=="" goto end
 for /L %%i in (1000,1000,6000) do call %benchmark_bat% -codec rav1e -i "%~1" -o "%~n1_rav1e_20190921_s2_tunepsnr_2pass_%%ikbps.mp4" -cmd "--bitrate %%i --second-pass rav1e_stats.log --speed 2 --tune psnr --keyint 250 --threads 8 --tile-cols 2 --tile-rows 2" -csvsuf 20190921_s2_tunepsnr_2pass_bitrate

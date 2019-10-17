@@ -1,8 +1,3 @@
-rem Output file save location and name.
-set "log_dir=%~dp1%~n1_benchmark_log\"
-set "movie_dir=%~dp1"
-set error_log="%log_dir%%~n1__error_log.txt"
-
 rem How much higher is the QP of P frame and B frame higher than I frame in cqp and vqp mode of QSV
 set QP_p_n=2
 set QP_b_n=5

@@ -16,9 +16,6 @@ call :variable_set -o OutputVideo %*
 call :variable_set -csvsuf CsvNameSuffix %*
 call :variable_set -codec codec %*
 echo "%*"|find "-encode-depth" >nul&& call :variable_set -encode-depth EncodeBitDepth %*
-if defined CsvNameSuffix set "CsvNameSuffix=_%CsvNameSuffix%"
-for %%i in ("%OutputVideo%") do set "OutputVideoNoExt=%%~ni"
-for %%i in ("%InputVideo%") do set "InputVideoNoExt=%%~ni"
 if "%codec%"=="" set ArgumentError=1
 if "%InputVideo%"=="" set ArgumentError=1
 if "%OutputVideo%"=="" set ArgumentError=1
@@ -29,7 +26,10 @@ if "%ArgumentError%"=="1" (
    timeout /t 30
    exit /b
 )
+for %%i in ("%InputVideo%") do set "InputVideoNoExt=%%~ni"
 for %%i in ("%InputVideo%") do set "InputVideo=%%~dpnxi"
+for %%i in ("%OutputVideo%") do set "OutputVideoNoExt=%%~ni"
+if defined CsvNameSuffix set "CsvNameSuffix=_%CsvNameSuffix%"
 
 rem 設定ファイルの読み込み
 rem user_settingが無ければdefault_settingをコピーする
@@ -37,6 +37,11 @@ if not exist "%~dp0setting\user_setting.bat" copy /y "%~dp0setting\default_setti
 
 call "%~dp0setting\default_setting.bat" "%InputVideo%" "%~dpnx0"
 call "%~dp0setting\user_setting.bat" "%InputVideo%" "%~dpnx0"
+
+for %%i in ("%OutputVideo%") do set "movie_dir=%%~dpi"
+for %%i in ("%OutputVideo%") do set "OutputVideo=%%~nxi"
+set "log_dir=%movie_dir%\%InputVideoNoExt%_benchmark_log\"
+set error_log="%log_dir%%InputVideoNoExt%__error_log.txt"
 
 rem 動画の情報を調べる
 :ffmediaInfo

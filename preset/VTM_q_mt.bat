@@ -1,6 +1,5 @@
 @echo off
-cd "%~dp0"
-for %%i in ("..\video_benchmark.bat") do set benchmark_bat="%%~dpnxi"
+for %%i in ("%~dp0.") do set benchmark_bat="%%~dpivideo_benchmark.bat"
 for %%i in ("..\ffmediaInfo.bat") do set ffmediaInfo_bat="%%~dpnxi"
 
 for %%i in ("..\tools\busybox64.exe") do set busybox64="%%~dpnxi"

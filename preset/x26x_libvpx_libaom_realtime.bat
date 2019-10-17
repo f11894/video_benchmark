@@ -1,6 +1,5 @@
 @echo off
-cd "%~dp0"
-for %%i in ("..\video_benchmark.bat") do set benchmark_bat="%%~dpnxi"
+for %%i in ("%~dp0.") do set benchmark_bat="%%~dpivideo_benchmark.bat"
 :loop
 if "%~1"=="" goto end
 for %%i in (500,750,1000,1500,2000,2500,3000,3500,4000,4500,5000) do call %benchmark_bat% -codec libvpx -i "%~1" -o "%~n1_libvpx_vp9_c6rt_1pass_%%ikbps.webm" -cmd "--codec=vp9 --frame-parallel=1 --row-mt=1 --tile-columns=2 --tile-rows=2 --good --rt --cpu-used=6 --tune=psnr --passes=1 --threads=8 --end-usage=vbr --target-bitrate=%%i --webm --kf-max-dist=60" -csvsuf vp9_c6rt_1pass_bitrate
