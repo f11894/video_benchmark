@@ -1,10 +1,10 @@
 # video_benchmark
-各種エンコーダーの性能をベンチマークをするbatファイル群
+bat files that benchmark the performance of various encoders
 
-PSNR、SSIM、VMAFのスコアを算出してcsvに出力したりグラフを作成することが出来ます  
-エンコード速度の計測や自動マルチパスエンコード機能もあります  
+You can calculate PSNR, SSIM and VMAF scores and output them to csv to create a graph.  
+There is also an encoding speed measurement and an automatic multipath encoding function.  
 
-### 使い方
+### Usage
 
 ```console
 Usage: video_benchmark.bat -codec x264 -i input.y4m -o output.mp4 -cmd "--crf 23"
@@ -30,18 +30,12 @@ Usage: video_benchmark.bat -codec x264 -i input.y4m -o output.mp4 -cmd "--crf 23
   -csvsuf              CSV file name suffix *optional
   -encode-depth        encoding bit-depth (8 or 10) *optional
 ```
-具体的な使い方は同梱してあるプリセット用のbatを見ればわかるかと思います  
-もしくはプリセット用のbatに動画ファイルをドラッグ&ドロップしてください  
-エンコードが終わったらbenchmark_logフォルダをCreate_Graph.batにドラッグ&ドロップしてグラフを作成します  
-  
-複数ファイルの平均値を算出したい場合  
-1 例えば[ここ](https://media.xiph.org/video/derf/)からobjective-1-fastなどのdatasetをダウンロードして解凍します  
-2 次にobjective-1-fastフォルダ内のy4mを全て選択して適当なプリセットで変換します  
-3 全て変換し終わったらobjective-1-fastフォルダをCalculate_average_value.batにドラッグ&ドロップしてcsvの平均値を算出します  
-4 objective-1-fastフォルダ内にobjective-1-fast_benchmark_logというフォルダが作成されているので、そのフォルダをCreate_Graph.batにドラッグ&ドロップしてグラフを作成します  
+The included preset bat provides more specific instructions.  
+Alternatively, drag and drop the video file into the preset bat.  
+After encoding, drag and drop the "benchmark_log" folder into Create_Graph.bat to create the graph.  
 
-### 注意点  
-10bitでベンチマークする際はuser_setting.batのComparePixelFormatをyuv420pからyuv420p10leに書き換えてください(8bitと10bitの混在したベンチマークの場合も)  
+### important point  
+When benchmarking with 10bit, rewrite ComparePixelFormat in user_setting.bat from yuv420p to yuv420p10le (even in the case of 8bit and 10bit mixed benchmarks)
 
-エンコード前の動画とエンコード後の動画のfpsが揃っていなかったりするとSSIMなどのスコアが異常に低く計測されてしまいます  
-元の動画は可変フレームレートではなく固定フレームレートで保存しておいてください  
+If the fps of the video before encoding and the video after encoding are not aligned, the score such as SSIM will be measured abnormally low.  
+Use a constant frame rate for the source video, not a variable frame rate.  
