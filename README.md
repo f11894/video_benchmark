@@ -7,11 +7,25 @@ PSNR、SSIM、VMAFのスコアを算出してcsvに出力したりグラフを�
 ### 使い方
 
 ```console
-Usage: video_benchmark.bat -codec x264 -i C:\enc\input.y4m -o output.mp4 -cmd "--crf 23"
+Usage: video_benchmark.bat -codec x264 -i input.y4m -o output.mp4 -cmd "--crf 23"
 
   -i                   input video path
-  -o                   output video name
-  -codec               encoder name   
+  -o                   output video path
+  -codec               the following encoders
+                       x264
+                       x265
+                       QSVEncV
+                       VCEEncC
+                       NVEncC
+                       FFmpeg
+                       libvpx
+                       libaom
+                       rav1e
+                       SVT-HEVC
+                       SVT-VP9
+                       SVT-AV1
+                       VTM
+                       XVC
   -cmd                 encoder command line
   -csvsuf              CSV file name suffix *optional
   -encode-depth        encoding bit-depth (8 or 10) *optional
@@ -25,22 +39,6 @@ Usage: video_benchmark.bat -codec x264 -i C:\enc\input.y4m -o output.mp4 -cmd "-
 2 次にobjective-1-fastフォルダ内のy4mを全て選択して適当なプリセットで変換します  
 3 全て変換し終わったらobjective-1-fastフォルダをCalculate_average_value.batにドラッグ&ドロップしてcsvの平均値を算出します  
 4 objective-1-fastフォルダ内にobjective-1-fast_benchmark_logというフォルダが作成されているので、そのフォルダをCreate_Graph.batにドラッグ&ドロップしてグラフを作成します  
-
-### エンコーダー名一覧
-x264  
-x265  
-QSVEncC  
-VCEEncC  
-NVEncC  
-FFmpeg  
-libvpx  
-libaom  
-rav1e  
-SVT-HEVC   
-SVT-VP9   
-SVT-AV1  
-VTM  
-XVC  
 
 ### 注意点  
 10bitでベンチマークする際はuser_setting.batのComparePixelFormatをyuv420pからyuv420p10leに書き換えてください(8bitと10bitの混在したベンチマークの場合も)  
