@@ -1,18 +1,17 @@
 @echo off
 for %%i in ("%~dp0.") do set benchmark_bat="%%~dpivideo_benchmark.bat"
-for %%i in ("..\ffmediaInfo.bat") do set ffmediaInfo_bat="%%~dpnxi"
 
-for %%i in ("..\tools\busybox64.exe") do set busybox64="%%~dpnxi"
-for %%i in ("..\tools\ffmpeg.exe") do set ffmpeg="%%~dpnxi"
-for %%i in ("..\tools\timer64.exe") do set timer64="%%~dpnxi"
-for %%i in ("..\tools\view_args64.exe") do set view_args64="%%~dpnxi"
-for %%i in ("..\tools\vtm\EncoderApp.exe") do set VTMenc="%%~dpnxi"
-for %%i in ("..\tools\vtm\encoder_randomaccess_vtm.cfg") do set "VTM_cfg=%%~dpnxi"
+for %%i in ("%~dp0.") do set busybox64="%%~dpitools\busybox64.exe"
+for %%i in ("%~dp0.") do set ffmpeg="%%~dpitools\ffmpeg.exe"
+for %%i in ("%~dp0.") do set timer64="%%~dpitools\timer64.exe"
+for %%i in ("%~dp0.") do set view_args64="%%~dpitools\view_args64.exe"
+for %%i in ("%~dp0.") do set VTMenc="%%~dpitools\vtm\EncoderApp.exe"
+for %%i in ("%~dp0.") do set "VTM_cfg=%%~dpitools\vtm\encoder_randomaccess_vtm.cfg"
 
 set VTM_option="-c %VTM_cfg% --InputBitDepth=8 --OutputBitDepth=8 -q %%i"
 set thread=8
 
-pushd ..\tools\
+for %%i in ("%~dp0.") do pushd "%%~dpitools\"
 set xargs_txt="%TEMP%\xargs_%RANDOM%_%RANDOM%_%RANDOM%.txt"
 setlocal enabledelayedexpansion
 for %%f in (%*) do (
