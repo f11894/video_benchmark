@@ -42,8 +42,8 @@ for /L %%i in (36,-2,22) do call %benchmark_bat% -codec VTM -i "%~1" -o "%~n1_VT
 rem For comparison
 for /L %%i in (32,-2,18) do call %benchmark_bat% -codec x264 -i "%~1" -o "%~n1_x264_veryslow_tunessim_kf32_crf%%i.mp4" -cmd "--preset veryslow --tune ssim --keyint 32 --crf %%i" -csvsuf veryslow_tunessim_kf32_crf
 for /L %%i in (32,-2,18) do call %benchmark_bat% -codec x265 -i "%~1" -o "%~n1_x265_veryslow_tunessim_kf32_crf%%i.mp4" -cmd "--preset veryslow --tune ssim --keyint 32 --crf %%i" -csvsuf veryslow_tunessim_kf32_crf
-for /L %%i in (55,-5,25) do call %benchmark_bat% -codec libvpx -i "%~1" -o "%~n1_libvpx_vp9_c0_kf32_2pass_q%%i.webm" -cmd "--codec=vp9 --frame-parallel=0 --tile-columns=2 --good --cpu-used=0 --tune=psnr --pass=2 --passes=2 --threads=2 --end-usage=q --cq-level=%%i --webm --auto-alt-ref=6 --kf-max-dist=32" -csvsuf vp9_c0_kf32_2pass_q
-for /L %%i in (55,-5,25) do call %benchmark_bat% -codec libaom -i "%~1" -o "%~n1_libaom_c1_kf32_2pass_q%%i.mp4" -cmd "--ivf --cpu-used=1 --threads=8 --tile-columns=2 --tile-rows=2 --pass=2 --passes=2 --end-usage=q --cq-level=%%i --kf-max-dist=32" -csvsuf c1_kf32_2pass_q
+for /L %%i in (55,-5,25) do call %benchmark_bat% -codec libvpx -i "%~1" -o "%~n1_libvpx_vp9_c0_kf32_2pass_q%%i.webm" -cmd "--codec=vp9 --webm --good --cpu-used=0 --tune=psnr --threads=8 --tile-columns=2 --tile-rows=2 --pass=2 --passes=2 --auto-alt-ref=6 --kf-max-dist=32 --end-usage=q --cq-level=%%i" -csvsuf vp9_c0_kf32_2pass_q
+for /L %%i in (55,-5,25) do call %benchmark_bat% -codec libaom -i "%~1" -o "%~n1_libaom_c1_kf32_2pass_q%%i.mp4" -cmd "--ivf --cpu-used=1 --threads=8 --tile-columns=2 --tile-rows=2 --pass=2 --passes=2 --kf-max-dist=32 --end-usage=q --cq-level=%%i" -csvsuf c1_kf32_2pass_q
 shift
 goto loop
 :end
