@@ -103,8 +103,9 @@ echo "%codec%"|findstr "QSVEncC VCEEncC" >nul&& echo "%CommandLine%"|findstr /r 
 
 rem マルチパス用の処理
 if not "%multipass%"=="1" echo "%CommandLine%"|find "--second-pass">nul&&set multipass=1&&set pass_temp=1&&set pass_orig=2&&set "CommandLine=%CommandLine:--second-pass=--first-pass%"
-if not "%multipass%"=="1" echo "%CommandLine%"|findstr /r /c:"--pass [0-9]">nul&&call :pass_number_set --pass
-if not "%multipass%"=="1" echo "%CommandLine%"|findstr /r /c:"-pass [0-9]">nul&&call :pass_number_set -pass
+if not "%multipass%"=="1" echo "%CommandLine%"|findstr /r /c:"--pass=[0-9]">nul&&set "multipasstype=1"&&call :pass_number_set --pass
+if not "%multipass%"=="1" echo "%CommandLine%"|findstr /r /c:"--pass [0-9]">nul&&set "multipasstype=0"&&call :pass_number_set --pass
+if not "%multipass%"=="1" echo "%CommandLine%"|findstr /r /c:"-pass [0-9]">nul&&set "multipasstype=0"&&call :pass_number_set -pass
 if not "%codec%"=="rav1e" if "%multipass%"=="1" call :multi_pass_set
 rem 各エンコーダーでエンコード
 if not exist "%movie_dir%%OutputVideo%" (
@@ -120,9 +121,8 @@ if not exist "%movie_dir%%OutputVideo%" (
    if /i "%codec%"=="x264" %view_args64% %ffmpeg% -y -i "%InputVideo%" -an %EncodePixelFormat% -strict -2 -f yuv4mpegpipe - 2>"%log_dir%%OutputVideoNoExt%_pipelog%pass_temp%.txt" | %timer64% %x264% %CommandLine% --demuxer y4m -o "%movie_dir%%OutputVideo%" - 2>&1 | %safetee% -o "%log_dir%%OutputVideoNoExt%_log%pass_temp%.txt"
    if /i "%codec%"=="x265" %view_args64% %ffmpeg% -y -i "%InputVideo%" -an %EncodePixelFormat% -strict -2 -f yuv4mpegpipe - 2>"%log_dir%%OutputVideoNoExt%_pipelog%pass_temp%.txt" | %timer64% %x265% %CommandLine% --input - --y4m "%movie_dir%%OutputVideoNoExt%.h265" 2>&1 | %safetee% -o "%log_dir%%OutputVideoNoExt%_log%pass_temp%.txt"
    if /i "%codec%"=="libaom" (
-      if not exist "%movie_dir%%InputVideoNoExt%_temp%EncodeBitDepth%bit.y4m" echo %MessageIntermediateFileEncode% && %view_args64% %ffmpeg% -i "%InputVideo%" -an %EncodePixelFormat% -strict -2 "%movie_dir%%InputVideoNoExt%_temp%EncodeBitDepth%bit.y4m" >"%log_dir%%OutputVideoNoExt%_log%pass_temp%.txt" 2>&1
       %aomenc% --help | find "AOMedia Project AV1 Encoder">>"%log_dir%%OutputVideoNoExt%_log%pass_temp%.txt" 2>&1 
-      %timer64% %aomenc% %CommandLine% -o "%movie_dir%%OutputVideoNoExt%.ivf" "%movie_dir%%InputVideoNoExt%_temp%EncodeBitDepth%bit.y4m" 2>&1 | %safetee% -a "%log_dir%%OutputVideoNoExt%_log%pass_temp%.txt"
+      %view_args64% %ffmpeg% -y -i "%InputVideo%" -an %EncodePixelFormat% -strict -2 -f yuv4mpegpipe - 2>"%log_dir%%OutputVideoNoExt%_pipelog%pass_temp%.txt" | %timer64% %aomenc% %CommandLine% -o "%movie_dir%%OutputVideoNoExt%.ivf" - 2>&1 | %safetee% -a "%log_dir%%OutputVideoNoExt%_log%pass_temp%.txt"
    )
    if /i "%codec%"=="rav1e" (
       %rav1e% --version >"%log_dir%%OutputVideoNoExt%_log%pass_temp%.txt"
@@ -132,9 +132,8 @@ if not exist "%movie_dir%%OutputVideo%" (
    if /i "%codec%"=="SVT-HEVC" %view_args64% %ffmpeg% -y -i "%InputVideo%" -an -nostdin -f rawvideo %EncodePixelFormat% -strict -2 - 2>"%log_dir%%OutputVideoNoExt%_pipelog%pass_temp%.txt" | %timer64% %SVT-HEVC% -i stdin %CommandLine% -n %FrameCount% -w %Width% -h %Height% -fps-num %frame_rate_num% -fps-denom %frame_rate_denom% -b "%movie_dir%%OutputVideoNoExt%.h265" 2>&1 | %safetee% -o "%log_dir%%OutputVideoNoExt%_log%pass_temp%.txt"
    if /i "%codec%"=="SVT-VP9" %view_args64% %ffmpeg% -y -i "%InputVideo%" -an -nostdin -f rawvideo %EncodePixelFormat% -strict -2 - 2>"%log_dir%%OutputVideoNoExt%_pipelog%pass_temp%.txt" | %timer64% %SVT-VP9% -i stdin %CommandLine% -n %FrameCount% -w %Width% -h %Height% -fps-num %frame_rate_num% -fps-denom %frame_rate_denom% -b "%movie_dir%%OutputVideoNoExt%.ivf" 2>&1 | %safetee% -o "%log_dir%%OutputVideoNoExt%_log%pass_temp%.txt"
    if /i "%codec%"=="libvpx" (
-      if not exist "%movie_dir%%InputVideoNoExt%_temp%EncodeBitDepth%bit.y4m" echo %MessageIntermediateFileEncode% && %view_args64% %ffmpeg% -i "%InputVideo%" -an %EncodePixelFormat% -strict -2 "%movie_dir%%InputVideoNoExt%_temp%EncodeBitDepth%bit.y4m" >"%log_dir%%OutputVideoNoExt%_log%pass_temp%.txt" 2>&1
       %vpxenc% --help | find "WebM Project">>"%log_dir%%OutputVideoNoExt%_log%pass_temp%.txt" 2>&1 
-      %timer64% %vpxenc% %CommandLine% -o "%movie_dir%%OutputVideo%" "%movie_dir%%InputVideoNoExt%_temp%EncodeBitDepth%bit.y4m" 2>&1 | %safetee% -a "%log_dir%%OutputVideoNoExt%_log%pass_temp%.txt"
+      %view_args64% %ffmpeg% -y -i "%InputVideo%" -an %EncodePixelFormat% -strict -2 -f yuv4mpegpipe - 2>"%log_dir%%OutputVideoNoExt%_pipelog%pass_temp%.txt" | %timer64% %vpxenc% %CommandLine% -o "%movie_dir%%OutputVideo%" - 2>&1 | %safetee% -a "%log_dir%%OutputVideoNoExt%_log%pass_temp%.txt"
    )
    if /i "%codec%"=="VTM" (
        if not exist "%movie_dir%%InputVideoNoExt%_temp%EncodeBitDepth%bit.yuv" echo %MessageIntermediateFileEncode% && %view_args64% %ffmpeg% -i "%InputVideo%" -an %EncodePixelFormat% -f rawvideo -strict -2 "%movie_dir%%InputVideoNoExt%_temp%EncodeBitDepth%bit.yuv" >"%log_dir%%OutputVideoNoExt%_log%pass_temp%.txt" 2>&1
@@ -159,7 +158,12 @@ if /i "%codec%"=="libaom" set ErrorCheckFile="%movie_dir%%OutputVideoNoExt%.ivf"
 if /i "%codec%"=="SVT-AV1" set ErrorCheckFile="%movie_dir%%OutputVideoNoExt%.ivf"
 if /i "%codec%"=="SVT-VP9" set ErrorCheckFile="%movie_dir%%OutputVideoNoExt%.ivf"
 
-if not "%enc_skip%"=="1" call :error_check "%InputVideo%" %ErrorCheckFile%
+if not "%enc_skip%"=="1" (
+    if /i "%codec%"=="libvpx" if "%multipass%"=="1" goto ErrorCheckSkip
+    if /i "%codec%"=="libaom" if "%multipass%"=="1" goto ErrorCheckSkip
+    call :error_check "%InputVideo%" %ErrorCheckFile%
+)
+:ErrorCheckSkip
 if "%multipass%"=="1" if not "%enc_skip%"=="1" if not "%pass_temp%"=="%pass_orig%" if exist %ErrorCheckFile% del %ErrorCheckFile%
 
 rem そのままではFFmpegで扱えないビットストリームを可逆圧縮のH.264にデコードする
@@ -193,6 +197,7 @@ if "%multipass%"=="1" (
    if exist x265_2pass.log.cutree del x265_2pass.log.cutree
    if exist rav1e_stats.json del rav1e_stats.json
    if exist rav1e_stats.log del rav1e_stats.log
+   if exist temp.fpf del temp.fpf
 )
 rem rawファイルをコンテナに格納
 if not "%enc_skip%"=="1" if exist "%movie_dir%%OutputVideoNoExt%.h265" %view_args64% %mp4box% -fps %frame_rate_mp4box% -add "%movie_dir%%OutputVideoNoExt%.h265" -new "%movie_dir%%OutputVideo%" >>"%log_dir%%OutputVideoNoExt%_log%pass_temp%.txt" 2>&1 && del "%movie_dir%%OutputVideoNoExt%.h265" & echo.
@@ -371,7 +376,7 @@ set pass_temp=1
 set pt=1
 set pt2=2
 :pass_number_set2
-for /f "tokens=%pt%,%pt2%" %%1 in ("%CommandLine%") do if "%%1"=="%1" (
+for /f "tokens=%pt%,%pt2% delims== " %%1 in ("%CommandLine%") do if "%%1"=="%1" (
    set pass_orig=%%2
    exit /b
 ) else (
@@ -382,11 +387,15 @@ for /f "tokens=%pt%,%pt2%" %%1 in ("%CommandLine%") do if "%%1"=="%1" (
 exit /b
 
 :multi_pass_set
-if "%pass_temp%"=="1" call set "CommandLine=%%CommandLine:-pass %pass_orig%=-pass 1%%"
+if "%pass_temp%"=="1" if "%multipasstype%"=="0" for /f "delims=" %%i in ('PowerShell -command "& {""""%CommandLine%"""" -replace """"-pass %pass_orig%"""",""""-pass 1""""}"') do set "CommandLine=%%i"
+if "%pass_temp%"=="1" if "%multipasstype%"=="1" for /f "delims=" %%i in ('PowerShell -command "& {""""%CommandLine%"""" -replace """"--pass=%pass_orig%"""",""""--pass=1 --fpf=temp.fpf""""}"') do set "CommandLine=%%i"
 if "%pass_temp%"=="%pass_orig%" (
-   if not "%pass_orig%"=="1" call set "CommandLine=%%CommandLine:-pass %pass_orig%=-pass 2%%"
+   if not "%pass_orig%"=="1" (
+      if "%multipasstype%"=="0" for /f "delims=" %%i in ('PowerShell -command "& {""""%CommandLine%"""" -replace """"-pass %pass_orig%"""",""""-pass 2""""}"') do set "CommandLine=%%i"
+      if "%multipasstype%"=="1" for /f "delims=" %%i in ('PowerShell -command "& {""""%CommandLine%"""" -replace """"--pass=%pass_orig%"""",""""--pass=2 --fpf=temp.fpf""""}"') do set "CommandLine=%%i"
+   )
 ) else (
-   call set "CommandLine=%%CommandLine:-pass %pass_orig%=-pass 3%%"
+   for /f "delims=" %%i in ('PowerShell -command "& {""""%CommandLine%"""" -replace """"-pass %pass_orig%"""",""""-pass 3""""}"') do set "CommandLine=%%i"
 )
 exit /b
 
