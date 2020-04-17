@@ -35,7 +35,7 @@ Usage: video_benchmark.bat -codec x264 -i input.y4m -o output.mp4 -cmd "--crf 23
 エンコードが終わったらbenchmark_logフォルダをCreate_Graph.batにドラッグ&ドロップしてグラフを作成します  
 
 ### 注意点  
-10bitでベンチマークする際はuser_setting.batのComparePixelFormatをyuv420pからyuv420p10leに書き換えてください(8bitと10bitの混在したベンチマークの場合も)  
+10bitでベンチマークする際はvideo_benchmark.batのComparePixelFormatをyuv420pからyuv420p10leに書き換えてください(8bitと10bitの混在したベンチマークの場合も)  
 
 エンコード前の動画とエンコード後の動画のfpsが揃っていなかったりするとSSIMなどのスコアが異常に低く計測されてしまいます  
 元の動画は可変フレームレートではなく固定フレームレートで保存しておいてください  

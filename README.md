@@ -35,7 +35,7 @@ Alternatively, drag and drop the video file into the preset bat.
 After encoding, drag and drop the "benchmark_log" folder into Create_Graph.bat to create the graph.  
 
 ### important point  
-When benchmarking with 10bit, rewrite ComparePixelFormat in user_setting.bat from yuv420p to yuv420p10le (even in the case of 8bit and 10bit mixed benchmarks)
+When benchmarking with 10bit, rewrite ComparePixelFormat in video_benchmark.bat from yuv420p to yuv420p10le (even in the case of 8bit and 10bit mixed benchmarks)
 
 If the fps of the video before encoding and the video after encoding are not aligned, the score such as SSIM will be measured abnormally low.  
 Use a constant frame rate for the source video, not a variable frame rate.  

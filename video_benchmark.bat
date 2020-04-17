@@ -1,4 +1,45 @@
 @echo off
+rem setting
+rem ------------------------------------------------------------------------------------------------
+rem How much higher is the QP of P frame and B frame higher than I frame in cqp and vqp mode of QSV
+set QP_p_n=2
+set QP_b_n=5
+
+rem Delete the encoded file (1: on)
+set del_enc_file=0
+
+rem How many seconds to wait when an error occurs
+set wait=60
+
+rem Bit depth when calculating SSIM or VMAF
+set ComparePixelFormat=-pix_fmt yuv420p
+
+rem Soft path
+set ffmpeg="%~dp0tools\ffmpeg.exe"
+if "%ffmpeg_enc%"=="" set ffmpeg_enc=%ffmpeg%
+set ffmpeg_VMAF="%~dp0tools\ffmpeg_vmaf.exe"
+set mediaInfo="%~dp0tools\MediaInfo.exe"
+set timer64="%~dp0tools\timer64.exe"
+set view_args64="%~dp0tools\view_args64.exe"
+set safetee="%~dp0tools\safetee.exe"
+set busybox64="%~dp0tools\busybox64.exe"
+set x264="%~dp0tools\x264.exe"
+set x265="%~dp0tools\x265.exe"
+set QSVEncC="%~dp0tools\QSVEncC\x64\QSVEncC64.exe"
+set VCEEncC="%~dp0tools\VCEEncC\x64\VCEEncC64.exe"
+set NVEncC="%~dp0tools\VCEEncC\x64\NVEncC64.exe"
+set vpxenc="%~dp0tools\vpxenc.exe"
+set aomenc="%~dp0tools\aomenc.exe"
+set rav1e="%~dp0tools\rav1e.exe"
+set SVT-AV1="%~dp0tools\SvtAv1EncApp.exe"
+set SVT-VP9="%~dp0tools\SvtVp9EncApp.exe"
+set SVT-HEVC="%~dp0tools\SvtHevcEncApp.exe"
+set VTMenc="%~dp0tools\vtm\EncoderApp.exe"
+set VTMdec="%~dp0tools\vtm\DecoderApp.exe"
+set xvcenc="%~dp0tools\xvcenc.exe"
+set xvcdec="%~dp0tools\xvcdec.exe"
+set mp4box="%~dp0tools\mp4box.exe"
+rem ------------------------------------------------------------------------------------------------
 if "%language_configured%"=="1" goto ArgumentCheck
 for /f "tokens=2" %%i in ('PowerShell Get-WinSystemLocale') do set "SystemLocale=%%i"
 chcp 65001 >nul 2>&1
@@ -30,13 +71,6 @@ for %%i in ("%InputVideo%") do set "InputVideoNoExt=%%~ni"
 for %%i in ("%InputVideo%") do set "InputVideo=%%~dpnxi"
 for %%i in ("%OutputVideo%") do set "OutputVideoNoExt=%%~ni"
 if defined CsvNameSuffix set "CsvNameSuffix=_%CsvNameSuffix%"
-
-rem 設定ファイルの読み込み
-rem user_settingが無ければdefault_settingをコピーする
-if not exist "%~dp0setting\user_setting.bat" copy /y "%~dp0setting\default_setting.bat" "%~dp0setting\user_setting.bat" >nul 2>&1
-
-call "%~dp0setting\default_setting.bat" "%InputVideo%" "%~dpnx0"
-call "%~dp0setting\user_setting.bat" "%InputVideo%" "%~dpnx0"
 
 for %%i in ("%OutputVideo%") do set "movie_dir=%%~dpi"
 for %%i in ("%OutputVideo%") do set "OutputVideo=%%~nxi"
