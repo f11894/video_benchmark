@@ -34,6 +34,12 @@ Usage: video_benchmark.bat -codec x264 -i input.y4m -o output.mp4 -cmd "--crf 23
 もしくはプリセット用のbatに動画ファイルをドラッグ&ドロップしてください  
 エンコードが終わったらbenchmark_logフォルダをCreate_Graph.batにドラッグ&ドロップしてグラフを作成します  
 
+複数ファイルの平均値を算出したい場合  
+1 例えば[ここ](https://media.xiph.org/video/derf/)からobjective-1-fastなどのdatasetをダウンロードして解凍します  
+2 次にobjective-1-fastフォルダ内のy4mを全て選択して適当なプリセットで変換します  
+3 全て変換し終わったらobjective-1-fastフォルダをAverage_of_multiple_csv.batにドロップしてcsvの平均値を算出します  
+4 objective-1-fastフォルダ内にobjective-1-fast_benchmark_logというフォルダが作成されているので、そのフォルダをCreate_Graph.batにドロップしてグラフを作成します  
+
 ### 注意点  
 10bitでベンチマークする際はvideo_benchmark.batのComparePixelFormatをyuv420pからyuv420p10leに書き換えてください(8bitと10bitの混在したベンチマークの場合も)  
 
