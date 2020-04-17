@@ -4,20 +4,9 @@ set QP_b_n=5
 
 rem Delete the encoded file (1: on)
 set del_enc_file=0
-rem Verbose log per frame of SSIM and PSNR (1: on)
-set verbose_log=0
+
 rem How many seconds to wait when an error occurs
 set wait=60
-
-rem Whether to calculate VMAF (1: on)
-rem VMAF is an excellent metric but it takes time to calculate
-set EnableVMAF=1
-
-rem Whether MS-SSIM should also be calculated when VMAF is calculated (1: on)
-set EnableMSSSIM=0
-
-rem whether to output csv file for bpp (1: on)
-set EnableBPP=0
 
 rem Bit depth when calculating SSIM or VMAF
 set ComparePixelFormat=-pix_fmt yuv420p

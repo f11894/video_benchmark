@@ -16,9 +16,10 @@ metric_array = ['PSNR_Y', 'PSNR_Average', 'SSIM_Y', 'SSIM_All', 'VMAF', 'MS-SSIM
 size_array = ['', '_bpp']
 
 for size in size_array:
+   row = 2
    for BitDepth in BitDepth_array:
       for metric in metric_array:
-         csv_list = glob.glob('*_' + metric + '(' + BitDepth + ')' + size + '.csv')
+         csv_list = glob.glob('*_'  + '(' + BitDepth + ').csv')
          plt.figure(figsize=(12, 8))
          csvFileExist = False
          MNum = 0
@@ -26,10 +27,13 @@ for size in size_array:
              csvFileExist = True
              codec_name = csv_name
              codec_name = csv_name.replace(input,'')
-             codec_name = re.sub('_' + '(.+)' + '_' + metric + '\(' + BitDepth + '\)' + size + '\.csv','\\1',codec_name)
-             data = np.loadtxt(csv_name ,comments='#' ,dtype='float' ,delimiter=',')
-             x_txt = data[:,0]
-             y_txt = data[:,1]
+             codec_name = re.sub('_' + '(.+)' + '_'  + '\(' + BitDepth + '\)\.csv','\\1',codec_name)
+             data = np.loadtxt(csv_name ,comments='#' ,dtype='float' ,delimiter=',',  skiprows=1)
+             if size == '':
+                x_txt = data[:,0]
+             else:
+                x_txt = data[:,1]
+             y_txt = data[:,row]
              plt.plot(x_txt,y_txt , label = codec_name , marker=markers[MNum])
              MNum = MNum + 1
          if csvFileExist:
@@ -52,3 +56,4 @@ for size in size_array:
                 plt.legend(bbox_to_anchor=(1.01, 1), loc='upper left', borderaxespad=0, prop=font_prop)
              plt.savefig(input + '_' +  metric + '(' + BitDepth + ')' + size + '_Graph.png' ,  bbox_inches='tight')
          plt.close()
+         row = row + 1
