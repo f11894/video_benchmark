@@ -7,7 +7,7 @@ There is also an encoding speed measurement and an automatic multipath encoding 
 ### Usage
 
 ```console
-Usage: video_benchmark.bat -codec x264 -i input.y4m -o output.mp4 -cmd "--crf 23"
+Example: video_benchmark.bat -codec x264 -i input.y4m -o output.mp4 -cmd "--crf 23"
 
   -i                   input video path
   -o                   output video path
