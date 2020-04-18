@@ -26,10 +26,12 @@ for BitDepth in BitDepth_array:
         csv_list2 = glob.glob('*/*' + codec_name + '_(' + BitDepth + ').csv')
         for path in csv_list2:
             data = np.loadtxt(path,comments='#' ,delimiter=',', skiprows=1)
+            print('Import   ' + path)
             sum_value = sum_value + data
             csv_Num = csv_Num + 1
-        ave = sum_value / csv_Num
+        ave_value = sum_value / csv_Num
+        print('New file   ' + DataSetName + '_benchmark_log/' + DataSetName + '_' + codec_name + '_(' + BitDepth + ').csv\n')
         with open(DataSetName + '_benchmark_log/' + DataSetName + '_' + codec_name + '_(' + BitDepth + ').csv', 'w') as file:
             writer = csv.writer(file, lineterminator='\n')
             writer.writerow(header)
-            writer.writerows(ave)
+            writer.writerows(ave_value)
