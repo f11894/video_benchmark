@@ -16,8 +16,8 @@ metric_array = ['PSNR_Y', 'PSNR_Average', 'SSIM_Y', 'SSIM_All', 'VMAF', 'MS-SSIM
 size_array = ['', '_bpp']
 
 for size in size_array:
-   row = 2
    for BitDepth in BitDepth_array:
+      row = 2
       for metric in metric_array:
          csv_list = glob.glob('*_'  + '(' + BitDepth + ').csv')
          plt.figure(figsize=(12, 8))
