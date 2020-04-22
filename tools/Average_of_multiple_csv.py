@@ -11,8 +11,9 @@ exist_dir = os.path.isdir(DataSetName + '_benchmark_log')
 if not exist_dir:
     os.mkdir(DataSetName + '_benchmark_log')
 
+empty = ['']
 BitDepth_array = ['8bit', '10bit', 'Unspecified']
-header = ['bitrate', 'bpp', 'PSNR_Y', 'PSNR_Average', 'SSIM_Y', 'SSIM_All', 'VMAF', 'MS-SSIM', 'fps' , 'Sec']
+header = ['Filename', 'bitrate', 'bpp', 'PSNR_Y', 'PSNR_Average', 'SSIM_Y', 'SSIM_All', 'VMAF', 'MS-SSIM', 'fps', 'Sec', 'CommandLine']
 files = os.listdir(sys.argv[1])
 files_dir = [f for f in files if os.path.isdir(os.path.join(sys.argv[1], f))]
 for BitDepth in BitDepth_array:
@@ -25,7 +26,7 @@ for BitDepth in BitDepth_array:
         sum_value = np.zeros(1)
         csv_list2 = glob.glob('*/*' + codec_name + '_(' + BitDepth + ').csv')
         for path in csv_list2:
-            data = np.loadtxt(path,comments='#' ,delimiter=',', skiprows=1)
+            data = np.loadtxt(path,comments='#' ,delimiter=',', skiprows=1, usecols=(1,2,3,4,5,6,7,8,9,10))
             print('Import   ' + path)
             sum_value = sum_value + data
             csv_Num = csv_Num + 1
@@ -34,4 +35,6 @@ for BitDepth in BitDepth_array:
         with open(DataSetName + '_benchmark_log/' + DataSetName + '_' + codec_name + '_(' + BitDepth + ').csv', 'w') as file:
             writer = csv.writer(file, lineterminator='\n')
             writer.writerow(header)
-            writer.writerows(ave_value)
+            for row in ave_value:
+                corrected_row = np.concatenate([empty,row,empty])
+                writer.writerow(corrected_row)
