@@ -56,6 +56,9 @@ call :variable_set -i InputVideo %*
 call :variable_set -o OutputVideo %*
 call :variable_set -csvsuf CsvNameSuffix %*
 call :variable_set -codec codec %*
+call :variable_set -enc-mode-1p enc-mode-1p %*
+call :variable_set --preset enc-mode-2p %CommandLine_orig%
+if not defined enc-mode-2p call :variable_set -enc-mode enc-mode-2p %CommandLine_orig%
 echo "%*"|find "-encode-depth" >nul&& call :variable_set -encode-depth EncodeBitDepth %*
 if "%codec%"=="" set ArgumentError=1
 if "%InputVideo%"=="" set ArgumentError=1
@@ -136,10 +139,13 @@ echo "%codec%"|findstr "QSVEncC VCEEncC" >nul&& echo "%CommandLine%"|findstr /r 
 
 rem マルチパス用の処理
 if not "%multipass%"=="1" echo "%CommandLine%"|find "--second-pass">nul&&set multipass=1&&set pass_temp=1&&set pass_orig=2&&set "CommandLine=%CommandLine:--second-pass=--first-pass%"
+if not "%multipass%"=="1" echo "%CommandLine%"|find "-input-stat-file">nul&&set multipass=1&&set pass_temp=1&&set pass_orig=2&&for /f "delims=" %%i in ('PowerShell -command "& {""""%CommandLine%"""" -replace """"-?-input-stat-file"""",""""--enc-mode-2p %enc-mode-2p% --output-stat-file""""}"') do set "CommandLine=%%i"
+if /i "%codec%"=="SVT-AV1" if "%multipass%"=="1" if "%pass_temp%"=="1" for /f "delims=" %%i in ('PowerShell -command "& {""""%CommandLine%"""" -replace """"--preset %enc-mode-2p%"""",""""--preset %enc-mode-1p%""""}"') do set "CommandLine=%%i"
+if /i "%codec%"=="SVT-AV1" if "%multipass%"=="1" if "%pass_temp%"=="1" for /f "delims=" %%i in ('PowerShell -command "& {""""%CommandLine%"""" -replace """"-enc-mode %enc-mode-2p%"""",""""-enc-mode %enc-mode-1p%""""}"') do set "CommandLine=%%i"
 if not "%multipass%"=="1" echo "%CommandLine%"|findstr /r /c:"--pass=[0-9]">nul&&set "multipasstype=1"&&call :pass_number_set --pass
 if not "%multipass%"=="1" echo "%CommandLine%"|findstr /r /c:"--pass [0-9]">nul&&set "multipasstype=0"&&call :pass_number_set --pass
 if not "%multipass%"=="1" echo "%CommandLine%"|findstr /r /c:"-pass [0-9]">nul&&set "multipasstype=0"&&call :pass_number_set -pass
-if not "%codec%"=="rav1e" if "%multipass%"=="1" call :multi_pass_set
+if not "%codec%"=="rav1e" if not "%codec%"=="SVT-AV1" if "%multipass%"=="1" call :multi_pass_set
 rem 各エンコーダーでエンコード
 if not exist "%movie_dir%%OutputVideo%" (
    rem ログフォルダに以前のログが残っていたら削除する
@@ -231,6 +237,7 @@ if "%multipass%"=="1" (
    if exist rav1e_stats.json del rav1e_stats.json
    if exist rav1e_stats.log del rav1e_stats.log
    if exist temp.fpf del temp.fpf
+   if exist svt-av1.stat del svt-av1.stat
 )
 rem rawファイルをコンテナに格納
 if not "%enc_skip%"=="1" if exist "%movie_dir%%OutputVideoNoExt%.h265" %view_args64% %mp4box% -fps %frame_rate_mp4box% -add "%movie_dir%%OutputVideoNoExt%.h265" -new "%movie_dir%%OutputVideo%" >>"%log_dir%%OutputVideoNoExt%_log%pass_temp%.txt" 2>&1 && del "%movie_dir%%OutputVideoNoExt%.h265" & echo.
