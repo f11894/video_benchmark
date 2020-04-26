@@ -223,7 +223,6 @@ if not "%enc_error%"=="1" if not "%timer_error%"=="1" FOR /f "tokens=3" %%i IN (
 if not "%enc_error%"=="1" call :msec_to_sec
 rem マルチパスなら最終パスになるまで処理をループする
 if "%multipass%"=="1" if not "%pass_temp%"=="%pass_orig%" (
-   if /i "%codec%"=="rav1e" set "CommandLine=%CommandLine:--first-pass=--second-pass%"
    set /a pass_temp=pass_temp+1
    goto enc_process
 )
