@@ -67,6 +67,14 @@ if "%CommandLine_orig%"=="" set ArgumentError=1
 if "%ArgumentError%"=="1" (
    echo %MessageArgumentErrorLine1%
    echo %MessageArgumentErrorLine2%
+   echo %MessageArgumentErrorLine3%
+   echo %MessageArgumentErrorLine4%
+   echo %MessageArgumentErrorLine5%
+   echo %MessageArgumentErrorLine6%
+   echo %MessageArgumentErrorLine7%
+   echo %MessageArgumentErrorLine8%
+   echo %MessageArgumentErrorLine9%
+   echo %MessageArgumentErrorLine10%
    timeout /t 30
    exit /b
 )
