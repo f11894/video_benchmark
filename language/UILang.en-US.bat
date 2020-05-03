@@ -30,4 +30,5 @@ set "MessageResultTime=Elapsed time                : %%echo_hour%% hour %%echo_m
 set "MessageResultTimeMultiPass=Elapsed time                : %%echo_hour%% hour %%echo_min%% minutes %%echo_sec%%.%%echo_msec%% seconds ^(%%pass_orig%%pass total^)"
 set "MessageEncodeErrorLine1=video encoding may have failed"
 set "MessageEncodeErrorLine2=There may be a problem with the input file or the command line may be incorrect"
+set "MessageFrameCountError=The FrameCount in the input file and the output file does not match"
 exit /b

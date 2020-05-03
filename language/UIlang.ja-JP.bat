@@ -30,4 +30,5 @@ set "MessageResultTime=エンコード時間              : %%echo_hour%%時間%
 set "MessageResultTimeMultiPass=エンコード時間              : %%echo_hour%%時間%%echo_min%%分%%echo_sec%%.%%echo_msec%%秒 ^(%%pass_orig%%パス合計^)"
 set "MessageEncodeErrorLine1=動画のエンコードに失敗した可能性があります"
 set "MessageEncodeErrorLine2=入力ファイルに問題がないか、コマンドラインが間違っていないか確認してください"
+set "MessageFrameCountError=入力ファイルと出力ファイルのフレーム数が一致していません"
 exit /b

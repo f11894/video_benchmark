@@ -268,6 +268,16 @@ set CompareVideo="%movie_dir%%OutputVideo%"
 if /i "%codec%"=="VTM" set CompareVideo="%movie_dir%%OutputVideoNoExt%.mp4"
 if /i "%codec%"=="xvc" set CompareVideo="%movie_dir%%OutputVideoNoExt%.mp4"
 
+pushd "%~dp0tools\"
+FOR /f "DELIMS=" %%i IN ('ffprobe -v error -count_frames -select_streams v:0 -show_entries stream^=nb_read_frames -of default^=nokey^=1:noprint_wrappers^=1 %CompareVideo%') DO SET FrameCount_CompareVideo=%%i
+popd
+
+if not "%FrameCount%"=="%FrameCount_CompareVideo%" (
+   echo %MessageFrameCountError%
+   set enc_error=1
+   timeout /T %wait%
+)
+
 find "Parsed_ssim" "%OutputVideoNoExt%_ssim(%CompareBitDepth%)_log%pass_orig%.txt">nul 2>&1 || set SSIM_check=1
 if not exist "%log_dir%%OutputVideoNoExt%_ssim(%CompareBitDepth%)_verbose_log.txt" set SSIM_check=1
 if not exist "%log_dir%%OutputVideoNoExt%_psnr(%CompareBitDepth%)_verbose_log.txt" set SSIM_check=1
