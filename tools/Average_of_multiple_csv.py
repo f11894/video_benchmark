@@ -26,7 +26,7 @@ for BitDepth in BitDepth_array:
         sum_value = np.zeros(1)
         csv_list2 = glob.glob('*/*' + codec_name + '_(' + BitDepth + ').csv')
         for path in csv_list2:
-            data = np.loadtxt(path,comments='#' ,delimiter=',', skiprows=1, usecols=(1,2,3,4,5,6,7,8,9,10))
+            data = np.loadtxt(path,comments='#' ,delimiter=',', skiprows=1, usecols=(1,2,3,4,5,6,7,8,9,10), encoding='utf-8')
             print('Import   ' + path)
             sum_value = sum_value + data
             csv_Num = csv_Num + 1

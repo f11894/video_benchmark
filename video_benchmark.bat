@@ -260,7 +260,8 @@ chcp 65001 >nul 2>&1
 
 rem SSIMを算出する
 for %%i in ("%movie_dir%%OutputVideo%") do set Filesize=%%~zi
-set ffmpeg_ssim_option="ssim='%OutputVideoNoExt%_ssim(%CompareBitDepth%)_verbose_log.txt';[0:v][1:v]psnr='%OutputVideoNoExt%_psnr(%CompareBitDepth%)_verbose_log.txt'"
+for /f "delims=" %%a in ('PowerShell "-Join (Get-Random -Count 32 -input 0,1,2,3,4,5,6,7,8,9,a,b,c,d,e,f,g,h,i,j,k,l,m,n,o,p,q,r,s,t,u,v,w,x,y,z)"') do set "random32=%%a"
+set ffmpeg_ssim_option="ssim='%random32%_ssim(%CompareBitDepth%)_verbose_log.txt';[0:v][1:v]psnr='%random32%_psnr(%CompareBitDepth%)_verbose_log.txt'"
 popd
 pushd "%log_dir%"
 
@@ -286,6 +287,8 @@ if "%SSIM_check%"=="1" if not "%enc_error%"=="1" (
    call echo %MessageSSIMCompare%
    echo %MessagePleaseWait%
    %view_args64% %ffmpeg% -r %frame_rate% -i %CompareVideo% -an %ComparePixelFormat% -strict -2 -f yuv4mpegpipe - 2>"%OutputVideoNoExt%_ssim(%CompareBitDepth%)_pipelog%pass_orig%.txt" | %view_args64% %ffmpeg% -i - -r %frame_rate% -i "%InputVideo%" -lavfi %ffmpeg_ssim_option% -an -f null - >"%OutputVideoNoExt%_ssim(%CompareBitDepth%)_log%pass_orig%.txt" 2>&1
+   move /y "%random32%_ssim(%CompareBitDepth%)_verbose_log.txt" "%log_dir%%OutputVideoNoExt%_ssim(%CompareBitDepth%)_verbose_log.txt" >nul
+   move /y "%random32%_psnr(%CompareBitDepth%)_verbose_log.txt" "%log_dir%%OutputVideoNoExt%_psnr(%CompareBitDepth%)_verbose_log.txt" >nul
    echo.
 )
 find "Parsed_ssim" "%OutputVideoNoExt%_ssim(%CompareBitDepth%)_log%pass_orig%.txt">nul 2>&1
@@ -308,7 +311,7 @@ set "vmaf_model_file=vmaf_v0.6.1.pkl"
 if %Height% GTR 2000 set "vmaf_model_file=vmaf_4k_v0.6.1.pkl"
 for %%i in (%ffmpeg_VMAF%) do set "vmaf_model_dir=%%~dpi\model"
 pushd %vmaf_model_dir%
-set ffmpeg_vmaf_option="libvmaf=model_path=%vmaf_model_file%:ms_ssim=1:log_fmt=json:log_path='%OutputVideoNoExt%_vmaf(%CompareBitDepth%).json'"
+set ffmpeg_vmaf_option="libvmaf=model_path=%vmaf_model_file%:ms_ssim=1:log_fmt=json:log_path='%random32%_vmaf(%CompareBitDepth%).json'"
 
 find "VMAF score" "%log_dir%%OutputVideoNoExt%_vmaf(%CompareBitDepth%)_log%pass_orig%.txt">nul 2>&1 || set VMAF_check=1
 find "MS-SSIM score" "%log_dir%%OutputVideoNoExt%_vmaf(%CompareBitDepth%)_log%pass_orig%.txt">nul 2>&1 || set VMAF_check=1
@@ -320,7 +323,7 @@ if "%VMAF_check%"=="1" if not "%enc_error%"=="1" (
    %view_args64% %ffmpeg% -r %frame_rate% -i %CompareVideo% -an %ComparePixelFormat% -strict -2 -f yuv4mpegpipe - 2>"%log_dir%%OutputVideoNoExt%_vmaf(%CompareBitDepth%)_pipelog%pass_orig%.txt" | %view_args64% %ffmpeg_VMAF% -i - -r %frame_rate% -i "%InputVideo%" -filter_complex %ffmpeg_vmaf_option% -an -f null - >"%log_dir%%OutputVideoNoExt%_vmaf(%CompareBitDepth%)_log%pass_orig%.txt" 2>&1
    echo.
 )
-if exist "%OutputVideoNoExt%_vmaf(%CompareBitDepth%).json" move /Y "%OutputVideoNoExt%_vmaf(%CompareBitDepth%).json" "%log_dir%%OutputVideoNoExt%_vmaf(%CompareBitDepth%).json" >nul
+if exist "%random32%_vmaf(%CompareBitDepth%).json" move /Y "%random32%_vmaf(%CompareBitDepth%).json" "%log_dir%%OutputVideoNoExt%_vmaf(%CompareBitDepth%).json" >nul
 find "VMAF score" "%log_dir%%OutputVideoNoExt%_vmaf(%CompareBitDepth%)_log%pass_orig%.txt">nul 2>&1
 if not "%ERRORLEVEL%"=="0" if not "%enc_error%"=="1" (
    echo %MessageVMAFCompareError%
@@ -366,7 +369,6 @@ if not "%enc_error%"=="1" if not "%Compare_error%"=="1" (
    echo "%OutputVideo%",%bitrate%,%bpp%,%PSNR_Y%,%PSNR_Average%,%SSIM_Y%,%SSIM_All%,%VMAF%,%MS-SSIM%,%fps%,%Sec%,"%CommandLine_orig%"|%safetee% -a "%InputVideoNoExt%_%CsvName%_(%CompareBitDepth%).csv" >nul
 )
 
-for /f "delims=" %%a in ('PowerShell "-Join (Get-Random -Count 32 -input 0,1,2,3,4,5,6,7,8,9,a,b,c,d,e,f,g,h,i,j,k,l,m,n,o,p,q,r,s,t,u,v,w,x,y,z)"') do set "random32=%%a"
 copy /Y "%InputVideoNoExt%_%CsvName%_(%CompareBitDepth%).csv" "%TEMP%\temp_%random32%.txt">nul
 %busybox64% awk -v ORS="\r\n" "!a[$0]++" "%TEMP%\temp_%random32%.txt" >"%InputVideoNoExt%_%CsvName%_(%CompareBitDepth%).csv"
 del "%TEMP%\temp_%random32%.txt">nul 2>&1

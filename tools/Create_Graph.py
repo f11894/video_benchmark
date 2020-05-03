@@ -28,7 +28,7 @@ for size in size_array:
              codec_name = csv_name
              codec_name = csv_name.replace(input,'')
              codec_name = re.sub('_' + '(.+)' + '_'  + '\(' + BitDepth + '\)\.csv','\\1',codec_name)
-             data = np.loadtxt(csv_name ,comments='#' ,dtype='float' ,delimiter=',',  skiprows=1, usecols=(1,2,3,4,5,6,7,8,9,10))
+             data = np.loadtxt(csv_name ,comments='#' ,dtype='float' ,delimiter=',',  skiprows=1, usecols=(1,2,3,4,5,6,7,8,9,10), encoding='utf-8')
              if size == '':
                 x_txt = data[:,0]
              else:
