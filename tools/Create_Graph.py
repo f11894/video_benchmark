@@ -6,7 +6,7 @@ import re
 import os
 import matplotlib.font_manager
 
-font_prop = matplotlib.font_manager.FontProperties(fname=r'C:\Windows\Fonts\meiryo.ttc')
+font_prop = matplotlib.font_manager.FontProperties(fname=r'C:\Windows\Fonts\YuGothM.ttc')
 os.chdir(sys.argv[1])
 input = os.path.basename(sys.argv[1])
 input = input.replace('_benchmark_log','')
