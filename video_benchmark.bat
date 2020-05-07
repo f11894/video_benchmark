@@ -362,6 +362,8 @@ if not "%enc_error%"=="1" if not "%Compare_error%"=="1" (
    for /f "DELIMS=" %%i IN ('PowerShell %Filesize%*8/%Duration2%') DO SET "bitrate=%%i"
    if not "%msec_total%"=="0" for /f "DELIMS=" %%i IN ('PowerShell "%enc_fps%"') DO SET "fps=%%i"
    if not "%msec_total%"=="0" for /f "DELIMS=" %%i IN ('PowerShell "%msec_total%/1000"') DO SET "Sec=%%i"
+   if "%msec_total%"=="0" SET Sec=0
+   if "%msec_total%"=="0" SET fps=0
    for /f "DELIMS=" %%i IN ('PowerShell "(%Filesize%*8)/(%Width%*%Height%*%FrameCount%)"') DO SET "bpp=%%i"
 )
 if not "%enc_error%"=="1" if not "%Compare_error%"=="1" (
