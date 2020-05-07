@@ -17,7 +17,7 @@ set ComparePixelFormat=-pix_fmt yuv420p
 rem Soft path
 set ffmpeg="%~dp0tools\ffmpeg.exe"
 if "%ffmpeg_enc%"=="" set ffmpeg_enc=%ffmpeg%
-set ffmpeg_VMAF="%~dp0tools\ffmpeg_vmaf.exe"
+set ffmpeg_VMAF="%~dp0tools\ffmpeg.exe"
 set mediaInfo="%~dp0tools\MediaInfo.exe"
 set timer64="%~dp0tools\timer64.exe"
 set view_args64="%~dp0tools\view_args64.exe"
@@ -313,8 +313,8 @@ for %%i in (%ffmpeg_VMAF%) do set "vmaf_model_dir=%%~dpi\model"
 pushd %vmaf_model_dir%
 set ffmpeg_vmaf_option="libvmaf=model_path=%vmaf_model_file%:ms_ssim=1:log_fmt=json:log_path='%random32%_vmaf(%CompareBitDepth%).json'"
 
-find "VMAF score" "%log_dir%%OutputVideoNoExt%_vmaf(%CompareBitDepth%)_log%pass_orig%.txt">nul 2>&1 || set VMAF_check=1
-find "MS-SSIM score" "%log_dir%%OutputVideoNoExt%_vmaf(%CompareBitDepth%)_log%pass_orig%.txt">nul 2>&1 || set VMAF_check=1
+find "VMAF score" "%log_dir%%OutputVideoNoExt%_vmaf(%CompareBitDepth%).json">nul 2>&1 || set VMAF_check=1
+find "MS-SSIM score" "%log_dir%%OutputVideoNoExt%_vmaf(%CompareBitDepth%).json">nul 2>&1 || set VMAF_check=1
 if not exist "%log_dir%%OutputVideoNoExt%_vmaf(%CompareBitDepth%).json" set VMAF_check=1
 
 if "%VMAF_check%"=="1" if not "%enc_error%"=="1" (
@@ -324,7 +324,7 @@ if "%VMAF_check%"=="1" if not "%enc_error%"=="1" (
    echo.
 )
 if exist "%random32%_vmaf(%CompareBitDepth%).json" move /Y "%random32%_vmaf(%CompareBitDepth%).json" "%log_dir%%OutputVideoNoExt%_vmaf(%CompareBitDepth%).json" >nul
-find "VMAF score" "%log_dir%%OutputVideoNoExt%_vmaf(%CompareBitDepth%)_log%pass_orig%.txt">nul 2>&1
+find "VMAF score" "%log_dir%%OutputVideoNoExt%_vmaf(%CompareBitDepth%).json">nul 2>&1
 if not "%ERRORLEVEL%"=="0" if not "%enc_error%"=="1" (
    echo %MessageVMAFCompareError%
    echo %date% %time%>>%error_log%
@@ -350,8 +350,8 @@ if not "%enc_error%"=="1" if not "%Compare_error%"=="1" (
    for /f "tokens=11" %%i in ("%Parsed_ssim%") do set "SSIM_All=%%i"
    for /f "tokens=5" %%i in ("%Parsed_psnr%") do set "PSNR_Y=%%i"
    for /f "tokens=8" %%i in ("%Parsed_psnr%") do set "PSNR_Average=%%i"
-   FOR /f "tokens=4" %%i IN ('find "VMAF score = " "%OutputVideoNoExt%_vmaf(%CompareBitDepth%)_log%pass_orig%.txt"') DO SET "VMAF=%%i"
-   FOR /f "tokens=4" %%i IN ('find "MS-SSIM score = " "%OutputVideoNoExt%_vmaf(%CompareBitDepth%)_log%pass_orig%.txt"') DO SET "MS-SSIM=%%i"
+   FOR /f "tokens=2 delims=:," %%i IN ('find "VMAF score" "%log_dir%%OutputVideoNoExt%_vmaf(%CompareBitDepth%).json"') DO SET "VMAF=%%i"
+   FOR /f "tokens=2 delims=:," %%i IN ('find "MS-SSIM score" "%log_dir%%OutputVideoNoExt%_vmaf(%CompareBitDepth%).json"') DO SET "MS-SSIM=%%i"
 )
 if not "%enc_error%"=="1" if not "%Compare_error%"=="1" (
    set "SSIM_Y=%SSIM_Y:~2%"
