@@ -142,11 +142,11 @@ echo "%codec%"|findstr "QSVEncC VCEEncC" >nul&& echo "%CommandLine%"|findstr /r 
 echo "%codec%"|findstr "QSVEncC VCEEncC" >nul&& echo "%CommandLine%"|findstr /r /c:"--vqp [0-9]">nul&&call :variable_set --vqp QSVQP %CommandLine%
 set /a QP_p=%QSVQP%+%QP_p_n%
 set /a QP_b=%QSVQP%+%QP_b_n%
-echo "%codec%"|findstr "QSVEncC VCEEncC" >nul&& echo "%CommandLine%"|findstr /r /c:"--cqp [0-9]">nul&&call set "CommandLine=%%CommandLine:--cqp %QSVQP%=--cqp %QSVQP%:%QP_p%:%QP_b%%%"
-echo "%codec%"|findstr "QSVEncC VCEEncC" >nul&& echo "%CommandLine%"|findstr /r /c:"--vqp [0-9]">nul&&call set "CommandLine=%%CommandLine:--vqp %QSVQP%=--vqp %QSVQP%:%QP_p%:%QP_b%%%"
+echo "%codec%"|findstr "QSVEncC VCEEncC" >nul&& echo "%CommandLine%"|findstr /r /c:"--cqp [0-9]">nul&&for /f "delims=" %%i in ('PowerShell -command "& {""""%CommandLine%"""" -replace """"--cqp %QSVQP%"""",""""--cqp %QSVQP%:%QP_p%:%QP_b%""""}"') do set "CommandLine=%%i"
+echo "%codec%"|findstr "QSVEncC VCEEncC" >nul&& echo "%CommandLine%"|findstr /r /c:"--vqp [0-9]">nul&&for /f "delims=" %%i in ('PowerShell -command "& {""""%CommandLine%"""" -replace """"--vqp %QSVQP%"""",""""--vqp %QSVQP%:%QP_p%:%QP_b%""""}"') do set "CommandLine=%%i"
 
 rem マルチパス用の処理
-if not "%multipass%"=="1" echo "%CommandLine%"|find "--second-pass">nul&&set multipass=1&&set pass_temp=1&&set pass_orig=2&&set "CommandLine=%CommandLine:--second-pass=--first-pass%"
+if not "%multipass%"=="1" echo "%CommandLine%"|find "--second-pass">nul&&set multipass=1&&set pass_temp=1&&set pass_orig=2&&for /f "delims=" %%i in ('PowerShell -command "& {""""%CommandLine%"""" -replace """"--second-pass"""",""""--first-pass""""}"') do set "CommandLine=%%i"
 if not "%multipass%"=="1" echo "%CommandLine%"|find "-input-stat-file">nul&&set multipass=1&&set pass_temp=1&&set pass_orig=2&&for /f "delims=" %%i in ('PowerShell -command "& {""""%CommandLine%"""" -replace """"-?-input-stat-file"""",""""--enc-mode-2p %enc-mode-2p% --output-stat-file""""}"') do set "CommandLine=%%i"
 if /i "%codec%"=="SVT-AV1" if "%multipass%"=="1" if "%pass_temp%"=="1" for /f "delims=" %%i in ('PowerShell -command "& {""""%CommandLine%"""" -replace """"--preset %enc-mode-2p%"""",""""--preset %enc-mode-1p%""""}"') do set "CommandLine=%%i"
 if /i "%codec%"=="SVT-AV1" if "%multipass%"=="1" if "%pass_temp%"=="1" for /f "delims=" %%i in ('PowerShell -command "& {""""%CommandLine%"""" -replace """"-enc-mode %enc-mode-2p%"""",""""-enc-mode %enc-mode-1p%""""}"') do set "CommandLine=%%i"
