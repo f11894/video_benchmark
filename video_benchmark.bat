@@ -1,7 +1,7 @@
 @echo off
 rem setting
 rem ------------------------------------------------------------------------------------------------
-rem How much higher is the QP of P frame and B frame higher than I frame in cqp and vqp mode of QSV
+rem How much higher is the QP of P frame and B frame higher than I frame in cqp mode of QSV
 set QP_p_n=2
 set QP_b_n=5
 
@@ -139,11 +139,9 @@ if "%EncodeBitDepth%"=="10" (
 
 rem qsv_enc用前処理
 echo "%codec%"|findstr "QSVEncC VCEEncC" >nul&& echo "%CommandLine%"|findstr /r /c:"--cqp [0-9]">nul&&call :variable_set --cqp QSVQP %CommandLine%
-echo "%codec%"|findstr "QSVEncC VCEEncC" >nul&& echo "%CommandLine%"|findstr /r /c:"--vqp [0-9]">nul&&call :variable_set --vqp QSVQP %CommandLine%
 set /a QP_p=%QSVQP%+%QP_p_n%
 set /a QP_b=%QSVQP%+%QP_b_n%
 echo "%codec%"|findstr "QSVEncC VCEEncC" >nul&& echo "%CommandLine%"|findstr /r /c:"--cqp [0-9]">nul&&for /f "delims=" %%i in ('PowerShell -command "& {""""%CommandLine%"""" -replace """"--cqp %QSVQP%"""",""""--cqp %QSVQP%:%QP_p%:%QP_b%""""}"') do set "CommandLine=%%i"
-echo "%codec%"|findstr "QSVEncC VCEEncC" >nul&& echo "%CommandLine%"|findstr /r /c:"--vqp [0-9]">nul&&for /f "delims=" %%i in ('PowerShell -command "& {""""%CommandLine%"""" -replace """"--vqp %QSVQP%"""",""""--vqp %QSVQP%:%QP_p%:%QP_b%""""}"') do set "CommandLine=%%i"
 
 rem マルチパス用の処理
 if not "%multipass%"=="1" echo "%CommandLine%"|find "--second-pass">nul&&set multipass=1&&set pass_temp=1&&set pass_orig=2&&for /f "delims=" %%i in ('PowerShell -command "& {""""%CommandLine%"""" -replace """"--second-pass"""",""""--first-pass""""}"') do set "CommandLine=%%i"
