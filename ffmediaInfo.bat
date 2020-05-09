@@ -22,7 +22,7 @@ if "%frame_rate%"=="24000/1001" (
    set frame_rate_integer=24
 )
 FOR /f "DELIMS=" %%i IN ('.\MediaInfo.exe --Inform^=Video^;%%Duration/String3%% "%~1"') DO SET "Duration=%%i"
-FOR /f "DELIMS=" %%i IN ('.\ffprobe -v error -count_frames -select_streams v:0 -show_entries stream^=nb_read_frames -of default^=nokey^=1:noprint_wrappers^=1 "%~1"') DO SET "FrameCount=%%i"
+FOR /f "DELIMS=" %%i IN ('.\ffprobe.exe -v error -count_frames -select_streams v:0 -show_entries stream^=nb_read_frames -of default^=nokey^=1:noprint_wrappers^=1 "%~1"') DO SET "FrameCount=%%i"
 FOR /f "DELIMS=" %%i IN ('.\MediaInfo.exe --Inform^=Video^;%%Width%% "%~1"') DO SET "Width=%%i"
 FOR /f "DELIMS=" %%i IN ('.\MediaInfo.exe --Inform^=Video^;%%Height%% "%~1"') DO SET "Height=%%i"
 set "video_size=%Width%x%Height%"

@@ -268,7 +268,7 @@ if /i "%codec%"=="VTM" set CompareVideo="%movie_dir%%OutputVideoNoExt%.mp4"
 if /i "%codec%"=="xvc" set CompareVideo="%movie_dir%%OutputVideoNoExt%.mp4"
 
 pushd "%~dp0tools\"
-FOR /f "DELIMS=" %%i IN ('.\ffprobe -v error -count_frames -select_streams v:0 -show_entries stream^=nb_read_frames -of default^=nokey^=1:noprint_wrappers^=1 %CompareVideo%') DO SET "FrameCount_CompareVideo=%%i"
+FOR /f "DELIMS=" %%i IN ('.\ffprobe.exe -v error -count_frames -select_streams v:0 -show_entries stream^=nb_read_frames -of default^=nokey^=1:noprint_wrappers^=1 %CompareVideo%') DO SET "FrameCount_CompareVideo=%%i"
 popd
 
 if not "%FrameCount%"=="%FrameCount_CompareVideo%" (
