@@ -4,9 +4,10 @@ import glob
 import sys
 import re
 import os
-import matplotlib.font_manager
+from matplotlib import rcParams
 
-font_prop = matplotlib.font_manager.FontProperties(fname=r'C:\Windows\Fonts\YuGothM.ttc')
+rcParams['font.family'] = 'sans-serif'
+rcParams['font.sans-serif'] = ['Meiryo', 'Yu Gothic', 'DejaVu Sans']
 os.chdir(sys.argv[1])
 input = os.path.basename(sys.argv[1])
 input = input.replace('_benchmark_log','')
@@ -37,23 +38,23 @@ for size in size_array:
              plt.plot(x_txt,y_txt , label = codec_name , marker=markers[MNum])
              MNum = MNum + 1
          if csvFileExist:
-             plt.title(input, fontproperties=font_prop)
+             plt.title(input)
              if size == '_bpp':
-                plt.xlabel("bpp", fontproperties=font_prop)
+                plt.xlabel("bpp")
              else:
-             	plt.xlabel("bitrate(kbps)", fontproperties=font_prop)
+             	plt.xlabel("bitrate(kbps)")
              if metric == 'PSNR_Y' or metric == 'PSNR_Average':
-                plt.ylabel(metric + ' (dB)', fontproperties=font_prop)
+                plt.ylabel(metric + ' (dB)')
              else:
                 if metric == 'Sec':
-                   plt.ylabel('Elapsed Time (sec)', fontproperties=font_prop)
+                   plt.ylabel('Elapsed Time (sec)')
                 else:
-                   plt.ylabel(metric, fontproperties=font_prop)
+                   plt.ylabel(metric)
              plt.grid(True,linestyle='dashed')
              if metric == 'PSNR_Y' or metric == 'PSNR_Average' or metric == 'SSIM_Y' or metric == 'SSIM_All' or metric == 'VMAF' or metric == 'MS-SSIM':
-             	  plt.legend(loc='lower right', prop=font_prop)
+             	  plt.legend(loc='lower right')
              else:
-                plt.legend(bbox_to_anchor=(1.01, 1), loc='upper left', borderaxespad=0, prop=font_prop)
+                plt.legend(bbox_to_anchor=(1.01, 1), loc='upper left', borderaxespad=0)
              plt.savefig(input + '_' +  metric + '(' + BitDepth + ')' + size + '_Graph.png' ,  bbox_inches='tight')
          plt.close()
          row = row + 1
