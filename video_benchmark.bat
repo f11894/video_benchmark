@@ -38,7 +38,7 @@ set VTMenc="%~dp0tools\vtm\EncoderApp.exe"
 set VTMdec="%~dp0tools\vtm\DecoderApp.exe"
 set xvcenc="%~dp0tools\xvcenc.exe"
 set xvcdec="%~dp0tools\xvcdec.exe"
-set mp4box="%~dp0tools\mp4box.exe"
+set mp4box="%~dp0tools\mp4box\mp4box.exe"
 rem ------------------------------------------------------------------------------------------------
 if "%language_configured%"=="1" goto ArgumentCheck
 for /f "tokens=2" %%i in ('PowerShell Get-WinSystemLocale') do set "SystemLocale=%%i"
