@@ -351,7 +351,7 @@ if not "%enc_error%"=="1" if not "%Compare_error%"=="1" (
    set "PSNR_Average=%PSNR_Average:~8%"
    set /a "echo_bitrare=%Filesize%/%Duration2%*8"
    for /f "DELIMS=" %%i IN ('PowerShell %Filesize%*8/%Duration2%') DO SET "bitrate=%%i"
-   if not "%msec_total%"=="0" for /f "DELIMS=" %%i IN ('PowerShell "%enc_fps%"') DO SET "fps=%%i"
+   if not "%msec_total%"=="0" for /f "DELIMS=" %%i IN ('PowerShell "%FrameCount%/(%msec_total%/1000)"') DO SET "fps=%%i"
    if not "%msec_total%"=="0" for /f "DELIMS=" %%i IN ('PowerShell "%msec_total%/1000"') DO SET "Sec=%%i"
    if "%msec_total%"=="0" SET Sec=0
    if "%msec_total%"=="0" SET fps=0
@@ -438,13 +438,6 @@ if "%pass_temp%"=="%pass_orig%" (
 exit /b
 
 :msec_to_sec
-rem csvに書き込むデータを計算
-if not "%multipass%"=="1" set enc_fps=%FrameCount%/(%enc_msec%/1000)
-if "%multipass%"=="1" if "%pass_temp%"=="1" call set enc_fps=(%FrameCount%*%pass_orig%)/((%%enc_msec%pass_temp%%%/1000)
-if "%multipass%"=="1" if not "%pass_temp%"=="1" if not "%pass_temp%"=="%pass_orig%" call set enc_fps=%enc_fps%+(%%enc_msec%pass_temp%%%/1000)
-if "%multipass%"=="1" if "%pass_temp%"=="%pass_orig%" call set enc_fps=%enc_fps%+(%%enc_msec%pass_temp%%%/1000))
-if "%multipass%"=="1" if "%pass_orig%"=="1" call set enc_fps=%FrameCount%/(%%enc_msec%pass_temp%%%/1000)
-
 rem 表示用のデータを計算
 if not defined msec_total set msec_total=0
 call set /a msec_total=msec_total+%%enc_msec%pass_temp%%%
