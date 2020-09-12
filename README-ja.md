@@ -29,7 +29,6 @@ Example: video_benchmark.bat -codec x264 -i input.y4m -o output.mp4 -cmd "--crf 
   -cmd                 encoder command line
   -csvsuf              CSV file name suffix *optional
   -encode-depth        encoding bit-depth (8 or 10) *optional
-  -enc-mode-1p         The first pass of SVT-AV1 2pass encoding (0 to 8) *optional
 ```
 具体的な使い方は同梱してあるプリセット用のbatを見ればわかるかと思います  
 もしくはプリセット用のbatに動画ファイルをドラッグ&ドロップしてください  
