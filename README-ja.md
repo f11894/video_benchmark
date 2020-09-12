@@ -25,6 +25,7 @@ Example: video_benchmark.bat -codec x264 -i input.y4m -o output.mp4 -cmd "--crf 
                        SVT-VP9
                        SVT-AV1
                        VTM
+                       VVenC
                        XVC
   -cmd                 encoder command line
   -csvsuf              CSV file name suffix *optional

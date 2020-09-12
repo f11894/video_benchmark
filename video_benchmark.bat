@@ -36,6 +36,7 @@ set SVT-VP9="%~dp0tools\SvtVp9EncApp.exe"
 set SVT-HEVC="%~dp0tools\SvtHevcEncApp.exe"
 set VTMenc="%~dp0tools\vtm\EncoderApp.exe"
 set VTMdec="%~dp0tools\vtm\DecoderApp.exe"
+set VVenC="%~dp0tools\VVenC\vvencapp.exe"
 set xvcenc="%~dp0tools\xvcenc.exe"
 set xvcdec="%~dp0tools\xvcdec.exe"
 set mp4box="%~dp0tools\mp4box\mp4box.exe"
@@ -175,6 +176,10 @@ if not exist "%movie_dir%%OutputVideo%" (
       %vpxenc% --help | find "WebM Project">"%log_dir%%OutputVideoNoExt%_log%pass_temp%.txt" 2>&1 
       %view_args64% %ffmpeg% -y -i "%InputVideo%" -an %EncodePixelFormat% -strict -2 -f yuv4mpegpipe - 2>"%log_dir%%OutputVideoNoExt%_pipelog%pass_temp%.txt" | %timer64% %vpxenc% %CommandLine% -o "%movie_dir%%OutputVideo%" - 2>&1 | %safetee% -a "%log_dir%%OutputVideoNoExt%_log%pass_temp%.txt"
    )
+   if /i "%codec%"=="VVenC" (
+       if not exist "%movie_dir%%InputVideoNoExt%_temp%EncodeBitDepth%bit.yuv" echo %MessageIntermediateFileEncode% && %view_args64% %ffmpeg% -i "%InputVideo%" -an %EncodePixelFormat% -f rawvideo -strict -2 "%movie_dir%%InputVideoNoExt%_temp%EncodeBitDepth%bit.yuv" >"%log_dir%%OutputVideoNoExt%_log%pass_temp%.txt" 2>&1
+       %timer64% %VVenC% -i "%movie_dir%%InputVideoNoExt%_temp%EncodeBitDepth%bit.yuv" %CommandLine% --framerate %frame_rate_integer% -s %Width%x%Height% -o "%movie_dir%%OutputVideo%" 2>&1 | %safetee% -o "%log_dir%%OutputVideoNoExt%_log%pass_temp%.txt"
+   )
    if /i "%codec%"=="VTM" (
        if not exist "%movie_dir%%InputVideoNoExt%_temp%EncodeBitDepth%bit.yuv" echo %MessageIntermediateFileEncode% && %view_args64% %ffmpeg% -i "%InputVideo%" -an %EncodePixelFormat% -f rawvideo -strict -2 "%movie_dir%%InputVideoNoExt%_temp%EncodeBitDepth%bit.yuv" >"%log_dir%%OutputVideoNoExt%_log%pass_temp%.txt" 2>&1
        %timer64% %VTMenc%  %CommandLine% -fr %frame_rate_integer% -wdt %Width% -hgt %Height% -f %FrameCount% -i "%movie_dir%%InputVideoNoExt%_temp%EncodeBitDepth%bit.yuv" -o NUL -b "%movie_dir%%OutputVideo%" 2>&1 | %safetee% -a "%log_dir%%OutputVideoNoExt%_log%pass_temp%.txt"
@@ -207,6 +212,10 @@ if "%multipass%"=="1" if not "%enc_skip%"=="1" if not "%pass_temp%"=="%pass_orig
 rem そのままではFFmpegで扱えないビットストリームを可逆圧縮のH.264にデコードする
 if not "%enc_error%"=="1" if not exist "%movie_dir%%OutputVideoNoExt%.mp4" (
    if /i "%codec%"=="VTM" (
+      %VTMdec% -d %EncodeBitDepth% -b "%movie_dir%%OutputVideo%" -o "%movie_dir%%OutputVideoNoExt%.yuv" 2>&1 | %safetee% -a "%log_dir%%OutputVideoNoExt%_log%pass_temp%.txt"
+      %view_args64% %ffmpeg% -y -f rawvideo -s %video_size% -r %frame_rate% %EncodePixelFormat% -i "%movie_dir%%OutputVideoNoExt%.yuv" -vcodec libx264 -qp 0 "%movie_dir%%OutputVideoNoExt%.mp4" >>"%log_dir%%OutputVideoNoExt%_log%pass_temp%.txt" 2>&1 &&del "%movie_dir%%OutputVideoNoExt%.yuv"
+   )
+   if /i "%codec%"=="VVenC" (
       %VTMdec% -d %EncodeBitDepth% -b "%movie_dir%%OutputVideo%" -o "%movie_dir%%OutputVideoNoExt%.yuv" 2>&1 | %safetee% -a "%log_dir%%OutputVideoNoExt%_log%pass_temp%.txt"
       %view_args64% %ffmpeg% -y -f rawvideo -s %video_size% -r %frame_rate% %EncodePixelFormat% -i "%movie_dir%%OutputVideoNoExt%.yuv" -vcodec libx264 -qp 0 "%movie_dir%%OutputVideoNoExt%.mp4" >>"%log_dir%%OutputVideoNoExt%_log%pass_temp%.txt" 2>&1 &&del "%movie_dir%%OutputVideoNoExt%.yuv"
    )
@@ -258,6 +267,7 @@ pushd "%log_dir%"
 
 set CompareVideo="%movie_dir%%OutputVideo%"
 if /i "%codec%"=="VTM" set CompareVideo="%movie_dir%%OutputVideoNoExt%.mp4"
+if /i "%codec%"=="VVenC" set CompareVideo="%movie_dir%%OutputVideoNoExt%.mp4"
 if /i "%codec%"=="xvc" set CompareVideo="%movie_dir%%OutputVideoNoExt%.mp4"
 
 pushd "%~dp0tools\"
