@@ -263,13 +263,21 @@ for %%i in ("%movie_dir%%OutputVideo%") do set Filesize=%%~zi
 for /f "delims=" %%a in ('PowerShell "-Join (Get-Random -Count 32 -input 0,1,2,3,4,5,6,7,8,9,a,b,c,d,e,f,g,h,i,j,k,l,m,n,o,p,q,r,s,t,u,v,w,x,y,z)"') do set "random32=%%a"
 set ffmpeg_ssim_option="ssim='%random32%_ssim(%CompareBitDepth%)_verbose_log.txt';[0:v][1:v]psnr='%random32%_psnr(%CompareBitDepth%)_verbose_log.txt'"
 popd
-pushd "%log_dir%"
 
 set CompareVideo="%movie_dir%%OutputVideo%"
 if /i "%codec%"=="VTM" set CompareVideo="%movie_dir%%OutputVideoNoExt%.mp4"
 if /i "%codec%"=="VVenC" set CompareVideo="%movie_dir%%OutputVideoNoExt%.mp4"
 if /i "%codec%"=="xvc" set CompareVideo="%movie_dir%%OutputVideoNoExt%.mp4"
 
+find "Parsed_ssim" "%log_dir%%OutputVideoNoExt%_ssim(%CompareBitDepth%)_log%pass_orig%.txt">nul 2>&1 || set SSIM_check=1
+if not exist "%log_dir%%OutputVideoNoExt%_ssim(%CompareBitDepth%)_verbose_log.txt" set SSIM_check=1
+if not exist "%log_dir%%OutputVideoNoExt%_psnr(%CompareBitDepth%)_verbose_log.txt" set SSIM_check=1
+find "VMAF score" "%log_dir%%OutputVideoNoExt%_vmaf(%CompareBitDepth%).json">nul 2>&1 || set VMAF_check=1
+find "MS-SSIM score" "%log_dir%%OutputVideoNoExt%_vmaf(%CompareBitDepth%).json">nul 2>&1 || set VMAF_check=1
+if not exist "%log_dir%%OutputVideoNoExt%_vmaf(%CompareBitDepth%).json" set VMAF_check=1
+
+if not "%SSIM_check%"=="1" if not "%VMAF_check%"=="1" goto FrameCount_check_skip
+rem 入力動画と出力動画のフレーム数が一致しているか調べる
 pushd "%~dp0tools\"
 FOR /f "DELIMS=" %%i IN ('.\ffprobe.exe -v error -count_frames -select_streams v:0 -show_entries stream^=nb_read_frames -of default^=nokey^=1:noprint_wrappers^=1 %CompareVideo%') DO SET "FrameCount_CompareVideo=%%i"
 popd
@@ -279,11 +287,9 @@ if not "%FrameCount%"=="%FrameCount_CompareVideo%" (
    set enc_error=1
    timeout /T %wait%
 )
+:FrameCount_check_skip
 
-find "Parsed_ssim" "%OutputVideoNoExt%_ssim(%CompareBitDepth%)_log%pass_orig%.txt">nul 2>&1 || set SSIM_check=1
-if not exist "%log_dir%%OutputVideoNoExt%_ssim(%CompareBitDepth%)_verbose_log.txt" set SSIM_check=1
-if not exist "%log_dir%%OutputVideoNoExt%_psnr(%CompareBitDepth%)_verbose_log.txt" set SSIM_check=1
-
+pushd "%log_dir%"
 if "%SSIM_check%"=="1" if not "%enc_error%"=="1" (
    call echo %MessageSSIMCompare%
    echo %MessagePleaseWait%
@@ -313,10 +319,6 @@ if %Height% GTR 2000 set "vmaf_model_file=vmaf_4k_v0.6.1.pkl"
 for %%i in (%ffmpeg_VMAF%) do set "vmaf_model_dir=%%~dpi\model"
 pushd %vmaf_model_dir%
 set ffmpeg_vmaf_option="libvmaf=model_path=%vmaf_model_file%:ms_ssim=1:log_fmt=json:log_path='%random32%_vmaf(%CompareBitDepth%).json'"
-
-find "VMAF score" "%log_dir%%OutputVideoNoExt%_vmaf(%CompareBitDepth%).json">nul 2>&1 || set VMAF_check=1
-find "MS-SSIM score" "%log_dir%%OutputVideoNoExt%_vmaf(%CompareBitDepth%).json">nul 2>&1 || set VMAF_check=1
-if not exist "%log_dir%%OutputVideoNoExt%_vmaf(%CompareBitDepth%).json" set VMAF_check=1
 
 if "%VMAF_check%"=="1" if not "%enc_error%"=="1" (
    call echo %MessageVMAFCompare%
