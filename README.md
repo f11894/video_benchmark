@@ -33,13 +33,13 @@ Example: video_benchmark.bat -codec x264 -i input.y4m -o output.mp4 -cmd "--crf 
 ```
 The included preset bat provides more specific instructions.  
 Alternatively, drag and drop the video file into the preset bat.  
-After encoding, drag and drop the "benchmark_log" folder into Create_Graph.bat to create the graph.  
+After encoding, drag and drop the "benchmark_log" folder into plot.bat to make the plot.  
 
 If you want to calculate the average value of multiple files  
 1. Download and unzip the dataset, for example, objective-1-fast, from [here](https://media.xiph.org/video/derf/)  
 2. Next, select all the y4m files in the objective-1-fast folder and convert them with an appropriate preset.  
-3. After all conversions are done, drop the objective-1-fast folder into Average_of_multiple_csv.bat and calculate the average value of csv  
-4. In the objective-1-fast folder, a folder called objective-1-fast_benchmark_log is created, so drop that folder into Create_Graph.bat to create a graph  
+3. After all conversions are done, drop the objective-1-fast folder into csv_ave.bat and calculate the average value of csv  
+4. In the objective-1-fast folder, a folder called objective-1-fast_benchmark_log is created, so drop that folder into plot.bat to make a plot  
 
 ### important point  
 When benchmarking with 10bit, rewrite ComparePixelFormat in video_benchmark.bat from yuv420p to yuv420p10le (even in the case of 8bit and 10bit mixed benchmarks)
