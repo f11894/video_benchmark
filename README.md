@@ -1,7 +1,7 @@
 # video_benchmark
 bat files that benchmark the performance of various encoders
 
-You can calculate PSNR, SSIM and VMAF scores and output them to csv to create a graph.  
+You can calculate PSNR, SSIM and VMAF scores and output them to csv to make a plot.  
 There is also an encoding speed measurement and an automatic multipath encoding function.  
 
 ### Usage
