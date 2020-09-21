@@ -8,7 +8,7 @@ for %%i in ("%~dp0.") do set view_args64="%%~dpitools\view_args64.exe"
 for %%i in ("%~dp0.") do set VTMenc="%%~dpitools\vtm\EncoderApp.exe"
 for %%i in ("%~dp0.") do set "VTM_cfg=%%~dpitools\vtm\encoder_randomaccess_vtm.cfg"
 
-set VTM_option="-c %VTM_cfg% --InputBitDepth=8 --OutputBitDepth=8 --IntraPeriod=256 -q %%i"
+set VTM_option="-c %VTM_cfg% --InputBitDepth=10 --OutputBitDepth=10 --IntraPeriod=256 -q %%i"
 set thread=8
 
 for %%i in ("%~dp0.") do pushd "%%~dpitools\"
@@ -28,8 +28,8 @@ for %%f in (%*) do (
    if "!frame_rate_delay!"=="24000/1001" set frame_rate_integer_delay=24
    if not exist "%%~dpf%%~nf_benchmark_log\" mkdir "%%~dpf%%~nf_benchmark_log\"
    for /L %%i in (36,-2,22) do (
-      echo "%%~f" "VTM_q%%i" %VTM_option% !Width_delay! !Height_delay! !FrameCount_delay! !frame_rate_delay! !frame_rate_integer_delay!>>%xargs_txt%
-      if not exist "%%~dpnf_temp8bit.yuv" %view_args64% %ffmpeg% -y -i "%%~f" -an -pix_fmt yuv420p -f rawvideo -strict -2 "%%~dpnf_temp8bit.yuv" >"%%~dpf%%~nf_benchmark_log\%%~nf_VTM_q%%i_log.txt" 2>&1 
+      echo "%%~f" "VTM_10bit_q%%i" %VTM_option% !Width_delay! !Height_delay! !FrameCount_delay! !frame_rate_delay! !frame_rate_integer_delay!>>%xargs_txt%
+      if not exist "%%~dpnf_temp10bit.yuv" %view_args64% %ffmpeg% -y -i "%%~f" -an -pix_fmt yuv420p10le -f rawvideo -strict -2 "%%~dpnf_temp10bit.yuv" >"%%~dpf%%~nf_benchmark_log\%%~nf_VTM_10bit_q%%i_log.txt" 2>&1 
    )
 )
 endlocal
@@ -38,12 +38,12 @@ popd
 %busybox64% xargs -a %xargs_txt%  -n 8 -P %thread% "%~dp0VTM_xargs.bat"
 :loop
 if "%~1"=="" goto end
-for /L %%i in (36,-2,22) do call %benchmark_bat% -codec VTM -i "%~1" -o "%~n1_VTM_q%%i.bin" -cmd %VTM_option% -csvsuf q
+for /L %%i in (36,-2,22) do call %benchmark_bat% -codec VTM -i "%~1" -o "%~n1_VTM_10bit_q%%i.bin" -cmd %VTM_option% -csvsuf 10bit_q -encode-depth 10
 rem For comparison
-for /L %%i in (32,-2,18) do call %benchmark_bat% -codec x264 -i "%~1" -o "%~n1_x264_placebo_tunessim_kf256_crf%%i.mp4" -cmd "--preset placebo --tune ssim --keyint 256 --crf %%i" -csvsuf placebo_tunessim_kf256_crf
-for /L %%i in (32,-2,18) do call %benchmark_bat% -codec x265 -i "%~1" -o "%~n1_x265_placebo_tunessim_kf256_crf%%i.mp4" -cmd "--preset placebo --tune ssim --keyint 256 --crf %%i" -csvsuf placebo_tunessim_kf256_crf
-for /L %%i in (55,-5,25) do call %benchmark_bat% -codec libvpx -i "%~1" -o "%~n1_libvpx_vp9_c0_kf256_2pass_q%%i.webm" -cmd "--codec=vp9 --webm --good --cpu-used=0 --tune=psnr --threads=8 --tile-columns=2 --tile-rows=1 --pass=2 --passes=2 --auto-alt-ref=6 --kf-max-dist=256 --end-usage=q --cq-level=%%i" -csvsuf vp9_c0_kf256_2pass_q
-for /L %%i in (55,-5,25) do call %benchmark_bat% -codec libaom -i "%~1" -o "%~n1_libaom_c0_kf256_2pass_q%%i.mp4" -cmd "--ivf --cpu-used=0 --threads=8 --tile-columns=2 --tile-rows=1 --pass=2 --passes=2 --kf-max-dist=256 --end-usage=q --cq-level=%%i" -csvsuf c0_kf256_2pass_q
+for /L %%i in (32,-2,18) do call %benchmark_bat% -codec x264 -i "%~1" -o "%~n1_x264_10bit_placebo_tunessim_kf256_crf%%i.mp4" -cmd "--preset placebo --tune ssim --keyint 256 --crf %%i --input-depth 10 --output-depth 10" -csvsuf 10bit_placebo_tunessim_kf256_crf -encode-depth 10
+for /L %%i in (32,-2,18) do call %benchmark_bat% -codec x265 -i "%~1" -o "%~n1_x265_10bit_placebo_tunessim_kf256_crf%%i.mp4" -cmd "--preset placebo --tune ssim --keyint 256 --crf %%i --input-depth 10 --output-depth 10" -csvsuf 10bit_placebo_tunessim_kf256_crf -encode-depth 10
+for /L %%i in (55,-5,25) do call %benchmark_bat% -codec libvpx -i "%~1" -o "%~n1_libvpx_vp9_10bit_c0_kf256_2pass_q%%i.webm" -cmd "--codec=vp9 --webm --good --profile=2 --cpu-used=0 --tune=psnr --threads=8 --tile-columns=2 --tile-rows=1 --pass=2 --passes=2 --auto-alt-ref=6 --kf-max-dist=256 --end-usage=q --cq-level=%%i --input-bit-depth=10 --bit-depth=10" -csvsuf 10bit_vp9_c0_kf256_2pass_q -encode-depth 10
+for /L %%i in (55,-5,25) do call %benchmark_bat% -codec libaom -i "%~1" -o "%~n1_libaom_10bit_c0_kf256_2pass_q%%i.mp4" -cmd "--ivf --cpu-used=0 --threads=8 --tile-columns=2 --tile-rows=1 --pass=2 --passes=2 --kf-max-dist=256 --end-usage=q --cq-level=%%i --input-bit-depth=10 --bit-depth=10" -csvsuf 10bit_c0_kf256_2pass_q -encode-depth 10
 shift
 goto loop
 :end
