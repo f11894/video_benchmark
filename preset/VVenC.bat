@@ -4,7 +4,7 @@ for %%i in ("%~dp0.") do set benchmark_bat="%%~dpivideo_benchmark.bat"
 if "%~1"=="" goto end
 set num=1
 for %%a in (faster, fast, medium, slow) do (
-   for /L %%i in (34,-2,22) do call %benchmark_bat% -codec VVenC -i "%~1" -o "%~n1_VVenC_10bit_%%num%%_%%a_q%%i.vvc" -cmd "--preset %%a --threads 8 --format yuv420_10 --qpa 0 --qp %%i" -csvsuf 10bit_%%num%%_%%a_q -encode-depth 10
+   for /L %%i in (34,-2,22) do call %benchmark_bat% -codec VVenC -i "%~1" -o "%~n1_VVenC_10bit_%%num%%_%%a_q%%i.vvc" -cmd "--preset %%a --threads 8 --format yuv420_10 --intraperiod 32 --qpa 0 --qp %%i" -csvsuf 10bit_%%num%%_%%a_q -encode-depth 10
    set /a num+=1
 )
 for %%a in (5, 4, 3, 2, 1) do (
