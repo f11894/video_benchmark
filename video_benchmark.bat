@@ -18,7 +18,6 @@ rem Soft path
 set ffmpeg="%~dp0tools\ffmpeg.exe"
 if "%ffmpeg_enc%"=="" set ffmpeg_enc=%ffmpeg%
 set ffmpeg_VMAF="%~dp0tools\ffmpeg.exe"
-set mediaInfo="%~dp0tools\MediaInfo.exe"
 set timer64="%~dp0tools\timer64.exe"
 set view_args64="%~dp0tools\view_args64.exe"
 set safetee="%~dp0tools\safetee.exe"
@@ -86,13 +85,13 @@ set "log_dir=%movie_dir%\%InputVideoNoExt%_benchmark_log\"
 set error_log="%log_dir%%InputVideoNoExt%__error_log.txt"
 
 rem 動画の情報を調べる
-:ffmediaInfo
+:fileinfo
 if not exist "%log_dir%" mkdir "%log_dir%"
 if not exist "%movie_dir%" mkdir "%movie_dir%"
-if "%ffmediaInfo_file%"=="%InputVideo%" goto start
+if "%fileinfo_file%"=="%InputVideo%" goto start
 echo %MessageInputVideoCheck%
 
-call "%~dp0ffmediaInfo.bat" "%InputVideo%"
+call "%~dp0fileinfo.bat" "%InputVideo%"
 
 if "%Duration%"=="" if "%FrameCount%"=="" (
    echo %MessageInputVideoCheckError%
@@ -100,22 +99,13 @@ if "%Duration%"=="" if "%FrameCount%"=="" (
    timeout /t %wait%
    goto input_error_skip
 )
-set Duration_msec=%Duration:~9,3%
-set /a Duration_msec=1%Duration_msec%-1000
-set Duration_sec=%Duration:~6,2%
-set /a Duration_sec=(1%Duration_sec%-100)*1000
-set Duration_Minute=%Duration:~3,2%
-set /a Duration_Minute=(1%Duration_Minute%-100)*60000
-set Duration_Hour=%Duration:~0,2%
-set /a Duration_Hour=(1%Duration_Hour%-100)*3600000
-set /a Duration2=%Duration_msec%+%Duration_sec%+%Duration_Minute%+%Duration_Hour%
 call echo %MessageInputVideoInfoFileName%
 call echo %MessageInputVideoInfoVideoSize%
 call echo %MessageInputVideoInfoFrameRate%
 call echo %MessageInputVideoInfoFrameCount%
 call echo %MessageInputVideoInfoDuration%
 echo.
-set "ffmediaInfo_file=%InputVideo%"
+set "fileinfo_file=%InputVideo%"
 
 :start
 setlocal
@@ -361,8 +351,7 @@ if not "%enc_error%"=="1" if not "%Compare_error%"=="1" (
    set "SSIM_All=%SSIM_All:~4%"
    set "PSNR_Y=%PSNR_Y:~2%"
    set "PSNR_Average=%PSNR_Average:~8%"
-   set /a "echo_bitrare=%Filesize%/%Duration2%*8"
-   for /f "DELIMS=" %%i IN ('PowerShell %Filesize%*8/%Duration2%') DO SET "bitrate=%%i"
+   for /f "DELIMS=" %%i IN ('PowerShell "%Filesize%*8/(%Duration%*1000)"') DO SET "bitrate=%%i"
    if not "%msec_total%"=="0" for /f "DELIMS=" %%i IN ('PowerShell "%FrameCount%/(%msec_total%/1000)"') DO SET "fps=%%i"
    if not "%msec_total%"=="0" for /f "DELIMS=" %%i IN ('PowerShell "%msec_total%/1000"') DO SET "Sec=%%i"
    if "%msec_total%"=="0" SET Sec=0
@@ -381,7 +370,7 @@ popd
 
 if not "%enc_error%"=="1" if not "%Compare_error%"=="1" call echo %MessageResultOutputName%
 if not "%enc_error%"=="1" if not "%Compare_error%"=="1" (
-   echo bitrate                     : %echo_bitrare% kbps
+   echo bitrate                     : %bitrate% kbps
    echo SSIM  ^(Y^)                   : %SSIM_Y% ^(%CompareBitDepth%^)
    echo SSIM  ^(All^)                 : %SSIM_All% ^(%CompareBitDepth%^)
    echo PSNR  ^(Y^)                   : %PSNR_Y% ^(%CompareBitDepth%^)

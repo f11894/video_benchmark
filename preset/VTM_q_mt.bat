@@ -15,10 +15,10 @@ for %%i in ("%~dp0.") do pushd "%%~dpitools\"
 set xargs_txt="%TEMP%\xargs_%RANDOM%_%RANDOM%_%RANDOM%.txt"
 setlocal enabledelayedexpansion
 for %%f in (%*) do (
-   FOR /f "DELIMS=" %%a IN ('MediaInfo.exe --Inform^=Video^;%%Width%% "%%~f"') DO SET Width_delay=%%a
-   FOR /f "DELIMS=" %%a IN ('MediaInfo.exe --Inform^=Video^;%%Height%% "%%~f"') DO SET Height_delay=%%a
-   FOR /f "DELIMS=" %%a IN ('MediaInfo.exe --Inform^=Video^;%%FrameCount%% "%%~f"') DO SET FrameCount_delay=%%a
-   FOR /f "DELIMS=" %%a IN ('ffmpeg.exe -loglevel 48 -i "%%~f" -t 00:00:00.00 -vcodec utvideo -an -f null -  2^>^&1 ^| find "'frame_rate'"') DO SET frame_rate_delay=%%a
+   FOR /f "DELIMS=" %%i IN ('.\ffprobe.exe -v error -select_streams v:0 -show_entries stream^=width -of default^=noprint_wrappers^=1:nokey^=1 "%%~f"') DO SET "Width_delay=%%i"
+   FOR /f "DELIMS=" %%i IN ('.\ffprobe.exe -v error -select_streams v:0 -show_entries stream^=height -of default^=noprint_wrappers^=1:nokey^=1 "%%~f"') DO SET "Height_delay=%%i"
+   FOR /f "DELIMS=" %%i IN ('.\ffprobe.exe -v error -count_frames -select_streams v:0 -show_entries stream^=nb_read_frames -of default^=nokey^=1:noprint_wrappers^=1 "%%~f"') DO SET "FrameCount_delay=%%i"
+   FOR /f "DELIMS=" %%a IN ('.\ffmpeg.exe -loglevel 48 -i "%%~f" -t 00:00:00.00 -vcodec rawvideo -an -f null -  2^>^&1 ^| find "'frame_rate'"') DO SET frame_rate_delay=%%a
    FOR /f "tokens=4 DELIMS='" %%a IN ("!frame_rate_delay!") DO SET frame_rate_delay=%%a
    FOR /f "tokens=1 DELIMS=/" %%a IN ("!frame_rate_delay!") DO SET frame_rate_num_delay=%%a
    rem FOR /f "tokens=2 DELIMS=/" %%a IN ("!frame_rate_delay!") DO SET frame_rate_denom_delay=%%a
