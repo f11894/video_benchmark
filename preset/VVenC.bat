@@ -1,5 +1,6 @@
 @echo off
 for %%i in ("%~dp0.") do set benchmark_bat="%%~dpivideo_benchmark.bat"
+set ComparePixelFormat=-pix_fmt yuv420p10le
 :loop
 if "%~1"=="" goto end
 set num=1

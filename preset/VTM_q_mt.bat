@@ -8,6 +8,7 @@ for %%i in ("%~dp0.") do set view_args64="%%~dpitools\view_args64.exe"
 for %%i in ("%~dp0.") do set VTMenc="%%~dpitools\vtm\EncoderApp.exe"
 for %%i in ("%~dp0.") do set "VTM_cfg=%%~dpitools\vtm\encoder_randomaccess_vtm.cfg"
 
+set ComparePixelFormat=-pix_fmt yuv420p10le
 set VTM_option="-c %VTM_cfg% --InputBitDepth=10 --OutputBitDepth=10 --IntraPeriod=256 -q %%i"
 set thread=8
 

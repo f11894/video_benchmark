@@ -12,7 +12,7 @@ rem How many seconds to wait when an error occurs
 set wait=60
 
 rem Bit depth when calculating SSIM or VMAF
-set ComparePixelFormat=-pix_fmt yuv420p
+if not defined ComparePixelFormat set ComparePixelFormat=-pix_fmt yuv420p
 
 rem Soft path
 set ffmpeg="%~dp0tools\ffmpeg.exe"
