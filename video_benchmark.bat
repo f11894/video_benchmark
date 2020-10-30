@@ -285,7 +285,7 @@ set ffmpeg_metric_option="ssim='%random32%_ssim(%CompareBitDepth%)_verbose_log.t
 if "%Metric_calculation%"=="1" if not "%enc_error%"=="1" (
    call echo %MessageMetricCompare%
    echo %MessagePleaseWait%
-   %view_args64% %ffmpeg% -r %frame_rate% -i %CompareVideo% -an %ComparePixelFormat% -strict -2 -f yuv4mpegpipe - 2>"%log_dir%%OutputVideoNoExt%_ssim(%CompareBitDepth%)_pipelog%pass_orig%.txt" | %view_args64% %ffmpeg% -i - -r %frame_rate% -i "%InputVideo%" -filter_complex %ffmpeg_metric_option% -an -f null - >"%log_dir%%OutputVideoNoExt%_metric(%CompareBitDepth%)_log%pass_orig%.txt" 2>&1
+   %view_args64% %ffmpeg% -r %frame_rate% -i %CompareVideo% -an %ComparePixelFormat% -strict -2 -f yuv4mpegpipe - 2>"%log_dir%%OutputVideoNoExt%_metric(%CompareBitDepth%)_pipelog%pass_orig%.txt" | %view_args64% %ffmpeg% -i - -r %frame_rate% -i "%InputVideo%" -filter_complex %ffmpeg_metric_option% -an -f null - >"%log_dir%%OutputVideoNoExt%_metric(%CompareBitDepth%)_log%pass_orig%.txt" 2>&1
    move /y "%random32%_ssim(%CompareBitDepth%)_verbose_log.txt" "%log_dir%%OutputVideoNoExt%_ssim(%CompareBitDepth%)_verbose_log.txt" >nul
    move /y "%random32%_psnr(%CompareBitDepth%)_verbose_log.txt" "%log_dir%%OutputVideoNoExt%_psnr(%CompareBitDepth%)_verbose_log.txt" >nul
    echo.
