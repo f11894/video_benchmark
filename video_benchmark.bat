@@ -139,8 +139,7 @@ if not "%codec%"=="rav1e" if "%multipass%"=="1" call :multi_pass_set
 rem 各エンコーダーでエンコード
 if not exist "%movie_dir%%OutputVideo%" (
    rem ログフォルダに以前のログが残っていたら削除する
-   if exist "%log_dir%%OutputVideoNoExt%_ssim(%CompareBitDepth%)_log%pass_orig%.txt" del "%log_dir%%OutputVideoNoExt%_ssim(%CompareBitDepth%)_log%pass_orig%.txt"
-   if exist "%log_dir%%OutputVideoNoExt%_vmaf(%CompareBitDepth%)_log%pass_orig%.txt" del "%log_dir%%OutputVideoNoExt%_vmaf(%CompareBitDepth%)_log%pass_orig%.txt"
+   if exist "%log_dir%%OutputVideoNoExt%_metric(%CompareBitDepth%)_log%pass_orig%.txt" del "%log_dir%%OutputVideoNoExt%_metric(%CompareBitDepth%)_log%pass_orig%.txt"
    if exist "%log_dir%%OutputVideoNoExt%_log%pass_temp%.txt" del "%log_dir%%OutputVideoNoExt%_log%pass_temp%.txt"
    if exist "%log_dir%%OutputVideoNoExt%_pipelog%pass_temp%.txt" del "%log_dir%%OutputVideoNoExt%_pipelog%pass_temp%.txt"
 
@@ -251,7 +250,6 @@ chcp 65001 >nul 2>&1
 rem SSIMを算出する
 for %%i in ("%movie_dir%%OutputVideo%") do set Filesize=%%~zi
 for /f "delims=" %%a in ('PowerShell "-Join (Get-Random -Count 32 -input 0,1,2,3,4,5,6,7,8,9,a,b,c,d,e,f,g,h,i,j,k,l,m,n,o,p,q,r,s,t,u,v,w,x,y,z)"') do set "random32=%%a"
-set ffmpeg_ssim_option="ssim='%random32%_ssim(%CompareBitDepth%)_verbose_log.txt';[0:v][1:v]psnr='%random32%_psnr(%CompareBitDepth%)_verbose_log.txt'"
 popd
 
 set CompareVideo="%movie_dir%%OutputVideo%"
@@ -259,14 +257,14 @@ if /i "%codec%"=="VTM" set CompareVideo="%movie_dir%%OutputVideoNoExt%.mp4"
 if /i "%codec%"=="VVenC" set CompareVideo="%movie_dir%%OutputVideoNoExt%.mp4"
 if /i "%codec%"=="xvc" set CompareVideo="%movie_dir%%OutputVideoNoExt%.mp4"
 
-find "Parsed_ssim" "%log_dir%%OutputVideoNoExt%_ssim(%CompareBitDepth%)_log%pass_orig%.txt">nul 2>&1 || set SSIM_check=1
-if not exist "%log_dir%%OutputVideoNoExt%_ssim(%CompareBitDepth%)_verbose_log.txt" set SSIM_check=1
-if not exist "%log_dir%%OutputVideoNoExt%_psnr(%CompareBitDepth%)_verbose_log.txt" set SSIM_check=1
-find "VMAF score" "%log_dir%%OutputVideoNoExt%_vmaf(%CompareBitDepth%).json">nul 2>&1 || set VMAF_check=1
-find "MS-SSIM score" "%log_dir%%OutputVideoNoExt%_vmaf(%CompareBitDepth%).json">nul 2>&1 || set VMAF_check=1
-if not exist "%log_dir%%OutputVideoNoExt%_vmaf(%CompareBitDepth%).json" set VMAF_check=1
+find "Parsed_ssim" "%log_dir%%OutputVideoNoExt%_metric(%CompareBitDepth%)_log%pass_orig%.txt">nul 2>&1 || set Metric_calculation=1
+if not exist "%log_dir%%OutputVideoNoExt%_ssim(%CompareBitDepth%)_verbose_log.txt" set Metric_calculation=1
+if not exist "%log_dir%%OutputVideoNoExt%_psnr(%CompareBitDepth%)_verbose_log.txt" set Metric_calculation=1
+find "VMAF score" "%log_dir%%OutputVideoNoExt%_vmaf(%CompareBitDepth%).json">nul 2>&1 || set Metric_calculation=1
+find "MS-SSIM score" "%log_dir%%OutputVideoNoExt%_vmaf(%CompareBitDepth%).json">nul 2>&1 || set Metric_calculation=1
+if not exist "%log_dir%%OutputVideoNoExt%_vmaf(%CompareBitDepth%).json" set Metric_calculation=1
 
-if not "%SSIM_check%"=="1" if not "%VMAF_check%"=="1" goto FrameCount_check_skip
+if not "%Metric_calculation%"=="1" goto FrameCount_check_skip
 rem 入力動画と出力動画のフレーム数が一致しているか調べる
 pushd "%~dp0tools\"
 FOR /f "DELIMS=" %%i IN ('.\ffprobe.exe -v error -count_frames -select_streams v:0 -show_entries stream^=nb_read_frames -of default^=nokey^=1:noprint_wrappers^=1 %CompareVideo%') DO SET "FrameCount_CompareVideo=%%i"
@@ -279,49 +277,26 @@ if not "%FrameCount%"=="%FrameCount_CompareVideo%" (
 )
 :FrameCount_check_skip
 
-pushd "%log_dir%"
-if "%SSIM_check%"=="1" if not "%enc_error%"=="1" (
-   call echo %MessageSSIMCompare%
-   echo %MessagePleaseWait%
-   %view_args64% %ffmpeg% -r %frame_rate% -i %CompareVideo% -an %ComparePixelFormat% -strict -2 -f yuv4mpegpipe - 2>"%OutputVideoNoExt%_ssim(%CompareBitDepth%)_pipelog%pass_orig%.txt" | %view_args64% %ffmpeg% -i - -r %frame_rate% -i "%InputVideo%" -lavfi %ffmpeg_ssim_option% -an -f null - >"%OutputVideoNoExt%_ssim(%CompareBitDepth%)_log%pass_orig%.txt" 2>&1
-   move /y "%random32%_ssim(%CompareBitDepth%)_verbose_log.txt" "%log_dir%%OutputVideoNoExt%_ssim(%CompareBitDepth%)_verbose_log.txt" >nul
-   move /y "%random32%_psnr(%CompareBitDepth%)_verbose_log.txt" "%log_dir%%OutputVideoNoExt%_psnr(%CompareBitDepth%)_verbose_log.txt" >nul
-   echo.
-)
-find "Parsed_ssim" "%OutputVideoNoExt%_ssim(%CompareBitDepth%)_log%pass_orig%.txt">nul 2>&1
-if not "%ERRORLEVEL%"=="0" if not "%enc_error%"=="1" (
-   echo %MessageSSIMCompareError%
-   echo %date% %time%>>%error_log%
-   echo %MessageSSIMCompareError% >>%error_log%
-   echo Input video>>%error_log%
-   echo "%InputVideo%">>%error_log%
-   echo Comparison video>>%error_log%
-   echo "%movie_dir%%OutputVideo%">>%error_log%
-   echo.>>%error_log%
-   set Compare_error=1
-   echo.
-   timeout /T %wait%
-)
-popd
-
 set "vmaf_model_file=vmaf_v0.6.1.pkl"
 if %Height% GTR 2000 set "vmaf_model_file=vmaf_4k_v0.6.1.pkl"
 for %%i in (%ffmpeg_VMAF%) do set "vmaf_model_dir=%%~dpi\model"
 pushd %vmaf_model_dir%
-set ffmpeg_vmaf_option="libvmaf=model_path=%vmaf_model_file%:ms_ssim=1:log_fmt=json:log_path='%random32%_vmaf(%CompareBitDepth%).json'"
-
-if "%VMAF_check%"=="1" if not "%enc_error%"=="1" (
-   call echo %MessageVMAFCompare%
+set ffmpeg_metric_option="ssim='%random32%_ssim(%CompareBitDepth%)_verbose_log.txt';[0:v][1:v]psnr='%random32%_psnr(%CompareBitDepth%)_verbose_log.txt';[0:v][1:v]libvmaf=model_path=%vmaf_model_file%:ms_ssim=1:log_fmt=json:log_path='%random32%_vmaf(%CompareBitDepth%).json'"
+if "%Metric_calculation%"=="1" if not "%enc_error%"=="1" (
+   call echo %MessageMetricCompare%
    echo %MessagePleaseWait%
-   %view_args64% %ffmpeg% -r %frame_rate% -i %CompareVideo% -an %ComparePixelFormat% -strict -2 -f yuv4mpegpipe - 2>"%log_dir%%OutputVideoNoExt%_vmaf(%CompareBitDepth%)_pipelog%pass_orig%.txt" | %view_args64% %ffmpeg_VMAF% -i - -r %frame_rate% -i "%InputVideo%" -filter_complex %ffmpeg_vmaf_option% -an -f null - >"%log_dir%%OutputVideoNoExt%_vmaf(%CompareBitDepth%)_log%pass_orig%.txt" 2>&1
+   %view_args64% %ffmpeg% -r %frame_rate% -i %CompareVideo% -an %ComparePixelFormat% -strict -2 -f yuv4mpegpipe - 2>"%OutputVideoNoExt%_ssim(%CompareBitDepth%)_pipelog%pass_orig%.txt" | %view_args64% %ffmpeg% -i - -r %frame_rate% -i "%InputVideo%" -filter_complex %ffmpeg_metric_option% -an -f null - >"%log_dir%%OutputVideoNoExt%_metric(%CompareBitDepth%)_log%pass_orig%.txt" 2>&1
+   move /y "%random32%_ssim(%CompareBitDepth%)_verbose_log.txt" "%log_dir%%OutputVideoNoExt%_ssim(%CompareBitDepth%)_verbose_log.txt" >nul
+   move /y "%random32%_psnr(%CompareBitDepth%)_verbose_log.txt" "%log_dir%%OutputVideoNoExt%_psnr(%CompareBitDepth%)_verbose_log.txt" >nul
    echo.
 )
 if exist "%random32%_vmaf(%CompareBitDepth%).json" move /Y "%random32%_vmaf(%CompareBitDepth%).json" "%log_dir%%OutputVideoNoExt%_vmaf(%CompareBitDepth%).json" >nul
-find "VMAF score" "%log_dir%%OutputVideoNoExt%_vmaf(%CompareBitDepth%).json">nul 2>&1
-if not "%ERRORLEVEL%"=="0" if not "%enc_error%"=="1" (
-   echo %MessageVMAFCompareError%
+find "VMAF score" "%log_dir%%OutputVideoNoExt%_vmaf(%CompareBitDepth%).json" >nul 2>&1 || set CompareError=1
+find "Parsed_ssim" "%log_dir%%OutputVideoNoExt%_metric(%CompareBitDepth%)_log%pass_orig%.txt">nul 2>&1 || set CompareError=1
+if "%CompareError%"=="1" if not "%enc_error%"=="1" (
+   echo %MessageMetricCompareError%
    echo %date% %time%>>%error_log%
-   echo %MessageVMAFCompareError% >>%error_log%
+   echo %MessageMetricCompareError% >>%error_log%
    echo Input video>>%error_log%
    echo "%InputVideo%">>%error_log%
    echo Comparison video>>%error_log%
@@ -335,8 +310,8 @@ popd
 
 pushd "%log_dir%"
 if not "%enc_error%"=="1" if not "%Compare_error%"=="1" (
-   for /f "DELIMS=" %%i IN ('find "Parsed_ssim" "%OutputVideoNoExt%_ssim(%CompareBitDepth%)_log%pass_orig%.txt"') DO SET "Parsed_ssim=%%i"
-   for /f "DELIMS=" %%i IN ('find "Parsed_psnr" "%OutputVideoNoExt%_ssim(%CompareBitDepth%)_log%pass_orig%.txt"') DO SET "Parsed_psnr=%%i"
+   for /f "DELIMS=" %%i IN ('find "Parsed_ssim" "%OutputVideoNoExt%_metric(%CompareBitDepth%)_log%pass_orig%.txt"') DO SET "Parsed_ssim=%%i"
+   for /f "DELIMS=" %%i IN ('find "Parsed_psnr" "%OutputVideoNoExt%_metric(%CompareBitDepth%)_log%pass_orig%.txt"') DO SET "Parsed_psnr=%%i"
 )
 if not "%enc_error%"=="1" if not "%Compare_error%"=="1" (
    for /f "tokens=5" %%i in ("%Parsed_ssim%") do set "SSIM_Y=%%i"
