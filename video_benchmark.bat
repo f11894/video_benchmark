@@ -258,8 +258,6 @@ if /i "%codec%"=="VVenC" set CompareVideo="%movie_dir%%OutputVideoNoExt%.mp4"
 if /i "%codec%"=="xvc" set CompareVideo="%movie_dir%%OutputVideoNoExt%.mp4"
 
 find "Parsed_ssim" "%log_dir%%OutputVideoNoExt%_metric(%CompareBitDepth%)_log%pass_orig%.txt">nul 2>&1 || set Metric_calculation=1
-if not exist "%log_dir%%OutputVideoNoExt%_ssim(%CompareBitDepth%)_verbose_log.txt" set Metric_calculation=1
-if not exist "%log_dir%%OutputVideoNoExt%_psnr(%CompareBitDepth%)_verbose_log.txt" set Metric_calculation=1
 find "VMAF score" "%log_dir%%OutputVideoNoExt%_vmaf(%CompareBitDepth%).json">nul 2>&1 || set Metric_calculation=1
 find "MS-SSIM score" "%log_dir%%OutputVideoNoExt%_vmaf(%CompareBitDepth%).json">nul 2>&1 || set Metric_calculation=1
 if not exist "%log_dir%%OutputVideoNoExt%_vmaf(%CompareBitDepth%).json" set Metric_calculation=1
@@ -281,13 +279,11 @@ set "vmaf_model_file=vmaf_v0.6.1.pkl"
 if %Height% GTR 2000 set "vmaf_model_file=vmaf_4k_v0.6.1.pkl"
 for %%i in (%ffmpeg_VMAF%) do set "vmaf_model_dir=%%~dpi\model"
 pushd %vmaf_model_dir%
-set ffmpeg_metric_option="ssim='%random32%_ssim(%CompareBitDepth%)_verbose_log.txt';[0:v][1:v]psnr='%random32%_psnr(%CompareBitDepth%)_verbose_log.txt';[0:v][1:v]libvmaf=model_path=%vmaf_model_file%:ms_ssim=1:log_fmt=json:log_path='%random32%_vmaf(%CompareBitDepth%).json'"
+set ffmpeg_metric_option="ssim;[0:v][1:v]psnr;[0:v][1:v]libvmaf=model_path=%vmaf_model_file%:ms_ssim=1:log_fmt=json:log_path='%random32%_vmaf(%CompareBitDepth%).json'"
 if "%Metric_calculation%"=="1" if not "%enc_error%"=="1" (
    call echo %MessageMetricCompare%
    echo %MessagePleaseWait%
    %view_args64% %ffmpeg% -r %frame_rate% -i %CompareVideo% -an %ComparePixelFormat% -strict -2 -f yuv4mpegpipe - 2>"%log_dir%%OutputVideoNoExt%_metric(%CompareBitDepth%)_pipelog%pass_orig%.txt" | %view_args64% %ffmpeg% -i - -r %frame_rate% -i "%InputVideo%" -filter_complex %ffmpeg_metric_option% -an -f null - >"%log_dir%%OutputVideoNoExt%_metric(%CompareBitDepth%)_log%pass_orig%.txt" 2>&1
-   move /y "%random32%_ssim(%CompareBitDepth%)_verbose_log.txt" "%log_dir%%OutputVideoNoExt%_ssim(%CompareBitDepth%)_verbose_log.txt" >nul
-   move /y "%random32%_psnr(%CompareBitDepth%)_verbose_log.txt" "%log_dir%%OutputVideoNoExt%_psnr(%CompareBitDepth%)_verbose_log.txt" >nul
    echo.
 )
 if exist "%random32%_vmaf(%CompareBitDepth%).json" move /Y "%random32%_vmaf(%CompareBitDepth%).json" "%log_dir%%OutputVideoNoExt%_vmaf(%CompareBitDepth%).json" >nul
