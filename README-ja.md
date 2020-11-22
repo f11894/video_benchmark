@@ -41,6 +41,12 @@ Example: video_benchmark.bat -codec x264 -i input.y4m -o output.mp4 -cmd "--crf 
 3. 全て変換し終わったらobjective-1-fastフォルダをcsv_ave.batにドロップしてcsvの平均値を算出します  
 4. objective-1-fastフォルダ内にobjective-1-fast_benchmark_logというフォルダが作成されているので、そのフォルダをplot.batにドロップしてグラフを作成します  
 
+BD-Rateを算出したい場合  
+1. AnacondaをインストールしてPythonのパスを通してください  
+2. コマンドプロンプトで「pip install Numpy matplotlib scipy」を実行します  
+3. 複数のコーデックの比較をしたい場合はbenchmark_logフォルダをbd_rate.batにドラッグ&ドロップ、特定のエンコーダーの各presetの比較をしたい場合は.bddataファイルをbd_rate.batにドラッグ&ドロップしてください  
+BD-Rateについてはは[こちらの記事](https://qiita.com/saka1_p/items/971c95049416f034342d)を参照してください  
+
 ### 注意点  
 10bitでベンチマークする際はvideo_benchmark.batのComparePixelFormatをyuv420pからyuv420p10leに書き換えてください(8bitと10bitの混在したベンチマークの場合も)  
 
