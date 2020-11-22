@@ -77,7 +77,7 @@ if "%ArgumentError%"=="1" (
 for %%i in ("%InputVideo%") do set "InputVideoNoExt=%%~ni"
 for %%i in ("%InputVideo%") do set "InputVideo=%%~dpnxi"
 for %%i in ("%OutputVideo%") do set "OutputVideoNoExt=%%~ni"
-if defined CsvNameSuffix set "CsvNameSuffix=_%CsvNameSuffix%"
+if defined CsvNameSuffix set "CsvNameSuffix2=_%CsvNameSuffix%"
 
 for %%i in ("%OutputVideo%") do set "movie_dir=%%~dpi"
 for %%i in ("%OutputVideo%") do set "OutputVideo=%%~nxi"
@@ -115,7 +115,7 @@ pushd "%movie_dir%"
 :enc_process
 rem エンコード前の下処理
 set "CommandLine=%CommandLine_orig%"
-set "CsvName=%codec%%CsvNameSuffix%"
+set "CsvName=%codec%%CsvNameSuffix2%"
 set "CompareBitDepth=Unspecified"
 echo "%ComparePixelFormat%"|find "yuv420p" >nul&&set "CompareBitDepth=8bit"
 echo "%ComparePixelFormat%"|find "yuv420p10le" >nul&&set "CompareBitDepth=10bit"
@@ -336,6 +336,7 @@ if not "%enc_error%"=="1" if not "%Compare_error%"=="1" (
 if not "%enc_error%"=="1" if not "%Compare_error%"=="1" (
    if not exist "%InputVideoNoExt%_%CsvName%_(%CompareBitDepth%).csv" echo Filename,bitrate,bpp,PSNR_Y,PSNR_Average,SSIM_Y,SSIM_All,VMAF,MS-SSIM,fps,Sec,CommandLine>"%InputVideoNoExt%_%CsvName%_(%CompareBitDepth%).csv"
    echo "%OutputVideo%",%bitrate%,%bpp%,%PSNR_Y%,%PSNR_Average%,%SSIM_Y%,%SSIM_All%,%VMAF%,%MS-SSIM%,%fps%,%Sec%,"%CommandLine_orig%"|%safetee% -a "%InputVideoNoExt%_%CsvName%_(%CompareBitDepth%).csv" >nul
+   find "('%codec%', %Sec%, '%CsvNameSuffix%', 0, %bitrate%, %VMAF%, %PSNR_Y%, %SSIM_Y%, %MS-SSIM%,)," "%InputVideoNoExt%_%codec%_(%CompareBitDepth%).bddata" >nul 2>&1 || set /P "x=('%codec%', %Sec%, '%CsvNameSuffix%', 0, %bitrate%, %VMAF%, %PSNR_Y%, %SSIM_Y%, %MS-SSIM%,),"<NUL >>"%InputVideoNoExt%_%codec%_(%CompareBitDepth%).bddata"
 )
 
 copy /Y "%InputVideoNoExt%_%CsvName%_(%CompareBitDepth%).csv" "%TEMP%\temp_%random32%.txt">nul
