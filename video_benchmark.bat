@@ -332,7 +332,7 @@ if not "%enc_error%"=="1" if not "%Compare_error%"=="1" (
 if not "%enc_error%"=="1" if not "%Compare_error%"=="1" (
    if not exist "%InputVideoNoExt%_%CsvName%_(%CompareBitDepth%).csv" echo Filename,bitrate,bpp,PSNR_Y,PSNR_Average,SSIM_Y,SSIM_All,VMAF,MS-SSIM,fps,Sec,CommandLine>"%InputVideoNoExt%_%CsvName%_(%CompareBitDepth%).csv"
    echo "%OutputVideo%",%bitrate%,%bpp%,%PSNR_Y%,%PSNR_Average%,%SSIM_Y%,%SSIM_All%,%VMAF%,%MS-SSIM%,%fps%,%Sec%,"%CommandLine_orig%"|%safetee% -a "%InputVideoNoExt%_%CsvName%_(%CompareBitDepth%).csv" >nul
-   find "('%codec%', %Sec%, '%CsvNameSuffix%', 0, %bitrate%, %VMAF%, %PSNR_Y%, %SSIM_Y%, %MS-SSIM%,)," "%InputVideoNoExt%_%codec%_(%CompareBitDepth%).bddata" >nul 2>&1 || set /P "x=('%codec%', %Sec%, '%CsvNameSuffix%', 0, %bitrate%, %VMAF%, %PSNR_Y%, %SSIM_Y%, %MS-SSIM%,),"<NUL >>"%InputVideoNoExt%_%codec%_(%CompareBitDepth%).bddata"
+   find "('%codec%', %Sec%, '%CsvNameSuffix%', 0, %bitrate%, %VMAF%, %PSNR_Y%, %SSIM_Y%, %MS-SSIM%)," "%InputVideoNoExt%_%codec%_(%CompareBitDepth%).bddata" >nul 2>&1 || set /P "x=('%codec%', %Sec%, '%CsvNameSuffix%', 0, %bitrate%, %VMAF%, %PSNR_Y%, %SSIM_Y%, %MS-SSIM%),"<NUL >>"%InputVideoNoExt%_%codec%_(%CompareBitDepth%).bddata"
 )
 
 copy /Y "%InputVideoNoExt%_%CsvName%_(%CompareBitDepth%).csv" "%TEMP%\temp_%random32%.txt">nul
