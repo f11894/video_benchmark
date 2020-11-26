@@ -35,13 +35,13 @@ The included preset bat provides more specific instructions.
 Alternatively, drag and drop the video file into the preset bat.  
 After encoding, drag and drop the "benchmark_log" folder into plot.bat to make the plot.  
 
-If you want to calculate the average value of multiple files  
+How to calculate the average value of multiple files  
 1. Download and unzip the dataset, for example, objective-1-fast, from [here](https://media.xiph.org/video/derf/)  
 2. Next, select all the y4m files in the objective-1-fast folder and convert them with an appropriate preset.  
 3. After all conversions are done, drop the objective-1-fast folder into csv_ave.bat and calculate the average value of csv  
 4. In the objective-1-fast folder, a folder called objective-1-fast_benchmark_log is created, so drop that folder into plot.bat to make a plot  
 
-If you want to calculate the BD-Rate  
+How to calculate the BD-Rate  
 1. Install Anaconda and set the Python path to environment variables  
 2. Run "pip install Numpy matplotlib scipy" at the command prompt  
 3. Drag and drop the benchmark_log folder to bd_rate.bat if you want to compare multiple codecs, or drag and drop the .bddata file to bd_rate.bat if you want to compare each preset of a specific encoder  
