@@ -37,7 +37,7 @@ Example: video_benchmark.bat -codec x264 -i input.y4m -o output.mp4 -cmd "--crf 
 
 複数ファイルの平均値を算出したい場合  
 1. 例えば[ここ](https://media.xiph.org/video/derf/)からobjective-1-fastなどのdatasetをダウンロードして解凍します  
-2. 次にobjective-1-fastフォルダ内のy4mを全て選択して適当なプリセットで変換します  
+2. objective-1-fastフォルダ内のy4mを全て選択して任意のプリセットで変換します  
 3. 全て変換し終わったらobjective-1-fastフォルダをcsv_ave.batにドロップしてcsvの平均値を算出します  
 4. objective-1-fastフォルダ内にobjective-1-fast_benchmark_logというフォルダが作成されているので、そのフォルダをplot.batにドロップしてグラフを作成します  
 

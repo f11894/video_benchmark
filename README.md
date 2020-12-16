@@ -37,7 +37,7 @@ After encoding, drag and drop the "benchmark_log" folder into plot.bat to make t
 
 How to calculate the average value of multiple files  
 1. Download and unzip the dataset, for example, objective-1-fast, from [here](https://media.xiph.org/video/derf/)  
-2. Next, select all the y4m files in the objective-1-fast folder and convert them with an appropriate preset.  
+2. select all the y4m files in the objective-1-fast folder and convert them with any preset.  
 3. After all conversions are done, drop the objective-1-fast folder into csv_ave.bat and calculate the average value of csv  
 4. In the objective-1-fast folder, a folder called objective-1-fast_benchmark_log is created, so drop that folder into plot.bat to make a plot  
 
