@@ -45,7 +45,7 @@ How to calculate the BD-Rate
 1. Install Anaconda and set the Python path to environment variables  
 2. Run "pip install Numpy matplotlib scipy" at the command prompt  
 3. Drag and drop the benchmark_log folder to bd_rate.bat if you want to compare multiple codecs, or drag and drop the .bddata file to bd_rate.bat if you want to compare each preset of a specific encoder  
-For more information about BD-Rate, see [this article](https://streaminglearningcenter.com/encoding/compute-bd-rate-functions.html).  
+For more information about BD-Rate, see [this article](https://ottverse.com/what-is-bd-rate-bd-psnr-calculation-interpretation/).  
 
 ### important point  
 When benchmarking with 10bit, rewrite ComparePixelFormat in video_benchmark.bat from yuv420p to yuv420p10le (even in the case of 8bit and 10bit mixed benchmarks)
