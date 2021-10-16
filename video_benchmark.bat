@@ -37,6 +37,7 @@ if not defined SVT-HEVC set SVT-HEVC="%~dp0tools\SvtHevcEncApp.exe"
 if not defined VTMenc set VTMenc="%~dp0tools\vtm\EncoderApp.exe"
 if not defined VTMdec set VTMdec="%~dp0tools\vtm\DecoderApp.exe"
 if not defined VVenC set VVenC="%~dp0tools\VVenC\vvencapp.exe"
+if not defined VVdeC set VVdeC="%~dp0tools\VVdeC\vvdecapp.exe"
 if not defined xvcenc set xvcenc="%~dp0tools\xvcenc.exe"
 if not defined xvcdec set xvcdec="%~dp0tools\xvcdec.exe"
 rem ------------------------------------------------------------------------------------------------
@@ -198,15 +199,10 @@ if not "%enc_skip%"=="1" (
 if "%multipass%"=="1" if not "%enc_skip%"=="1" if not "%pass_temp%"=="%pass_orig%" if exist %ErrorCheckFile% del %ErrorCheckFile%
 
 rem そのままではFFmpegで扱えないビットストリームを可逆圧縮のH.264にデコードする
+if /i "%codec%"=="VTM" set vvc_codec=1
+if /i "%codec%"=="VVenC" set vvc_codec=1
 if not "%enc_error%"=="1" if not exist "%movie_dir%%OutputVideoNoExt%.mp4" (
-   if /i "%codec%"=="VTM" (
-      %VTMdec% -d %EncodeBitDepth% -b "%movie_dir%%OutputVideo%" -o "%movie_dir%%OutputVideoNoExt%.yuv" 2>&1 | %safetee% -a "%log_dir%%OutputVideoNoExt%_log%pass_temp%.txt"
-      %view_args64% %ffmpeg% -y -f rawvideo -s %video_size% -r %frame_rate% %EncodePixelFormat% -i "%movie_dir%%OutputVideoNoExt%.yuv" -vcodec libx264 -qp 0 "%movie_dir%%OutputVideoNoExt%.mp4" >>"%log_dir%%OutputVideoNoExt%_log%pass_temp%.txt" 2>&1 &&del "%movie_dir%%OutputVideoNoExt%.yuv"
-   )
-   if /i "%codec%"=="VVenC" (
-      %VTMdec% -d %EncodeBitDepth% -b "%movie_dir%%OutputVideo%" -o "%movie_dir%%OutputVideoNoExt%.yuv" 2>&1 | %safetee% -a "%log_dir%%OutputVideoNoExt%_log%pass_temp%.txt"
-      %view_args64% %ffmpeg% -y -f rawvideo -s %video_size% -r %frame_rate% %EncodePixelFormat% -i "%movie_dir%%OutputVideoNoExt%.yuv" -vcodec libx264 -qp 0 "%movie_dir%%OutputVideoNoExt%.mp4" >>"%log_dir%%OutputVideoNoExt%_log%pass_temp%.txt" 2>&1 &&del "%movie_dir%%OutputVideoNoExt%.yuv"
-   )
+   if "%vvc_codec%"=="1" %view_args64% %VVdeC% -b "%movie_dir%%OutputVideo%" --y4m -o - 2>>"%log_dir%%OutputVideoNoExt%_pipelog%pass_temp%.txt" | %view_args64% %ffmpeg% -y -r %frame_rate% -i - -vcodec libx264 -qp 0 "%movie_dir%%OutputVideoNoExt%.mp4" >>"%log_dir%%OutputVideoNoExt%_log%pass_temp%.txt" 2>&1
    if /i "%codec%"=="xvc" (
       %xvcdec% -bitstream-file "%movie_dir%%OutputVideo%" -output-file "%movie_dir%%OutputVideoNoExt%.yuv" 2>&1 | %safetee% -a "%log_dir%%OutputVideoNoExt%_log%pass_temp%.txt"
       %view_args64% %ffmpeg% -y -f rawvideo -s %video_size% -r %frame_rate% %EncodePixelFormat% -i "%movie_dir%%OutputVideoNoExt%.yuv" -vcodec libx264 -qp 0 "%movie_dir%%OutputVideoNoExt%.mp4" >>"%log_dir%%OutputVideoNoExt%_log%pass_temp%.txt" 2>&1 &&del "%movie_dir%%OutputVideoNoExt%.yuv"
