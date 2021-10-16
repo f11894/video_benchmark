@@ -4,6 +4,9 @@
 PSNR、SSIM、VMAFのスコアを算出してcsvに出力したりグラフを作成することが出来ます  
 エンコード速度の計測や自動マルチパスエンコード機能もあります  
 
+付属されているエンコーダーより新しいものを入手したい場合こちらから入手出来ます  
+https://drive.google.com/drive/folders/1fEwt2W2r5lh7zvv7ttog2u3Jt8M-ezfh
+
 ### 使い方
 
 ```console

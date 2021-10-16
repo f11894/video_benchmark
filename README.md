@@ -4,6 +4,9 @@ bat files that benchmark the performance of various encoders
 You can calculate PSNR, SSIM and VMAF scores and output them to csv to make a plot.  
 There is also an encoding speed measurement and an automatic multipath encoding function.  
 
+If you want something newer than the included encoder binary, you can download it from this link.  
+https://drive.google.com/drive/folders/1fEwt2W2r5lh7zvv7ttog2u3Jt8M-ezfh
+
 ### Usage
 
 ```console
