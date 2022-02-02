@@ -252,8 +252,8 @@ if /i "%codec%"=="VVenC" set CompareVideo="%movie_dir%%OutputVideoNoExt%.mp4"
 if /i "%codec%"=="xvc" set CompareVideo="%movie_dir%%OutputVideoNoExt%.mp4"
 
 find "Parsed_ssim" "%log_dir%%OutputVideoNoExt%_metric(%CompareBitDepth%)_log%pass_orig%.txt">nul 2>&1 || set Metric_calculation=1
-findstr /C:"metric name=\"vmaf\"" "%log_dir%%OutputVideoNoExt%_vmaf(%CompareBitDepth%).xml">nul 2>&1 || set Metric_calculation=1
-findstr /C:"metric name=\"ms_ssim\"" "%log_dir%%OutputVideoNoExt%_vmaf(%CompareBitDepth%).xml">nul 2>&1 || set Metric_calculation=1
+find "metric name=""vmaf""" "%log_dir%%OutputVideoNoExt%_vmaf(%CompareBitDepth%).xml">nul 2>&1 || set Metric_calculation=1
+find "metric name=""ms_ssim""" "%log_dir%%OutputVideoNoExt%_vmaf(%CompareBitDepth%).xml">nul 2>&1 || set Metric_calculation=1
 if not exist "%log_dir%%OutputVideoNoExt%_vmaf(%CompareBitDepth%).xml" set Metric_calculation=1
 
 if not "%Metric_calculation%"=="1" goto FrameCount_check_skip
@@ -281,7 +281,7 @@ if "%Metric_calculation%"=="1" if not "%enc_error%"=="1" (
    echo.
 )
 if exist "%random32%_vmaf(%CompareBitDepth%).xml" move /Y "%random32%_vmaf(%CompareBitDepth%).xml" "%log_dir%%OutputVideoNoExt%_vmaf(%CompareBitDepth%).xml" >nul
-findstr /C:"metric name=\"vmaf\"" "%log_dir%%OutputVideoNoExt%_vmaf(%CompareBitDepth%).xml" >nul 2>&1 || set CompareError=1
+find "metric name=""vmaf""" "%log_dir%%OutputVideoNoExt%_vmaf(%CompareBitDepth%).xml">nul 2>&1 || set CompareError=1
 find "Parsed_ssim" "%log_dir%%OutputVideoNoExt%_metric(%CompareBitDepth%)_log%pass_orig%.txt">nul 2>&1 || set CompareError=1
 if "%CompareError%"=="1" if not "%enc_error%"=="1" (
    echo %MessageMetricCompareError%
@@ -308,8 +308,8 @@ if not "%enc_error%"=="1" if not "%Compare_error%"=="1" (
    for /f "tokens=11" %%i in ("%Parsed_ssim%") do set "SSIM_All=%%i"
    for /f "tokens=5" %%i in ("%Parsed_psnr%") do set "PSNR_Y=%%i"
    for /f "tokens=8" %%i in ("%Parsed_psnr%") do set "PSNR_Average=%%i"
-   FOR /f tokens^=8^ delims^=^" %%i IN ('findstr /C:"metric name=\"vmaf\"" "%log_dir%%OutputVideoNoExt%_vmaf(%CompareBitDepth%).xml"') DO SET "VMAF=%%i"
-   FOR /f tokens^=8^ delims^=^" %%i IN ('findstr /C:"metric name=\"ms_ssim\"" "%log_dir%%OutputVideoNoExt%_vmaf(%CompareBitDepth%).xml"') DO SET "MS-SSIM=%%i"
+   FOR /f tokens^=8^ delims^=^" %%i IN ('find "metric name=""vmaf""" "%log_dir%%OutputVideoNoExt%_vmaf(%CompareBitDepth%).xml"') DO SET "VMAF=%%i"
+   FOR /f tokens^=8^ delims^=^" %%i IN ('find "metric name=""ms_ssim""" "%log_dir%%OutputVideoNoExt%_vmaf(%CompareBitDepth%).xml"') DO SET "MS-SSIM=%%i"
 )
 if not "%enc_error%"=="1" if not "%Compare_error%"=="1" (
    set "SSIM_Y=%SSIM_Y:~2%"
