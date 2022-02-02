@@ -19,6 +19,7 @@ set ffmpeg="%~dp0tools\ffmpeg.exe"
 set ffmpeg_VMAF="%~dp0tools\ffmpeg.exe"
 set timer64="%~dp0tools\timer64.exe"
 set view_args64="%~dp0tools\view_args64.exe"
+set safetee="%~dp0tools\safetee.exe"
 set busybox64="%~dp0tools\busybox64.exe"
 set mp4box="%~dp0tools\mp4box\mp4box.exe"
 if not defined ffmpeg_enc set ffmpeg_enc=%ffmpeg%
@@ -144,35 +145,35 @@ if not exist "%movie_dir%%OutputVideo%" (
    if exist "%log_dir%%OutputVideoNoExt%_pipelog%pass_temp%.txt" del "%log_dir%%OutputVideoNoExt%_pipelog%pass_temp%.txt"
 
    if "%multipass%"=="1" echo %MessageMultiPass% %pass_temp%/%pass_orig%&&echo.
-   if /i "%codec%"=="QSVEncC" %timer64% "%QSVEncC%" -i "%InputVideo%" %CommandLine% -o "%movie_dir%%OutputVideo%" 2>&1 | %busybox64% tee "%log_dir%%OutputVideoNoExt%_log%pass_temp%.txt"
-   if /i "%codec%"=="VCEEncC" %timer64% "%VCEEncC%" -i "%InputVideo%" %CommandLine% -o "%movie_dir%%OutputVideo%" 2>&1 | %busybox64% tee "%log_dir%%OutputVideoNoExt%_log%pass_temp%.txt"
-   if /i "%codec%"=="NVEncC" %timer64% "%NVEncC%" -i "%InputVideo%" %CommandLine% -o "%movie_dir%%OutputVideo%" 2>&1 | %busybox64% tee "%log_dir%%OutputVideoNoExt%_log%pass_temp%.txt"
-   if /i "%codec%"=="FFmpeg" %timer64% %ffmpeg_enc% -y -i "%InputVideo%" -an %EncodePixelFormat% %CommandLine% "%movie_dir%%OutputVideo%" 2>&1 | %busybox64% tee "%log_dir%%OutputVideoNoExt%_log%pass_temp%.txt"
-   if /i "%codec%"=="x264" %view_args64% %ffmpeg% -y -i "%InputVideo%" -an %EncodePixelFormat% -strict -2 -f yuv4mpegpipe - 2>"%log_dir%%OutputVideoNoExt%_pipelog%pass_temp%.txt" | %timer64% %x264% %CommandLine% --demuxer y4m -o "%movie_dir%%OutputVideo%" - 2>&1 | %busybox64% tee "%log_dir%%OutputVideoNoExt%_log%pass_temp%.txt"
-   if /i "%codec%"=="x265" %view_args64% %ffmpeg% -y -i "%InputVideo%" -an %EncodePixelFormat% -strict -2 -f yuv4mpegpipe - 2>"%log_dir%%OutputVideoNoExt%_pipelog%pass_temp%.txt" | %timer64% %x265% %CommandLine% --input - --y4m "%movie_dir%%OutputVideoNoExt%.h265" 2>&1 | %busybox64% tee "%log_dir%%OutputVideoNoExt%_log%pass_temp%.txt"
+   if /i "%codec%"=="QSVEncC" %timer64% "%QSVEncC%" -i "%InputVideo%" %CommandLine% -o "%movie_dir%%OutputVideo%" 2>&1 | %safetee% -o "%log_dir%%OutputVideoNoExt%_log%pass_temp%.txt"
+   if /i "%codec%"=="VCEEncC" %timer64% "%VCEEncC%" -i "%InputVideo%" %CommandLine% -o "%movie_dir%%OutputVideo%" 2>&1 | %safetee% -o "%log_dir%%OutputVideoNoExt%_log%pass_temp%.txt"
+   if /i "%codec%"=="NVEncC" %timer64% "%NVEncC%" -i "%InputVideo%" %CommandLine% -o "%movie_dir%%OutputVideo%" 2>&1 | %safetee% -o "%log_dir%%OutputVideoNoExt%_log%pass_temp%.txt"
+   if /i "%codec%"=="FFmpeg" %timer64% %ffmpeg_enc% -y -i "%InputVideo%" -an %EncodePixelFormat% %CommandLine% "%movie_dir%%OutputVideo%" 2>&1 | %safetee% -o "%log_dir%%OutputVideoNoExt%_log%pass_temp%.txt"
+   if /i "%codec%"=="x264" %view_args64% %ffmpeg% -y -i "%InputVideo%" -an %EncodePixelFormat% -strict -2 -f yuv4mpegpipe - 2>"%log_dir%%OutputVideoNoExt%_pipelog%pass_temp%.txt" | %timer64% %x264% %CommandLine% --demuxer y4m -o "%movie_dir%%OutputVideo%" - 2>&1 | %safetee% -o "%log_dir%%OutputVideoNoExt%_log%pass_temp%.txt"
+   if /i "%codec%"=="x265" %view_args64% %ffmpeg% -y -i "%InputVideo%" -an %EncodePixelFormat% -strict -2 -f yuv4mpegpipe - 2>"%log_dir%%OutputVideoNoExt%_pipelog%pass_temp%.txt" | %timer64% %x265% %CommandLine% --input - --y4m "%movie_dir%%OutputVideoNoExt%.h265" 2>&1 | %safetee% -o "%log_dir%%OutputVideoNoExt%_log%pass_temp%.txt"
    if /i "%codec%"=="libaom" (
       %aomenc% --help | find "AOMedia Project AV1 Encoder">"%log_dir%%OutputVideoNoExt%_log%pass_temp%.txt" 2>&1 
-      %view_args64% %ffmpeg% -y -i "%InputVideo%" -an %EncodePixelFormat% -strict -2 -f yuv4mpegpipe - 2>"%log_dir%%OutputVideoNoExt%_pipelog%pass_temp%.txt" | %timer64% %aomenc% %CommandLine% -o "%movie_dir%%OutputVideoNoExt%.ivf" - 2>&1 | %busybox64% tee -a "%log_dir%%OutputVideoNoExt%_log%pass_temp%.txt"
+      %view_args64% %ffmpeg% -y -i "%InputVideo%" -an %EncodePixelFormat% -strict -2 -f yuv4mpegpipe - 2>"%log_dir%%OutputVideoNoExt%_pipelog%pass_temp%.txt" | %timer64% %aomenc% %CommandLine% -o "%movie_dir%%OutputVideoNoExt%.ivf" - 2>&1 | %safetee% -a "%log_dir%%OutputVideoNoExt%_log%pass_temp%.txt"
    )
    if /i "%codec%"=="rav1e" (
       %rav1e% --version >"%log_dir%%OutputVideoNoExt%_log%pass_temp%.txt"
-      %view_args64% %ffmpeg% -y -i "%InputVideo%" -an %EncodePixelFormat% -strict -2 -f yuv4mpegpipe - 2>"%log_dir%%OutputVideoNoExt%_pipelog%pass_temp%.txt" | %timer64% %rav1e% - %CommandLine% -o "%movie_dir%%OutputVideoNoExt%.ivf" 2>&1 | %busybox64% tee -a "%log_dir%%OutputVideoNoExt%_log%pass_temp%.txt"
+      %view_args64% %ffmpeg% -y -i "%InputVideo%" -an %EncodePixelFormat% -strict -2 -f yuv4mpegpipe - 2>"%log_dir%%OutputVideoNoExt%_pipelog%pass_temp%.txt" | %timer64% %rav1e% - %CommandLine% -o "%movie_dir%%OutputVideoNoExt%.ivf" 2>&1 | %safetee% -a "%log_dir%%OutputVideoNoExt%_log%pass_temp%.txt"
    )
-   if /i "%codec%"=="SVT-AV1" %view_args64% %ffmpeg% -y -i "%InputVideo%" -an -nostdin -f rawvideo %EncodePixelFormat% -strict -2 - 2>"%log_dir%%OutputVideoNoExt%_pipelog%pass_temp%.txt" | %timer64% %SVT-AV1% -i stdin %CommandLine% -n %FrameCount% -w %Width% -h %Height% --fps-num %frame_rate_num% --fps-denom %frame_rate_denom% -b "%movie_dir%%OutputVideoNoExt%.ivf" 2>&1 | %busybox64% tee "%log_dir%%OutputVideoNoExt%_log%pass_temp%.txt"
-   if /i "%codec%"=="SVT-HEVC" %view_args64% %ffmpeg% -y -i "%InputVideo%" -an -nostdin -f rawvideo %EncodePixelFormat% -strict -2 - 2>"%log_dir%%OutputVideoNoExt%_pipelog%pass_temp%.txt" | %timer64% %SVT-HEVC% -i stdin %CommandLine% -n %FrameCount% -w %Width% -h %Height% -fps-num %frame_rate_num% -fps-denom %frame_rate_denom% -b "%movie_dir%%OutputVideoNoExt%.h265" 2>&1 | %busybox64% tee "%log_dir%%OutputVideoNoExt%_log%pass_temp%.txt"
-   if /i "%codec%"=="SVT-VP9" %view_args64% %ffmpeg% -y -i "%InputVideo%" -an -nostdin -f rawvideo %EncodePixelFormat% -strict -2 - 2>"%log_dir%%OutputVideoNoExt%_pipelog%pass_temp%.txt" | %timer64% %SVT-VP9% -i stdin %CommandLine% -n %FrameCount% -w %Width% -h %Height% -fps-num %frame_rate_num% -fps-denom %frame_rate_denom% -b "%movie_dir%%OutputVideoNoExt%.ivf" 2>&1 | %busybox64% tee "%log_dir%%OutputVideoNoExt%_log%pass_temp%.txt"
+   if /i "%codec%"=="SVT-AV1" %view_args64% %ffmpeg% -y -i "%InputVideo%" -an -nostdin -f rawvideo %EncodePixelFormat% -strict -2 - 2>"%log_dir%%OutputVideoNoExt%_pipelog%pass_temp%.txt" | %timer64% %SVT-AV1% -i stdin %CommandLine% -n %FrameCount% -w %Width% -h %Height% --fps-num %frame_rate_num% --fps-denom %frame_rate_denom% -b "%movie_dir%%OutputVideoNoExt%.ivf" 2>&1 | %safetee% -o "%log_dir%%OutputVideoNoExt%_log%pass_temp%.txt"
+   if /i "%codec%"=="SVT-HEVC" %view_args64% %ffmpeg% -y -i "%InputVideo%" -an -nostdin -f rawvideo %EncodePixelFormat% -strict -2 - 2>"%log_dir%%OutputVideoNoExt%_pipelog%pass_temp%.txt" | %timer64% %SVT-HEVC% -i stdin %CommandLine% -n %FrameCount% -w %Width% -h %Height% -fps-num %frame_rate_num% -fps-denom %frame_rate_denom% -b "%movie_dir%%OutputVideoNoExt%.h265" 2>&1 | %safetee% -o "%log_dir%%OutputVideoNoExt%_log%pass_temp%.txt"
+   if /i "%codec%"=="SVT-VP9" %view_args64% %ffmpeg% -y -i "%InputVideo%" -an -nostdin -f rawvideo %EncodePixelFormat% -strict -2 - 2>"%log_dir%%OutputVideoNoExt%_pipelog%pass_temp%.txt" | %timer64% %SVT-VP9% -i stdin %CommandLine% -n %FrameCount% -w %Width% -h %Height% -fps-num %frame_rate_num% -fps-denom %frame_rate_denom% -b "%movie_dir%%OutputVideoNoExt%.ivf" 2>&1 | %safetee% -o "%log_dir%%OutputVideoNoExt%_log%pass_temp%.txt"
    if /i "%codec%"=="libvpx" (
       %vpxenc% --help | find "WebM Project">"%log_dir%%OutputVideoNoExt%_log%pass_temp%.txt" 2>&1 
-      %view_args64% %ffmpeg% -y -i "%InputVideo%" -an %EncodePixelFormat% -strict -2 -f yuv4mpegpipe - 2>"%log_dir%%OutputVideoNoExt%_pipelog%pass_temp%.txt" | %timer64% %vpxenc% %CommandLine% -o "%movie_dir%%OutputVideo%" - 2>&1 | %busybox64% tee -a "%log_dir%%OutputVideoNoExt%_log%pass_temp%.txt"
+      %view_args64% %ffmpeg% -y -i "%InputVideo%" -an %EncodePixelFormat% -strict -2 -f yuv4mpegpipe - 2>"%log_dir%%OutputVideoNoExt%_pipelog%pass_temp%.txt" | %timer64% %vpxenc% %CommandLine% -o "%movie_dir%%OutputVideo%" - 2>&1 | %safetee% -a "%log_dir%%OutputVideoNoExt%_log%pass_temp%.txt"
    )
    if /i "%codec%"=="VVenC" (
-       %view_args64% %ffmpeg% -i "%InputVideo%" -an %EncodePixelFormat% -f rawvideo -strict -2 - 2>"%log_dir%%OutputVideoNoExt%_pipelog%pass_temp%.txt" | %timer64% %VVenC% -i - %CommandLine% --framerate %frame_rate_integer% -s %Width%x%Height% -o "%movie_dir%%OutputVideo%" 2>&1 | %busybox64% tee -a "%log_dir%%OutputVideoNoExt%_log%pass_temp%.txt"
+       %view_args64% %ffmpeg% -i "%InputVideo%" -an %EncodePixelFormat% -f rawvideo -strict -2 - 2>"%log_dir%%OutputVideoNoExt%_pipelog%pass_temp%.txt" | %timer64% %VVenC% -i - %CommandLine% --framerate %frame_rate_integer% -s %Width%x%Height% -o "%movie_dir%%OutputVideo%" 2>&1 | %safetee% -a "%log_dir%%OutputVideoNoExt%_log%pass_temp%.txt"
    )
    if /i "%codec%"=="VTM" (
        if not exist "%movie_dir%%InputVideoNoExt%_temp%EncodeBitDepth%bit.yuv" echo %MessageIntermediateFileEncode% && %view_args64% %ffmpeg% -i "%InputVideo%" -an %EncodePixelFormat% -f rawvideo -strict -2 "%movie_dir%%InputVideoNoExt%_temp%EncodeBitDepth%bit.yuv" >"%log_dir%%OutputVideoNoExt%_log%pass_temp%.txt" 2>&1
-       %timer64% %VTMenc%  %CommandLine% -fr %frame_rate_integer% -wdt %Width% -hgt %Height% -f %FrameCount% -i "%movie_dir%%InputVideoNoExt%_temp%EncodeBitDepth%bit.yuv" -o NUL -b "%movie_dir%%OutputVideo%" 2>&1 | %busybox64% tee -a "%log_dir%%OutputVideoNoExt%_log%pass_temp%.txt"
+       %timer64% %VTMenc%  %CommandLine% -fr %frame_rate_integer% -wdt %Width% -hgt %Height% -f %FrameCount% -i "%movie_dir%%InputVideoNoExt%_temp%EncodeBitDepth%bit.yuv" -o NUL -b "%movie_dir%%OutputVideo%" 2>&1 | %safetee% -a "%log_dir%%OutputVideoNoExt%_log%pass_temp%.txt"
    )
-   if /i "%codec%"=="xvc" %view_args64% %ffmpeg% -y -i "%InputVideo%" -an %EncodePixelFormat% -strict -2 -f yuv4mpegpipe - 2>"%log_dir%%OutputVideoNoExt%_pipelog%pass_temp%.txt" | %timer64% %xvcenc% -verbose 1 -input-file - -output-file "%movie_dir%%OutputVideo%" %CommandLine% 2>&1 | %busybox64% tee "%log_dir%%OutputVideoNoExt%_log%pass_temp%.txt"
+   if /i "%codec%"=="xvc" %view_args64% %ffmpeg% -y -i "%InputVideo%" -an %EncodePixelFormat% -strict -2 -f yuv4mpegpipe - 2>"%log_dir%%OutputVideoNoExt%_pipelog%pass_temp%.txt" | %timer64% %xvcenc% -verbose 1 -input-file - -output-file "%movie_dir%%OutputVideo%" %CommandLine% 2>&1 | %safetee% -o "%log_dir%%OutputVideoNoExt%_log%pass_temp%.txt"
 ) else (
    set enc_skip=1
    echo %MessageEncodeSkip%
@@ -203,7 +204,7 @@ if /i "%codec%"=="VVenC" set vvc_codec=1
 if not "%enc_error%"=="1" if not exist "%movie_dir%%OutputVideoNoExt%.mp4" (
    if "%vvc_codec%"=="1" %view_args64% %VVdeC% -b "%movie_dir%%OutputVideo%" --y4m -o - 2>>"%log_dir%%OutputVideoNoExt%_pipelog%pass_temp%.txt" | %view_args64% %ffmpeg% -y -r %frame_rate% -i - -vcodec libx264 -qp 0 "%movie_dir%%OutputVideoNoExt%.mp4" >>"%log_dir%%OutputVideoNoExt%_log%pass_temp%.txt" 2>&1
    if /i "%codec%"=="xvc" (
-      %xvcdec% -bitstream-file "%movie_dir%%OutputVideo%" -output-file "%movie_dir%%OutputVideoNoExt%.yuv" 2>&1 | %busybox64% tee -a "%log_dir%%OutputVideoNoExt%_log%pass_temp%.txt"
+      %xvcdec% -bitstream-file "%movie_dir%%OutputVideo%" -output-file "%movie_dir%%OutputVideoNoExt%.yuv" 2>&1 | %safetee% -a "%log_dir%%OutputVideoNoExt%_log%pass_temp%.txt"
       %view_args64% %ffmpeg% -y -f rawvideo -s %video_size% -r %frame_rate% %EncodePixelFormat% -i "%movie_dir%%OutputVideoNoExt%.yuv" -vcodec libx264 -qp 0 "%movie_dir%%OutputVideoNoExt%.mp4" >>"%log_dir%%OutputVideoNoExt%_log%pass_temp%.txt" 2>&1 &&del "%movie_dir%%OutputVideoNoExt%.yuv"
    )
 )
@@ -325,7 +326,7 @@ if not "%enc_error%"=="1" if not "%Compare_error%"=="1" (
 )
 if not "%enc_error%"=="1" if not "%Compare_error%"=="1" (
    if not exist "%InputVideoNoExt%_%CsvName%_(%CompareBitDepth%).csv" echo Filename,bitrate,bpp,PSNR_Y,PSNR_Average,SSIM_Y,SSIM_All,VMAF,MS-SSIM,fps,Sec,CommandLine>"%InputVideoNoExt%_%CsvName%_(%CompareBitDepth%).csv"
-   echo "%OutputVideo%",%bitrate%,%bpp%,%PSNR_Y%,%PSNR_Average%,%SSIM_Y%,%SSIM_All%,%VMAF%,%MS-SSIM%,%fps%,%Sec%,"%CommandLine_orig%"|%busybox64% tee -a "%InputVideoNoExt%_%CsvName%_(%CompareBitDepth%).csv" >nul
+   echo "%OutputVideo%",%bitrate%,%bpp%,%PSNR_Y%,%PSNR_Average%,%SSIM_Y%,%SSIM_All%,%VMAF%,%MS-SSIM%,%fps%,%Sec%,"%CommandLine_orig%"|%safetee% -a "%InputVideoNoExt%_%CsvName%_(%CompareBitDepth%).csv" >nul
    find "('%codec%', %Sec%, '%CsvNameSuffix%', 0, %bitrate%, %VMAF%, %PSNR_Y%, %SSIM_Y%, %MS-SSIM%)," "%InputVideoNoExt%_%codec%_(%CompareBitDepth%).bddata" >nul 2>&1 || set /P "x=('%codec%', %Sec%, '%CsvNameSuffix%', 0, %bitrate%, %VMAF%, %PSNR_Y%, %SSIM_Y%, %MS-SSIM%),"<NUL >>"%InputVideoNoExt%_%codec%_(%CompareBitDepth%).bddata"
 )
 
@@ -431,7 +432,7 @@ echo %MessageEncodeErrorLine2%
 echo Input video  "%~1"
 echo Output video "%~2"
 echo CommandLine "%codec% %CommandLine%"
-echo.) | %busybox64% tee -a %error_log%
+echo.) | %safetee% -a %error_log%
 timeout /t %wait%
 exit /b
 
