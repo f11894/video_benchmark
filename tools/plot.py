@@ -5,6 +5,7 @@ import sys
 import re
 import os
 from matplotlib import rcParams
+import matplotlib.ticker
 
 rcParams['font.family'] = 'sans-serif'
 rcParams['font.sans-serif'] = ['Meiryo', 'Yu Gothic', 'DejaVu Sans']
@@ -54,6 +55,8 @@ for size in size_array:
              if metric == 'PSNR_Y' or metric == 'PSNR_Average' or metric == 'SSIM_Y' or metric == 'SSIM_All' or metric == 'VMAF' or metric == 'XPSNR_Y':
              	  plt.legend(loc='lower right')
              else:
+                plt.yscale('log')
+                plt.gca().yaxis.set_major_formatter(matplotlib.ticker.ScalarFormatter())
                 plt.legend(bbox_to_anchor=(1.01, 1), loc='upper left', borderaxespad=0)
              plt.savefig(input + '_' +  metric + '(' + BitDepth + ')' + size + '_Graph.png' ,  bbox_inches='tight')
          plt.close()
