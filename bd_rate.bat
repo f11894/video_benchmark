@@ -1,8 +1,6 @@
 @echo off
 cd "%~dp0"
-for %%i in (bd_codecs_all_variants.py,bd_codecs_sorted.py) do (
-    if not exist .\tools\%%i curl -L "https://github.com/f11894/AV1-benchmarks/raw/master/2020.11.04%%20Aomenc%%20LIF/Make%%20Plots%%E2%%81%%84BD-Rates/%%i" -o .\tools\%%i
-)
+if not exist .\tools\bd_codecs_sorted.py curl -L "https://raw.githubusercontent.com/f11894/AV1-benchmarks/master/2020.12.14%%20AOM%%20VS%%20VVC%%200.2.0%%20/Make%%20Plots%%E2%%81%%84BD-Rates/bd_codecs_sorted.py" -o .\tools\bd_codecs_sorted.py
 echo,
 set attribute=%~a1
 if %attribute:~0,1%==d goto folder
@@ -14,7 +12,6 @@ exit /b
 for %%i in ("%~1\*.bddata") do (
    call set bddatefiles=%%bddatefiles%%"%%i" 
 )
-python .\tools\bd_codecs_all_variants.py %bddatefiles%
 python .\tools\bd_codecs_sorted.py %bddatefiles%
 pause
 exit /b

@@ -17,7 +17,7 @@ for bddata_path in bddata_list:
 
 empty = ['']
 BitDepth_array = ['8bit', '10bit', 'Unspecified']
-header = ['Filename', 'bitrate', 'bpp', 'PSNR_Y', 'PSNR_Average', 'SSIM_Y', 'SSIM_All', 'VMAF', 'MS-SSIM', 'fps', 'Sec', 'CommandLine']
+header = ['Filename', 'bitrate', 'bpp', 'PSNR_Y', 'PSNR_Average', 'SSIM_Y', 'SSIM_All', 'VMAF', 'XPSNR_Y', 'fps', 'Sec', 'CommandLine']
 files = os.listdir(sys.argv[1])
 files_dir = [f for f in files if os.path.isdir(os.path.join(sys.argv[1], f))]
 for BitDepth in BitDepth_array:
