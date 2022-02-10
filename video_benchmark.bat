@@ -253,6 +253,7 @@ if /i "%codec%"=="VVenC" set CompareVideo="%movie_dir%%OutputVideoNoExt%.mp4"
 if /i "%codec%"=="xvc" set CompareVideo="%movie_dir%%OutputVideoNoExt%.mp4"
 
 find "Parsed_ssim" "%log_dir%%OutputVideoNoExt%_metric(%CompareBitDepth%)_log%pass_orig%.txt">nul 2>&1 || set Metric_calculation=1
+find "Parsed_xpsnr" "%log_dir%%OutputVideoNoExt%_metric(%CompareBitDepth%)_log%pass_orig%.txt">nul 2>&1 || set Metric_calculation=1
 find "metric name=""vmaf""" "%log_dir%%OutputVideoNoExt%_vmaf(%CompareBitDepth%).xml">nul 2>&1 || set Metric_calculation=1
 if not exist "%log_dir%%OutputVideoNoExt%_vmaf(%CompareBitDepth%).xml" set Metric_calculation=1
 
