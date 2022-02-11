@@ -6,6 +6,7 @@ import re
 import os
 from matplotlib import rcParams
 import matplotlib.ticker
+from adjustText import adjust_text
 
 rcParams['font.family'] = 'sans-serif'
 rcParams['font.sans-serif'] = ['Meiryo', 'Yu Gothic', 'DejaVu Sans']
@@ -32,6 +33,10 @@ for BitDepth in BitDepth_array:
           x_txt = data[:,0]
           y_txt = data[:,row]
           plt.plot(x_txt,y_txt , label = codec_name , marker=markers[MNum])
+          if metric == 'fps' or metric == 'Sec':
+             plt.yscale('log')
+             texts = [plt.text(x_txt[i], y_txt[i], (f'{y_txt[i]:.3f}'), ha='center', va='center') for i in range(len(x_txt))]
+             adjust_text(texts)
           MNum = MNum + 1
       if csvFileExist:
           plt.title(input)
@@ -49,9 +54,9 @@ for BitDepth in BitDepth_array:
           	  plt.savefig(input + '_' +  metric + '(' + BitDepth + ')'  + '_Graph.png' ,  bbox_inches='tight')
           else:
              plt.legend(bbox_to_anchor=(1.01, 1), loc='upper left', borderaxespad=0)
-             plt.savefig(input + '_' +  metric + '(' + BitDepth + ')'  + '_Graph.png' ,  bbox_inches='tight')
-             plt.yscale('log')
              plt.gca().yaxis.set_major_formatter(matplotlib.ticker.ScalarFormatter())
              plt.savefig(input + '_' +  metric + '(' + BitDepth + ')'  + '_log_Graph.png' ,  bbox_inches='tight')
+             plt.yscale('linear')
+             plt.savefig(input + '_' +  metric + '(' + BitDepth + ')'  + '_Graph.png' ,  bbox_inches='tight')
       plt.close()
       row = row + 1
