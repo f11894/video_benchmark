@@ -24,6 +24,8 @@ for BitDepth in BitDepth_array:
       plt.figure(figsize=(12, 8))
       csvFileExist = False
       MNum = 0
+      x_label = []
+      y_label = []
       for csv_name in csv_list:
           csvFileExist = True
           codec_name = csv_name
@@ -33,10 +35,8 @@ for BitDepth in BitDepth_array:
           x_txt = data[:,0]
           y_txt = data[:,row]
           plt.plot(x_txt,y_txt , label = codec_name , marker=markers[MNum])
-          if metric == 'fps' or metric == 'Sec':
-             plt.yscale('log')
-             texts = [plt.text(x_txt[i], y_txt[i], (f'{y_txt[i]:.3f}'), ha='center', va='center') for i in range(len(x_txt))]
-             adjust_text(texts)
+          x_label.extend(x_txt)
+          y_label.extend(y_txt)
           MNum = MNum + 1
       if csvFileExist:
           plt.title(input)
@@ -54,7 +54,10 @@ for BitDepth in BitDepth_array:
           	  plt.savefig(input + '_' +  metric + '(' + BitDepth + ')'  + '_Graph.png' ,  bbox_inches='tight')
           else:
              plt.legend(bbox_to_anchor=(1.01, 1), loc='upper left', borderaxespad=0)
+             plt.yscale('log')
              plt.gca().yaxis.set_major_formatter(matplotlib.ticker.ScalarFormatter())
+             texts = [plt.text(x_label[i], y_label[i], (f'{y_label[i]:.3f}'), ha='center', va='center') for i in range(len(x_label))]
+             adjust_text(texts, arrowprops=dict(arrowstyle='->', color='red'))
              plt.savefig(input + '_' +  metric + '(' + BitDepth + ')'  + '_log_Graph.png' ,  bbox_inches='tight')
              plt.yscale('linear')
              plt.savefig(input + '_' +  metric + '(' + BitDepth + ')'  + '_Graph.png' ,  bbox_inches='tight')
