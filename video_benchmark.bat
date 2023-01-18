@@ -36,7 +36,7 @@ if not defined SVT-VP9 set SVT-VP9="%~dp0tools\SvtVp9EncApp.exe"
 if not defined SVT-HEVC set SVT-HEVC="%~dp0tools\SvtHevcEncApp.exe"
 if not defined VTMenc set VTMenc="%~dp0tools\vtm\EncoderApp.exe"
 if not defined VTMdec set VTMdec="%~dp0tools\vtm\DecoderApp.exe"
-if not defined VVenC set VVenC="%~dp0tools\VVenC\vvencapp.exe"
+if not defined VVenC set VVenC="%~dp0tools\VVenC\vvencFFapp.exe"
 if not defined VVdeC set VVdeC="%~dp0tools\VVdeC\vvdecapp.exe"
 if not defined xvcenc set xvcenc="%~dp0tools\xvcenc.exe"
 if not defined xvcdec set xvcdec="%~dp0tools\xvcdec.exe"
@@ -167,7 +167,7 @@ if not exist "%movie_dir%%OutputVideo%" (
       %view_args64% %ffmpeg% -y -i "%InputVideo%" -an %EncodePixelFormat% -strict -2 -f yuv4mpegpipe - 2>"%log_dir%%OutputVideoNoExt%_pipelog%pass_temp%.txt" | %timer64% start /high /b /wait %vpxenc% %CommandLine% -o "%movie_dir%%OutputVideo%" - 2>&1 | %safetee% -a "%log_dir%%OutputVideoNoExt%_log%pass_temp%.txt"
    )
    if /i "%codec%"=="VVenC" (
-       %view_args64% %ffmpeg% -i "%InputVideo%" -an %EncodePixelFormat% -f rawvideo -strict -2 - 2>"%log_dir%%OutputVideoNoExt%_pipelog%pass_temp%.txt" | %timer64% start /high /b /wait %VVenC% -i - %CommandLine% --framerate %frame_rate_integer% -s %Width%x%Height% -o "%movie_dir%%OutputVideo%" 2>&1 | %safetee% -a "%log_dir%%OutputVideoNoExt%_log%pass_temp%.txt"
+       %view_args64% %ffmpeg% -i "%InputVideo%" -an %EncodePixelFormat% -f rawvideo -strict -2 - 2>"%log_dir%%OutputVideoNoExt%_pipelog%pass_temp%.txt" | %timer64% start /high /b /wait %VVenC% -i - %CommandLine% -f %FrameCount% --fps %frame_rate% -s %Width%x%Height% -b "%movie_dir%%OutputVideo%" 2>&1 | %safetee% -a "%log_dir%%OutputVideoNoExt%_log%pass_temp%.txt"
    )
    if /i "%codec%"=="VTM" (
        if not exist "%movie_dir%%InputVideoNoExt%_temp%EncodeBitDepth%bit.yuv" echo %MessageIntermediateFileEncode% && %view_args64% %ffmpeg% -i "%InputVideo%" -an %EncodePixelFormat% -f rawvideo -strict -2 "%movie_dir%%InputVideoNoExt%_temp%EncodeBitDepth%bit.yuv" >"%log_dir%%OutputVideoNoExt%_log%pass_temp%.txt" 2>&1
