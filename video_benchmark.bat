@@ -281,15 +281,19 @@ if not "%FrameCount%"=="%FrameCount_CompareVideo%" (
 )
 :FrameCount_check_skip
 
-set "vmaf_model_file=vmaf_v0.6.1.json"
-if %Height% GTR 2000 set "vmaf_model_file=vmaf_4k_v0.6.1.json"
+set "vmaf_model_file=version=vmaf_v0.6.1"
+if %Height% GTR 2000 set "vmaf_model_file=version=vmaf_4k_v0.6.1"
+
 for %%i in (%ffmpeg_VMAF%) do set "vmaf_model_dir=%%~dpi\model"
 pushd %vmaf_model_dir%
-set ffmpeg_metric_option="ssim;[0:v][1:v]psnr;[0:v][1:v]libvmaf=model_path=%vmaf_model_file%:n_threads=%NUMBER_OF_PROCESSORS%:log_fmt=xml:log_path='%random32%_vmaf(%CompareBitDepth%).xml';[0:v][1:v]xpsnr"
+set ffmpeg_metric_option="ssim;[0:v][1:v]psnr;[0:v][1:v]libvmaf=model=%vmaf_model_file%:n_threads=%NUMBER_OF_PROCESSORS%:log_fmt=xml:log_path='%random32%_vmaf(%CompareBitDepth%).xml';[0:v][1:v]xpsnr"
 if "%Metric_calculation%"=="1" if not "%enc_error%"=="1" (
    call echo %MessageMetricCompare%
    echo %MessagePleaseWait%
    %view_args64% %ffmpeg% -r %frame_rate% -i %CompareVideo% -an %ComparePixelFormat% -strict -2 -f yuv4mpegpipe - 2>"%log_dir%%OutputVideoNoExt%_metric(%CompareBitDepth%)_pipelog%pass_orig%.txt" | %view_args64% %ffmpeg% -i - -r %frame_rate% -i "%InputVideo%" -filter_complex %ffmpeg_metric_option% -an -f null - >"%log_dir%%OutputVideoNoExt%_metric(%CompareBitDepth%)_log%pass_orig%.txt" 2>&1
+   PowerShell -command "& {Get-Content '%log_dir%%OutputVideoNoExt%_metric(%CompareBitDepth%)_log%pass_orig%.txt' | Set-Content -Encoding oem '%log_dir%%OutputVideoNoExt%_metric(%CompareBitDepth%)_log%pass_orig%_tmp.txt'}"
+   del "%log_dir%%OutputVideoNoExt%_metric(%CompareBitDepth%)_log%pass_orig%.txt"
+   ren "%log_dir%%OutputVideoNoExt%_metric(%CompareBitDepth%)_log%pass_orig%_tmp.txt" "%OutputVideoNoExt%_metric(%CompareBitDepth%)_log%pass_orig%.txt"
    echo.
 )
 if exist "%random32%_vmaf(%CompareBitDepth%).xml" move /Y "%random32%_vmaf(%CompareBitDepth%).xml" "%log_dir%%OutputVideoNoExt%_vmaf(%CompareBitDepth%).xml" >nul

@@ -2,8 +2,7 @@
 set ffmpeg="%~dp0tools\ffmpeg.exe"
 
 pushd "%~dp0tools\"
-FOR /f "DELIMS=" %%i IN ('.\ffmpeg.exe -loglevel 48 -i "%~1" -t 00:00:00.00 -vcodec rawvideo -an -f null -  2^>^&1 ^| find "'frame_rate'"') DO SET "frame_rate=%%i"
-FOR /f "tokens=4 DELIMS='" %%i IN ("%frame_rate%") DO SET "frame_rate=%%i"
+FOR /f "DELIMS=" %%i IN ('.\ffprobe -v error -select_streams v:0 -show_entries stream^=avg_frame_rate -of default^=noprint_wrappers^=1:nokey^=1 "%~1"') DO SET "frame_rate=%%i"
 FOR /f "tokens=1 DELIMS=/" %%i IN ("%frame_rate%") DO SET "frame_rate_num=%%i"
 FOR /f "tokens=2 DELIMS=/" %%i IN ("%frame_rate%") DO SET "frame_rate_denom=%%i"
 set frame_rate_mp4box=%frame_rate_num%
