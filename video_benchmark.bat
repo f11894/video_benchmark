@@ -30,6 +30,8 @@ if not defined VCEEncC set VCEEncC="%~dp0tools\VCEEncC\x64\VCEEncC64.exe"
 if not defined NVEncC set NVEncC="%~dp0tools\NVEncC\x64\NVEncC64.exe"
 if not defined vpxenc set vpxenc="%~dp0tools\vpxenc.exe"
 if not defined aomenc set aomenc="%~dp0tools\aomenc.exe"
+if not defined avmenc set avmenc="%~dp0tools\avmenc.exe"
+if not defined avmdec set avmdec="%~dp0tools\avmdec.exe"
 if not defined rav1e set rav1e="%~dp0tools\rav1e.exe"
 if not defined SVT-AV1 set SVT-AV1="%~dp0tools\SvtAv1EncApp.exe"
 if not defined SVT-VP9 set SVT-VP9="%~dp0tools\SvtVp9EncApp.exe"
@@ -155,6 +157,10 @@ if not exist "%movie_dir%%OutputVideo%" (
       %aomenc% --help | find "AOMedia Project AV1 Encoder">"%log_dir%%OutputVideoNoExt%_log%pass_temp%.txt" 2>&1 
       %view_args64% %ffmpeg% -y -i "%InputVideo%" -an %EncodePixelFormat% -strict -2 -f yuv4mpegpipe - 2>"%log_dir%%OutputVideoNoExt%_pipelog%pass_temp%.txt" | %timer64% start /high /b /wait %aomenc% %CommandLine% -o "%movie_dir%%OutputVideoNoExt%.ivf" - 2>&1 | %safetee% -a "%log_dir%%OutputVideoNoExt%_log%pass_temp%.txt"
    )
+   if /i "%codec%"=="AVM" (
+      %avmenc% --help | find "AOMedia Project AV2 Encoder">"%log_dir%%OutputVideoNoExt%_log%pass_temp%.txt" 2>&1 
+      %view_args64% %ffmpeg% -y -i "%InputVideo%" -an %EncodePixelFormat% -strict -2 -f yuv4mpegpipe - 2>"%log_dir%%OutputVideoNoExt%_pipelog%pass_temp%.txt" | %timer64% start /high /b /wait %avmenc% %CommandLine% -o "%movie_dir%%OutputVideoNoExt%.ivf" - 2>&1 | %safetee% -a "%log_dir%%OutputVideoNoExt%_log%pass_temp%.txt"
+   )
    if /i "%codec%"=="rav1e" (
       %rav1e% --version >"%log_dir%%OutputVideoNoExt%_log%pass_temp%.txt"
       %view_args64% %ffmpeg% -y -i "%InputVideo%" -an %EncodePixelFormat% -strict -2 -f yuv4mpegpipe - 2>"%log_dir%%OutputVideoNoExt%_pipelog%pass_temp%.txt" | %timer64% start /high /b /wait %rav1e% - %CommandLine% -o "%movie_dir%%OutputVideoNoExt%.ivf" 2>&1 | %safetee% -a "%log_dir%%OutputVideoNoExt%_log%pass_temp%.txt"
@@ -189,10 +195,13 @@ if /i "%codec%"=="rav1e" set ErrorCheckFile="%movie_dir%%OutputVideoNoExt%.ivf"
 if /i "%codec%"=="libaom" set ErrorCheckFile="%movie_dir%%OutputVideoNoExt%.ivf"
 if /i "%codec%"=="SVT-AV1" set ErrorCheckFile="%movie_dir%%OutputVideoNoExt%.ivf"
 if /i "%codec%"=="SVT-VP9" set ErrorCheckFile="%movie_dir%%OutputVideoNoExt%.ivf"
+if /i "%codec%"=="AVM" set ErrorCheckFile="%movie_dir%%OutputVideoNoExt%.ivf"
 
 if not "%enc_skip%"=="1" (
     if /i "%codec%"=="libvpx" if "%multipass%"=="1" goto ErrorCheckSkip
     if /i "%codec%"=="libaom" if "%multipass%"=="1" goto ErrorCheckSkip
+    if /i "%codec%"=="AVM" if "%multipass%"=="1" goto ErrorCheckSkip
+
     call :error_check "%InputVideo%" %ErrorCheckFile%
 )
 :ErrorCheckSkip
@@ -203,6 +212,7 @@ if /i "%codec%"=="VTM" set vvc_codec=1
 if /i "%codec%"=="VVenC" set vvc_codec=1
 if not "%enc_error%"=="1" if not exist "%movie_dir%%OutputVideoNoExt%.mp4" (
    if "%vvc_codec%"=="1" %view_args64% %VVdeC% -b "%movie_dir%%OutputVideo%" --y4m -o - 2>>"%log_dir%%OutputVideoNoExt%_pipelog%pass_temp%.txt" | %view_args64% %ffmpeg% -y -r %frame_rate% -i - -vcodec libx264 -qp 0 "%movie_dir%%OutputVideoNoExt%.mp4" >>"%log_dir%%OutputVideoNoExt%_log%pass_temp%.txt" 2>&1
+   if /i "%codec%"=="AVM" %view_args64% %avmdec% -o - "%movie_dir%%OutputVideo%" 2>>"%log_dir%%OutputVideoNoExt%_pipelog%pass_temp%.txt" | %view_args64% %ffmpeg% -y -r %frame_rate% -i - -vcodec libx264 -qp 0 "%movie_dir%%OutputVideoNoExt%.mp4" >>"%log_dir%%OutputVideoNoExt%_log%pass_temp%.txt" 2>&1
    if /i "%codec%"=="xvc" (
       %xvcdec% -bitstream-file "%movie_dir%%OutputVideo%" -output-file "%movie_dir%%OutputVideoNoExt%.yuv" 2>&1 | %safetee% -a "%log_dir%%OutputVideoNoExt%_log%pass_temp%.txt"
       %view_args64% %ffmpeg% -y -f rawvideo -s %video_size% -r %frame_rate% %EncodePixelFormat% -i "%movie_dir%%OutputVideoNoExt%.yuv" -vcodec libx264 -qp 0 "%movie_dir%%OutputVideoNoExt%.mp4" >>"%log_dir%%OutputVideoNoExt%_log%pass_temp%.txt" 2>&1 &&del "%movie_dir%%OutputVideoNoExt%.yuv"
@@ -235,7 +245,7 @@ if not "%enc_skip%"=="1" if exist "%movie_dir%%OutputVideoNoExt%.h265" %view_arg
 if not "%enc_skip%"=="1" if exist "%movie_dir%%OutputVideoNoExt%.ivf" (
    if /i "%codec%"=="SVT-VP9" (
       %view_args64% %ffmpeg% -y -r %frame_rate% -i "%movie_dir%%OutputVideoNoExt%.ivf" -c copy "%movie_dir%%OutputVideo%" >>"%log_dir%%OutputVideoNoExt%_log%pass_temp%.txt" 2>&1 && del "%movie_dir%%OutputVideoNoExt%.ivf"
-   ) else (
+   ) else if /i not "%codec%"=="AVM" (
       %view_args64% %mp4box% -fps %frame_rate_mp4box% -add "%movie_dir%%OutputVideoNoExt%.ivf" -new "%movie_dir%%OutputVideo%" >>"%log_dir%%OutputVideoNoExt%_log%pass_temp%.txt" 2>&1 && del "%movie_dir%%OutputVideoNoExt%.ivf"
    )
    echo.
@@ -251,6 +261,7 @@ set CompareVideo="%movie_dir%%OutputVideo%"
 if /i "%codec%"=="VTM" set CompareVideo="%movie_dir%%OutputVideoNoExt%.mp4"
 if /i "%codec%"=="VVenC" set CompareVideo="%movie_dir%%OutputVideoNoExt%.mp4"
 if /i "%codec%"=="xvc" set CompareVideo="%movie_dir%%OutputVideoNoExt%.mp4"
+if /i "%codec%"=="AVM" set CompareVideo="%movie_dir%%OutputVideoNoExt%.mp4"
 
 find "Parsed_ssim" "%log_dir%%OutputVideoNoExt%_metric(%CompareBitDepth%)_log%pass_orig%.txt">nul 2>&1 || set Metric_calculation=1
 find "Parsed_xpsnr" "%log_dir%%OutputVideoNoExt%_metric(%CompareBitDepth%)_log%pass_orig%.txt">nul 2>&1 || set Metric_calculation=1
