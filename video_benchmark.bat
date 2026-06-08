@@ -173,11 +173,11 @@ if not exist "%movie_dir%%OutputVideo%" (
       %view_args64% %ffmpeg% -y -i "%InputVideo%" -an %EncodePixelFormat% -strict -2 -f yuv4mpegpipe - 2>"%log_dir%%OutputVideoNoExt%_pipelog%pass_temp%.txt" | %timer64% start /high /b /wait %vpxenc% %CommandLine% -o "%movie_dir%%OutputVideo%" - 2>&1 | %safetee% -a "%log_dir%%OutputVideoNoExt%_log%pass_temp%.txt"
    )
    if /i "%codec%"=="VVenC" (
-       %view_args64% %ffmpeg% -i "%InputVideo%" -an %EncodePixelFormat% -f rawvideo -strict -2 - 2>"%log_dir%%OutputVideoNoExt%_pipelog%pass_temp%.txt" | %timer64% start /high /b /wait %VVenC% -i - %CommandLine% -f %FrameCount% --fps %frame_rate% -s %Width%x%Height% -b "%movie_dir%%OutputVideo%" 2>&1 | %safetee% -a "%log_dir%%OutputVideoNoExt%_log%pass_temp%.txt"
+       %view_args64% %ffmpeg% -i "%InputVideo%" -an %EncodePixelFormat% -f rawvideo -strict -2 - 2>"%log_dir%%OutputVideoNoExt%_pipelog%pass_temp%.txt" | %timer64% start /high /b /wait %VVenC% -i - %CommandLine% -f %FrameCount% --fps %frame_rate% -s %Width%x%Height% -b "%movie_dir%%OutputVideoNoExt%.h266" 2>&1 | %safetee% -a "%log_dir%%OutputVideoNoExt%_log%pass_temp%.txt"
    )
    if /i "%codec%"=="VTM" (
        if not exist "%movie_dir%%InputVideoNoExt%_temp%EncodeBitDepth%bit.yuv" echo %MessageIntermediateFileEncode% && %view_args64% %ffmpeg% -i "%InputVideo%" -an %EncodePixelFormat% -f rawvideo -strict -2 "%movie_dir%%InputVideoNoExt%_temp%EncodeBitDepth%bit.yuv" >"%log_dir%%OutputVideoNoExt%_log%pass_temp%.txt" 2>&1
-       %timer64% start /high /b /wait %VTMenc%  %CommandLine% -fr %frame_rate_integer% -wdt %Width% -hgt %Height% -f %FrameCount% -i "%movie_dir%%InputVideoNoExt%_temp%EncodeBitDepth%bit.yuv" -o NUL -b "%movie_dir%%OutputVideo%" 2>&1 | %safetee% -a "%log_dir%%OutputVideoNoExt%_log%pass_temp%.txt"
+       %timer64% start /high /b /wait %VTMenc%  %CommandLine% -fr %frame_rate_integer% -wdt %Width% -hgt %Height% -f %FrameCount% -i "%movie_dir%%InputVideoNoExt%_temp%EncodeBitDepth%bit.yuv" -o NUL -b "%movie_dir%%OutputVideoNoExt%.h266" 2>&1 | %safetee% -a "%log_dir%%OutputVideoNoExt%_log%pass_temp%.txt"
    )
    if /i "%codec%"=="xvc" %view_args64% %ffmpeg% -y -i "%InputVideo%" -an %EncodePixelFormat% -strict -2 -f yuv4mpegpipe - 2>"%log_dir%%OutputVideoNoExt%_pipelog%pass_temp%.txt" | %timer64% start /high /b /wait %xvcenc% -verbose 1 -input-file - -output-file "%movie_dir%%OutputVideo%" %CommandLine% 2>&1 | %safetee% -o "%log_dir%%OutputVideoNoExt%_log%pass_temp%.txt"
 ) else (
@@ -191,6 +191,8 @@ rem エラーチェック&マルチパスの途中のファイルは削除する
 set ErrorCheckFile="%movie_dir%%OutputVideo%"
 if /i "%codec%"=="x265" set ErrorCheckFile="%movie_dir%%OutputVideoNoExt%.h265"
 if /i "%codec%"=="SVT-HEVC" set ErrorCheckFile="%movie_dir%%OutputVideoNoExt%.h265"
+if /i "%codec%"=="VTM" set ErrorCheckFile="%movie_dir%%OutputVideoNoExt%.h266"
+if /i "%codec%"=="VVenC" set ErrorCheckFile="%movie_dir%%OutputVideoNoExt%.h266"
 if /i "%codec%"=="rav1e" set ErrorCheckFile="%movie_dir%%OutputVideoNoExt%.ivf"
 if /i "%codec%"=="libaom" set ErrorCheckFile="%movie_dir%%OutputVideoNoExt%.ivf"
 if /i "%codec%"=="SVT-AV1" set ErrorCheckFile="%movie_dir%%OutputVideoNoExt%.ivf"
@@ -208,10 +210,7 @@ if not "%enc_skip%"=="1" (
 if "%multipass%"=="1" if not "%enc_skip%"=="1" if not "%pass_temp%"=="%pass_orig%" if exist %ErrorCheckFile% del %ErrorCheckFile%
 
 rem そのままではFFmpegで扱えないビットストリームを可逆圧縮のH.264にデコードする
-if /i "%codec%"=="VTM" set vvc_codec=1
-if /i "%codec%"=="VVenC" set vvc_codec=1
 if not "%enc_error%"=="1" if not exist "%movie_dir%%OutputVideoNoExt%.mp4" (
-   if "%vvc_codec%"=="1" %view_args64% %VVdeC% -b "%movie_dir%%OutputVideo%" --y4m -o - 2>>"%log_dir%%OutputVideoNoExt%_pipelog%pass_temp%.txt" | %view_args64% %ffmpeg% -y -r %frame_rate% -i - -vcodec libx264 -qp 0 "%movie_dir%%OutputVideoNoExt%.mp4" >>"%log_dir%%OutputVideoNoExt%_log%pass_temp%.txt" 2>&1
    if /i "%codec%"=="AVM" %view_args64% %avmdec% -o - "%movie_dir%%OutputVideo%" 2>>"%log_dir%%OutputVideoNoExt%_pipelog%pass_temp%.txt" | %view_args64% %ffmpeg% -y -r %frame_rate% -i - -vcodec libx264 -qp 0 "%movie_dir%%OutputVideoNoExt%.mp4" >>"%log_dir%%OutputVideoNoExt%_log%pass_temp%.txt" 2>&1
    if /i "%codec%"=="xvc" (
       %xvcdec% -bitstream-file "%movie_dir%%OutputVideo%" -output-file "%movie_dir%%OutputVideoNoExt%.yuv" 2>&1 | %safetee% -a "%log_dir%%OutputVideoNoExt%_log%pass_temp%.txt"
@@ -241,6 +240,7 @@ if "%multipass%"=="1" (
    if exist svtav1_2pass.log del svtav1_2pass.log
 )
 rem rawファイルをコンテナに格納
+if not "%enc_skip%"=="1" if exist "%movie_dir%%OutputVideoNoExt%.h266" %view_args64% %mp4box% -fps %frame_rate_mp4box% -add "%movie_dir%%OutputVideoNoExt%.h266" -new "%movie_dir%%OutputVideo%" >>"%log_dir%%OutputVideoNoExt%_log%pass_temp%.txt" 2>&1 && del "%movie_dir%%OutputVideoNoExt%.h266" & echo.
 if not "%enc_skip%"=="1" if exist "%movie_dir%%OutputVideoNoExt%.h265" %view_args64% %mp4box% -fps %frame_rate_mp4box% -add "%movie_dir%%OutputVideoNoExt%.h265" -new "%movie_dir%%OutputVideo%" >>"%log_dir%%OutputVideoNoExt%_log%pass_temp%.txt" 2>&1 && del "%movie_dir%%OutputVideoNoExt%.h265" & echo.
 if not "%enc_skip%"=="1" if exist "%movie_dir%%OutputVideoNoExt%.ivf" (
    if /i "%codec%"=="SVT-VP9" (
@@ -258,8 +258,6 @@ for /f "delims=" %%a in ('PowerShell "-Join (Get-Random -Count 32 -input 0,1,2,3
 popd
 
 set CompareVideo="%movie_dir%%OutputVideo%"
-if /i "%codec%"=="VTM" set CompareVideo="%movie_dir%%OutputVideoNoExt%.mp4"
-if /i "%codec%"=="VVenC" set CompareVideo="%movie_dir%%OutputVideoNoExt%.mp4"
 if /i "%codec%"=="xvc" set CompareVideo="%movie_dir%%OutputVideoNoExt%.mp4"
 if /i "%codec%"=="AVM" set CompareVideo="%movie_dir%%OutputVideoNoExt%.mp4"
 

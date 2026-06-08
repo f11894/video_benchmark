@@ -39,7 +39,7 @@ popd
 %busybox64% xargs -a %xargs_txt%  -n 8 -P %thread% "%~dp0VTM_xargs.bat"
 :loop
 if "%~1"=="" goto end
-for /L %%i in (36,-2,22) do call %benchmark_bat% -codec VTM -i "%~1" -o "%~n1_VTM_10bit_q%%i.bin" -cmd %VTM_option% -csvsuf 10bit_q -encode-depth 10
+for /L %%i in (36,-2,22) do call %benchmark_bat% -codec VTM -i "%~1" -o "%~n1_VTM_10bit_q%%i.mp4" -cmd %VTM_option% -csvsuf 10bit_q -encode-depth 10
 rem For comparison
 for /L %%i in (32,-2,18) do call %benchmark_bat% -codec x264 -i "%~1" -o "%~n1_x264_10bit_placebo_tunessim_kf256_crf%%i.mp4" -cmd "--preset placebo --tune ssim --keyint 256 --crf %%i --input-depth 10 --output-depth 10" -csvsuf 10bit_placebo_tunessim_kf256_crf -encode-depth 10
 for /L %%i in (32,-2,18) do call %benchmark_bat% -codec x265 -i "%~1" -o "%~n1_x265_10bit_placebo_tunessim_kf256_crf%%i.mp4" -cmd "--preset placebo --tune ssim --keyint 256 --crf %%i --input-depth 10 --output-depth 10" -csvsuf 10bit_placebo_tunessim_kf256_crf -encode-depth 10
