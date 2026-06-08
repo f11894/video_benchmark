@@ -286,7 +286,7 @@ if %Height% GTR 2000 set "vmaf_model_file=version=vmaf_4k_v0.6.1"
 
 for %%i in (%ffmpeg_VMAF%) do set "vmaf_model_dir=%%~dpi\model"
 pushd %vmaf_model_dir%
-set ffmpeg_metric_option="ssim;[0:v][1:v]psnr;[0:v][1:v]libvmaf=model=%vmaf_model_file%:n_threads=%NUMBER_OF_PROCESSORS%:log_fmt=xml:log_path='%random32%_vmaf(%CompareBitDepth%).xml';[0:v][1:v]xpsnr"
+set ffmpeg_metric_option="ssim;[0:v][1:v]psnr;[0:v][1:v]libvmaf=model=%vmaf_model_file%:n_threads=%NUMBER_OF_PROCESSORS%:log_fmt=xml:log_path='%random32%_vmaf(%CompareBitDepth%).xml';[1:v][0:v]xpsnr"
 if "%Metric_calculation%"=="1" if not "%enc_error%"=="1" (
    call echo %MessageMetricCompare%
    echo %MessagePleaseWait%
