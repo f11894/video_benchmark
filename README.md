@@ -5,7 +5,7 @@ You can calculate PSNR, SSIM and VMAF scores and output them to csv to make a pl
 There is also an encoding speed measurement and an automatic multipath encoding function.  
 
 If you want something newer than the included encoder binary, you can download it from this link.  
-https://drive.google.com/drive/folders/1fEwt2W2r5lh7zvv7ttog2u3Jt8M-ezfh
+https://github.com/f11894?tab=repositories&q=Build_Actions+&type=&language=&sort=
 
 ### Usage
 
@@ -30,6 +30,7 @@ Example: video_benchmark.bat -codec x264 -i input.y4m -o output.mp4 -cmd "--crf 
                        VTM
                        VVenC
                        XVC
+                       AVM
   -cmd                 encoder command line
   -csvsuf              CSV file name suffix *optional
   -encode-depth        encoding bit-depth (8 or 10) *optional
@@ -51,7 +52,5 @@ How to calculate the BD-Rate
 For more information about BD-Rate, see [this article](https://ottverse.com/what-is-bd-rate-bd-psnr-calculation-interpretation/).  
 
 ### important point  
-When benchmarking with 10bit, rewrite ComparePixelFormat in video_benchmark.bat from yuv420p to yuv420p10le (even in the case of 8bit and 10bit mixed benchmarks)
-
 If the fps of the video before encoding and the video after encoding are not aligned, the score such as SSIM will be measured abnormally low.  
 Use a constant frame rate for the source video, not a variable frame rate.  
