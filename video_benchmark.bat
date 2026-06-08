@@ -210,11 +210,11 @@ if not "%enc_skip%"=="1" (
 if "%multipass%"=="1" if not "%enc_skip%"=="1" if not "%pass_temp%"=="%pass_orig%" if exist %ErrorCheckFile% del %ErrorCheckFile%
 
 rem そのままではFFmpegで扱えないビットストリームを可逆圧縮のH.264にデコードする
-if not "%enc_error%"=="1" if not exist "%movie_dir%%OutputVideoNoExt%.mp4" (
-   if /i "%codec%"=="AVM" %view_args64% %avmdec% -o - "%movie_dir%%OutputVideo%" 2>>"%log_dir%%OutputVideoNoExt%_pipelog%pass_temp%.txt" | %view_args64% %ffmpeg% -y -r %frame_rate% -i - -vcodec libx264 -qp 0 "%movie_dir%%OutputVideoNoExt%.mp4" >>"%log_dir%%OutputVideoNoExt%_log%pass_temp%.txt" 2>&1
+if not "%enc_error%"=="1" if not exist "%movie_dir%%OutputVideoNoExt%_decode.mp4" (
+   if /i "%codec%"=="AVM" %view_args64% %avmdec% -o - "%movie_dir%%OutputVideo%" 2>>"%log_dir%%OutputVideoNoExt%_pipelog%pass_temp%.txt" | %view_args64% %ffmpeg% -y -r %frame_rate% -i - -vcodec libx264 -qp 0 "%movie_dir%%OutputVideoNoExt%_decode.mp4" >>"%log_dir%%OutputVideoNoExt%_log%pass_temp%.txt" 2>&1
    if /i "%codec%"=="xvc" (
       %xvcdec% -bitstream-file "%movie_dir%%OutputVideo%" -output-file "%movie_dir%%OutputVideoNoExt%.yuv" 2>&1 | %safetee% -a "%log_dir%%OutputVideoNoExt%_log%pass_temp%.txt"
-      %view_args64% %ffmpeg% -y -f rawvideo -s %video_size% -r %frame_rate% %EncodePixelFormat% -i "%movie_dir%%OutputVideoNoExt%.yuv" -vcodec libx264 -qp 0 "%movie_dir%%OutputVideoNoExt%.mp4" >>"%log_dir%%OutputVideoNoExt%_log%pass_temp%.txt" 2>&1 &&del "%movie_dir%%OutputVideoNoExt%.yuv"
+      %view_args64% %ffmpeg% -y -f rawvideo -s %video_size% -r %frame_rate% %EncodePixelFormat% -i "%movie_dir%%OutputVideoNoExt%.yuv" -vcodec libx264 -qp 0 "%movie_dir%%OutputVideoNoExt%_decode.mp4" >>"%log_dir%%OutputVideoNoExt%_log%pass_temp%.txt" 2>&1 &&del "%movie_dir%%OutputVideoNoExt%.yuv"
    )
 )
 
@@ -258,8 +258,8 @@ for /f "delims=" %%a in ('PowerShell "-Join (Get-Random -Count 32 -input 0,1,2,3
 popd
 
 set CompareVideo="%movie_dir%%OutputVideo%"
-if /i "%codec%"=="xvc" set CompareVideo="%movie_dir%%OutputVideoNoExt%.mp4"
-if /i "%codec%"=="AVM" set CompareVideo="%movie_dir%%OutputVideoNoExt%.mp4"
+if /i "%codec%"=="xvc" set CompareVideo="%movie_dir%%OutputVideoNoExt%_decode.mp4"
+if /i "%codec%"=="AVM" set CompareVideo="%movie_dir%%OutputVideoNoExt%_decode.mp4"
 
 find "Parsed_ssim" "%log_dir%%OutputVideoNoExt%_metric(%CompareBitDepth%)_log%pass_orig%.txt">nul 2>&1 || set Metric_calculation=1
 find "Parsed_xpsnr" "%log_dir%%OutputVideoNoExt%_metric(%CompareBitDepth%)_log%pass_orig%.txt">nul 2>&1 || set Metric_calculation=1
