@@ -279,8 +279,8 @@ if not "%FrameCount%"=="%FrameCount_CompareVideo%" (
 )
 :FrameCount_check_skip
 
-set "vmaf_model_file=version=vmaf_v0.6.1"
-if %Height% GTR 2000 set "vmaf_model_file=version=vmaf_4k_v0.6.1"
+set "vmaf_model_file=version=vmaf_v1.0.16_3d0h"
+if %Height% GTR 2000 set "vmaf_model_file=version=vmaf_v1.0.16_1d5h_2160"
 
 for %%i in (%ffmpeg_VMAF%) do set "vmaf_model_dir=%%~dpi\model"
 pushd %vmaf_model_dir%
