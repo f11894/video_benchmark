@@ -8,7 +8,7 @@ for %%a in (5,3,1) do (
 )
 set num=4
 for %%a in (slow, medium, fast, faster) do (
-   for /L %%i in (32,-2,16) do call %benchmark_bat% -codec VVenC -i "%~1" -o "%~n1_VVenC_10bit_%%num%%_%%a_q%%i.vvc" -cmd "--preset %%a --WaveFrontSynchro=1 --Tiles=2x1 --threads 12 --InputBitDepth 10 --InternalBitDepth 10 --OutputBitDepth 10 --GOPSize 32 --qpa 0 --QP %%i" -csvsuf 10bit_%%num%%_%%a_q -encode-depth 10
+   for /L %%i in (32,-2,16) do call %benchmark_bat% -codec VVenC -i "%~1" -o "%~n1_VVenC_10bit_%%num%%_%%a_q%%i.mp4" -cmd "--preset %%a --WaveFrontSynchro=1 --Tiles=2x1 --threads 12 --InputBitDepth 10 --InternalBitDepth 10 --OutputBitDepth 10 --GOPSize 32 --qpa 0 --QP %%i" -csvsuf 10bit_%%num%%_%%a_q -encode-depth 10
    set /a num=num-1
 )
 shift
