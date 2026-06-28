@@ -17,6 +17,7 @@ if not defined ComparePixelFormat set ComparePixelFormat=-pix_fmt yuv420p10le
 rem Soft path
 set ffmpeg="%~dp0tools\ffmpeg.exe"
 set ffmpeg_VMAF="%~dp0tools\ffmpeg.exe"
+set FFVship="%~dp0tools\FFVship_Vulkan\FFVship.exe"
 set timer64="%~dp0tools\timer64.exe"
 set view_args64="%~dp0tools\view_args64.exe"
 set safetee="%~dp0tools\safetee.exe"
@@ -265,6 +266,7 @@ find "Parsed_ssim" "%log_dir%%OutputVideoNoExt%_metric(%CompareBitDepth%)_log%pa
 find "Parsed_xpsnr" "%log_dir%%OutputVideoNoExt%_metric(%CompareBitDepth%)_log%pass_orig%.txt">nul 2>&1 || set Metric_calculation=1
 find "metric name=""vmaf""" "%log_dir%%OutputVideoNoExt%_vmaf(%CompareBitDepth%).xml">nul 2>&1 || set Metric_calculation=1
 if not exist "%log_dir%%OutputVideoNoExt%_vmaf(%CompareBitDepth%).xml" set Metric_calculation=1
+find "-----------SSIMULACRA2-----------" "%log_dir%%OutputVideoNoExt%_metric2(%CompareBitDepth%)_log%pass_orig%.txt">nul 2>&1 || set Metric_calculation=1
 
 if not "%Metric_calculation%"=="1" goto FrameCount_check_skip
 rem 入力動画と出力動画のフレーム数が一致しているか調べる
@@ -293,11 +295,16 @@ if "%Metric_calculation%"=="1" if not "%enc_error%"=="1" (
    del "%log_dir%%OutputVideoNoExt%_metric(%CompareBitDepth%)_log%pass_orig%.txt"
    ren "%log_dir%%OutputVideoNoExt%_metric(%CompareBitDepth%)_log%pass_orig%_tmp.txt" "%OutputVideoNoExt%_metric(%CompareBitDepth%)_log%pass_orig%.txt"
    echo.
+   %view_args64% %FFVship% --source "%InputVideo%" --encoded %CompareVideo% >"%log_dir%%OutputVideoNoExt%_metric2(%CompareBitDepth%)_log%pass_orig%.txt" 2>&1 
+   find "-----------SSIMULACRA2-----------" "%log_dir%%OutputVideoNoExt%_metric2(%CompareBitDepth%)_log%pass_orig%.txt">nul 2>&1 || %view_args64% %ffmpeg% -y -r %frame_rate% -i %CompareVideo% -vcodec libx264 -qp 0 "%movie_dir%%random32%_FFVshipTEMP.mp4" >>"%log_dir%%OutputVideoNoExt%_metric2(%CompareBitDepth%)_log%pass_orig%.txt" 2>&1 
+   find "-----------SSIMULACRA2-----------" "%log_dir%%OutputVideoNoExt%_metric2(%CompareBitDepth%)_log%pass_orig%.txt">nul 2>&1 || %view_args64% %FFVship% --source "%InputVideo%" --encoded "%movie_dir%%random32%_FFVshipTEMP.mp4" >>"%log_dir%%OutputVideoNoExt%_metric2(%CompareBitDepth%)_log%pass_orig%.txt" 2>&1
 )
+if exist "%movie_dir%%random32%_FFVshipTEMP.mp4" del "%movie_dir%%random32%_FFVshipTEMP.mp4">nul
 if exist "%random32%_vmaf(%CompareBitDepth%).xml" move /Y "%random32%_vmaf(%CompareBitDepth%).xml" "%log_dir%%OutputVideoNoExt%_vmaf(%CompareBitDepth%).xml" >nul
 find "metric name=""vmaf""" "%log_dir%%OutputVideoNoExt%_vmaf(%CompareBitDepth%).xml">nul 2>&1 || set CompareError=1
 find "Parsed_ssim" "%log_dir%%OutputVideoNoExt%_metric(%CompareBitDepth%)_log%pass_orig%.txt">nul 2>&1 || set CompareError=1
 find "Parsed_xpsnr" "%log_dir%%OutputVideoNoExt%_metric(%CompareBitDepth%)_log%pass_orig%.txt">nul 2>&1 || set CompareError=1
+find "-----------SSIMULACRA2-----------" "%log_dir%%OutputVideoNoExt%_metric2(%CompareBitDepth%)_log%pass_orig%.txt">nul 2>&1 || set CompareError=1
 if "%CompareError%"=="1" if not "%enc_error%"=="1" (
    echo %MessageMetricCompareError%
    echo %date% %time%>>%error_log%
@@ -318,6 +325,7 @@ if not "%enc_error%"=="1" if not "%Compare_error%"=="1" (
    for /f "DELIMS=" %%i IN ('find "Parsed_ssim" "%OutputVideoNoExt%_metric(%CompareBitDepth%)_log%pass_orig%.txt"') DO SET "Parsed_ssim=%%i"
    for /f "DELIMS=" %%i IN ('find "Parsed_psnr" "%OutputVideoNoExt%_metric(%CompareBitDepth%)_log%pass_orig%.txt"') DO SET "Parsed_psnr=%%i"
    for /f "tokens=6" %%i IN ('find "Parsed_xpsnr" "%OutputVideoNoExt%_metric(%CompareBitDepth%)_log%pass_orig%.txt"') DO SET "XPSNR_Y=%%i"
+   for /f "tokens=3" %%i IN ('find "Average" "%OutputVideoNoExt%_metric2(%CompareBitDepth%)_log%pass_orig%.txt"') DO SET "SSIMULACRA2=%%i"
 )
 if not "%enc_error%"=="1" if not "%Compare_error%"=="1" (
    for /f "tokens=5" %%i in ("%Parsed_ssim%") do set "SSIM_Y=%%i"
@@ -339,9 +347,9 @@ if not "%enc_error%"=="1" if not "%Compare_error%"=="1" (
    for /f "DELIMS=" %%i IN ('PowerShell "(%Filesize%*8)/(%Width%*%Height%*%FrameCount%)"') DO SET "bpp=%%i"
 )
 if not "%enc_error%"=="1" if not "%Compare_error%"=="1" (
-   if not exist "%InputVideoNoExt%_%CsvName%_(%CompareBitDepth%).csv" echo Filename,bitrate,bpp,PSNR_Y,PSNR_Average,SSIM_Y,SSIM_All,VMAF,XPSNR_Y,fps,Sec,CommandLine>"%InputVideoNoExt%_%CsvName%_(%CompareBitDepth%).csv"
-   echo "%OutputVideo%",%bitrate%,%bpp%,%PSNR_Y%,%PSNR_Average%,%SSIM_Y%,%SSIM_All%,%VMAF%,%XPSNR_Y%,%fps%,%Sec%,"%CommandLine_orig%"|%safetee% -a "%InputVideoNoExt%_%CsvName%_(%CompareBitDepth%).csv" >nul
-   find "('%codec%', %Sec%, '%CsvNameSuffix%', 0, %bitrate%, %VMAF%, %PSNR_Y%, %SSIM_Y%, %XPSNR_Y%)," "%InputVideoNoExt%_%codec%_(%CompareBitDepth%).bddata" >nul 2>&1 || set /P "x=('%codec%', %Sec%, '%CsvNameSuffix%', 0, %bitrate%, %VMAF%, %PSNR_Y%, %SSIM_Y%, %XPSNR_Y%),"<NUL >>"%InputVideoNoExt%_%codec%_(%CompareBitDepth%).bddata"
+   if not exist "%InputVideoNoExt%_%CsvName%_(%CompareBitDepth%).csv" echo Filename,bitrate,bpp,PSNR_Y,PSNR_Average,SSIM_Y,SSIM_All,VMAF,XPSNR_Y,SSIMULACRA2,fps,Sec,CommandLine>"%InputVideoNoExt%_%CsvName%_(%CompareBitDepth%).csv"
+   echo "%OutputVideo%",%bitrate%,%bpp%,%PSNR_Y%,%PSNR_Average%,%SSIM_Y%,%SSIM_All%,%VMAF%,%XPSNR_Y%,%SSIMULACRA2%,%fps%,%Sec%,"%CommandLine_orig%"|%safetee% -a "%InputVideoNoExt%_%CsvName%_(%CompareBitDepth%).csv" >nul
+   find "('%codec%', %Sec%, '%CsvNameSuffix%', 0, %bitrate%, %VMAF%, %PSNR_Y%, %SSIM_Y%, %XPSNR_Y%, %SSIMULACRA2%)," "%InputVideoNoExt%_%codec%_(%CompareBitDepth%).bddata" >nul 2>&1 || set /P "x=('%codec%', %Sec%, '%CsvNameSuffix%', 0, %bitrate%, %VMAF%, %PSNR_Y%, %SSIM_Y%, %XPSNR_Y%, %SSIMULACRA2%),"<NUL >>"%InputVideoNoExt%_%codec%_(%CompareBitDepth%).bddata"
 )
 
 copy /Y "%InputVideoNoExt%_%CsvName%_(%CompareBitDepth%).csv" "%TEMP%\temp_%random32%.txt">nul
@@ -358,6 +366,7 @@ if not "%enc_error%"=="1" if not "%Compare_error%"=="1" (
    echo PSNR  ^(AVERAGE^)             : %PSNR_Average% ^(%CompareBitDepth%^)
    echo VMAF                        : %VMAF% ^(%CompareBitDepth%^)
    echo XPSNR ^(Y^)                   : %XPSNR_Y% ^(%CompareBitDepth%^)
+   echo SSIMULACRA2                 : %SSIMULACRA2%
    if not "%msec_total%"=="0" if not "%multipass%"=="1" call echo %MessageResultFPS%
    if not "%msec_total%"=="0" if "%multipass%"=="1" call echo %MessageResultFPSMultiPass%
    if not "%msec_total%"=="0" if not "%multipass%"=="1" call echo %MessageResultTime%
